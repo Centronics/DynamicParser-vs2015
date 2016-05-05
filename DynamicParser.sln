@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicParser", "DynamicParser\DynamicParser.csproj", "{DBA31F86-345D-40B7-AF46-BE0488899AEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicParserTest", "DynamicParserTest\DynamicParserTest.csproj", "{57474D91-1CC3-4D42-9CE2-A08902E1083E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DBA31F86-345D-40B7-AF46-BE0488899AEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBA31F86-345D-40B7-AF46-BE0488899AEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBA31F86-345D-40B7-AF46-BE0488899AEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBA31F86-345D-40B7-AF46-BE0488899AEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57474D91-1CC3-4D42-9CE2-A08902E1083E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57474D91-1CC3-4D42-9CE2-A08902E1083E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57474D91-1CC3-4D42-9CE2-A08902E1083E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57474D91-1CC3-4D42-9CE2-A08902E1083E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

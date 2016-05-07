@@ -1,28 +1,29 @@
 ﻿using DynamicProcessor;
-using System.Collections.Generic;
 using System;
-using System.IO;
+using System.Collections.Generic;
 
 namespace DynamicParser
 {
+    public struct AssigmentResult
+    {
+        public int Difference;
+        public int Number;
+
+        public bool IsActual
+        {
+            get
+            {
+                return (Difference >= 0 && Number >= 0);
+            }
+        }
+    }
+
     /// <summary>
     /// Представляет хранилище с координатами фрагментов сканируемого изображения и списками выходных знаков после их разбора.
     /// </summary>
     public class DynamicAssigment
     {
-        public List<List<SignValue>> Objects;
-
-        public List<SignValue> Img1;
-        /// <summary>
-        /// Список знаков разобранного фрагмента, относящегося к второму изображению.
-        /// </summary>
-        public List<SignValue> Img2;
-        /// <summary>
-        /// Список знаков разобранного фрагмента, относящегося к третьему изображению.
-        /// </summary>
-        public List<SignValue> img3;
-
-        public List<Map> ConverterList;
+        public List<Map> ResearchList { get; set; }
 
         /// <summary>
         /// Находит наиболее подходящие друг к другу изображения, сравнивая знаки, содержащиеся в списках, и вычисляя, какое изображение соответствует более всего,
@@ -30,89 +31,36 @@ namespace DynamicParser
         /// возвращается в переменную "count".
         /// </summary>
         /// <param name="assigment">.</param>
-        /// <param name="count">Степень соответствия. Чем больше, тем лучше.</param>
         /// <returns>Возвращает номер наиболее подходящего изображения.</returns>
-        public byte GetBySign(DynamicAssigment assigment, out int count)
+        public AssigmentResult Assign(Map assign)
         {
-            count = 0;
-            if (Img1 == null && Img2 == null && img3 == null)
-                return 0;
-            int i1 = 0, i2 = 0, i3 = 0;
-            for (int k = 0; k < Map.AllMax; k++)
+            if (ResearchList == null)
+                return new AssigmentResult { Difference = -1, Number = -1 };
+            if (ResearchList.Count <= 0)
+                return new AssigmentResult { Difference = -1, Number = -1 };
+            if (assign == null)
+                return new AssigmentResult { Difference = -1, Number = -1 };
+            if (assign.Count <= 0)
+                return new AssigmentResult { Difference = -1, Number = -1 };
+            int size = ResearchList[0].Count;
+            foreach (Map map in ResearchList)
+                if (map.Count != size)
+                    throw new ArgumentException("Карты, содержащиеся в объекте \"ResearchList\" должны быть с одним и тем же количеством объектов");
+            if (assign.Count != size)
+                throw new ArgumentException(
+                    string.Format("Количество объектов на сопоставляемых картах должно быть одинаковым: {0} сопоставляется с {1}", assign, size));
+            int diff = int.MaxValue, number = int.MaxValue;
+            for (int k = 0; k < ResearchList.Count; k++)
             {
-                SignValue sv1 = SignValue.MaxValue, sv2 = SignValue.MaxValue, sv3 = SignValue.MaxValue;
-                if (Img1 != null)
-                    sv1 = Img1[k] - lst1[k];
-                if (Img2 != null)
-                    sv2 = Img2[k] - lst2[k];
-                if (img3 != null)
-                    sv3 = img3[k] - lst3[3];
-                if (sv1 < sv2 && sv1 < sv3)
-                {
-                    i1++;
+                int diffSumm = 0;
+                for (int n = 0; n < ResearchList[k].Count; n++)
+                    diffSumm += (ResearchList[k][n].Sign - assign[n].Sign).Value;
+                if (diffSumm > diff)
                     continue;
-                }
-                if (sv2 < sv1 && sv2 < sv3)
-                {
-                    i2++;
-                    continue;
-                }
-                i3++;
+                diff = diffSumm;
+                number = k;
             }
-            if (i1 > i2 && i1 > i3)
-            {
-                count = i1;
-                return 1;
-            }
-            if (i2 > i1 && i2 > i3)
-            {
-                count = i2;
-                return 2;
-            }
-            count = i3;
-            return 3;
-        }
-
-        /// <summary>
-        /// Находит наиболее соответствующие друг другу изображения: фрагмент исследуемого изображения и входное изображение.
-        /// </summary>
-        /// <param name="img">Список знаков, полученных в результате разбора фрагментов сканируемого изображения.</param>
-        /// <param name="sv1">Список знаков, полученных в результате разбора первого изображения.</param>
-        /// <param name="sv2">Список знаков, полученных в результате разбора второго изображения.</param>
-        /// <param name="sv3">Список знаков, полученных в результате разбора третьего изображения.</param>
-        /// <param name="im1">Результат поиска первого изображения на сканируемом.</param>
-        /// <param name="im2">Результат поиска второго изображения на сканируемом.</param>
-        /// <param name="im3">Результат поиска третьего изображения на сканируемом.</param>
-        public void FindMin(DynamicAssigment assign, out Images? im1, out Images? im2, out Images? im3)
-        {
-            im1 = im2 = im3 = null;
-            for (int k = 0, s1 = 0, s2 = 0, s3 = 0; k < img.Count; k++)
-            {
-                int count;
-                switch (img[k].GetBySign(sv1, sv2, sv3, out count))
-                {
-                    case 1:
-                        if (count <= s1)
-                            break;
-                        s1 = count;
-                        im1 = img[k];
-                        break;
-                    case 2:
-                        if (count <= s2)
-                            break;
-                        s2 = count;
-                        im2 = img[k];
-                        break;
-                    case 3:
-                        if (count <= s3)
-                            break;
-                        s3 = count;
-                        im3 = img[k];
-                        break;
-                    default:
-                        throw new Exception("Неизвестный тип объекта");
-                }
-            }
+            return new AssigmentResult { Difference = diff, Number = number };
         }
 
         public static Map Convert(List<Map> lstConvert)

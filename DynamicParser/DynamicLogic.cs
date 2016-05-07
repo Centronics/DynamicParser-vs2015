@@ -63,46 +63,31 @@ namespace DynamicParser
             return new AssigmentResult { Difference = diff, Number = number };
         }
 
-        public static Map Convert(List<Map> lstConvert)
+        public Map Convert(bool change)
         {
-            if (lstConvert == null)
+            if (ResearchList == null)
                 return null;
-            if (lstConvert.Count <= 0)
+            if (ResearchList.Count <= 0)
                 return null;
             Map curMap = new Map(); SignValue? sv = null;
             for (int n = 0, plus = SignValue.MaxValue.Value / Map.AllMax, p = 0; p < Map.AllMax; n += plus, p++)
             {
-                for (int k = 0; k < lstConvert.Count; k++)
+                for (int k = 0; k < ResearchList.Count; k++)
                 {
-                    Map map = (Map)lstConvert[k].Clone();
+                    Map convertMap = ResearchList[k];
+                    if (convertMap == null)
+                        continue;
+                    if (convertMap.Count <= 0)
+                        continue;
+                    Map map = change ? convertMap : (Map)convertMap.Clone();
                     Processor proc = new Processor(map);
                     SignValue? sv1 = proc.Run(new SignValue(n));
-                    if (sv1 == null)
-                        return null;
                     sv = (sv == null) ? sv1.Value : sv.Value.Average(sv1.Value);
                 }
                 curMap.Add(new MapObject { Sign = sv.Value });
                 sv = null;
             }
             return curMap;
-        }
-
-        /// <summary>
-        /// Осуществляет разбор карт по количеству знаков, равному Map.AllMax. Таким образом, формируются списки выходных знаков.
-        /// </summary>
-        /// <returns></returns>
-        public static Map Combine(Map convert)
-        {
-            if (convert == null)
-                return null;
-            if (convert.Count <= 0)
-                return null;
-            Processor proc = new Processor(convert);
-            Map map = new Map();
-            for (int k = 0, plus = SignValue.MaxValue.Value / Map.AllMax, p = 0; p < Map.AllMax; k += plus, p++)
-                map.Add(new MapObject { Sign = proc.Run(new SignValue(k)).Value });
-            map.ObjectNumeration();
-            return map;
         }
     }
 }

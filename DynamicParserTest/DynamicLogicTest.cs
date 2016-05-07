@@ -7,7 +7,7 @@ namespace DynamicParserTest
     public class DynamicLogicTest
     {
         [TestMethod]
-        public void TestMethod1()
+        public void AssignTest()
         {
 
         }

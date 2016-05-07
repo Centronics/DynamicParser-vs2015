@@ -4,17 +4,15 @@ using System.Collections.Generic;
 
 namespace DynamicParser
 {
-    public struct AssigmentResult
+    public class AssigmentResult
     {
-        public int Difference;
-        public int Number;
+        public int Difference { get; set; }
+        public int Number { get; set; }
 
-        public bool IsActual
+        public AssigmentResult()
         {
-            get
-            {
-                return (Difference >= 0 && Number >= 0);
-            }
+            Difference = -1;
+            Number = -1;
         }
     }
 
@@ -24,6 +22,11 @@ namespace DynamicParser
     public class DynamicAssigment
     {
         public List<Map> ResearchList { get; set; }
+
+        public DynamicAssigment()
+        {
+            ResearchList = new List<Map>();
+        }
 
         /// <summary>
         /// Находит наиболее подходящие друг к другу изображения, сравнивая знаки, содержащиеся в списках, и вычисляя, какое изображение соответствует более всего,
@@ -35,20 +38,23 @@ namespace DynamicParser
         public AssigmentResult Assign(Map assign)
         {
             if (ResearchList == null)
-                return new AssigmentResult { Difference = -1, Number = -1 };
+                return null;
             if (ResearchList.Count <= 0)
-                return new AssigmentResult { Difference = -1, Number = -1 };
+                return null;
             if (assign == null)
-                return new AssigmentResult { Difference = -1, Number = -1 };
+                return null;
             if (assign.Count <= 0)
-                return new AssigmentResult { Difference = -1, Number = -1 };
-            int size = ResearchList[0].Count;
+                return null;
+            int size = (ResearchList[0] == null) ? 0 : ResearchList[0].Count;
             foreach (Map map in ResearchList)
-                if (map.Count != size)
-                    throw new ArgumentException("Карты, содержащиеся в объекте \"ResearchList\" должны быть с одним и тем же количеством объектов");
+                if (map != null)
+                    if (map.Count != size)
+                        throw new ArgumentException("Карты, содержащиеся в объекте \"ResearchList\" должны быть с одним и тем же количеством объектов");
             if (assign.Count != size)
                 throw new ArgumentException(
                     string.Format("Количество объектов на сопоставляемых картах должно быть одинаковым: {0} сопоставляется с {1}", assign, size));
+            if (assign.Count <= 0 || size <= 0)
+                throw new ArgumentException("Количество объектов на сопоставляемых картах должно быть больше нуля");
             int diff = int.MaxValue, number = int.MaxValue;
             for (int k = 0; k < ResearchList.Count; k++)
             {
@@ -63,7 +69,7 @@ namespace DynamicParser
             return new AssigmentResult { Difference = diff, Number = number };
         }
 
-        public Map Convert(bool change)
+        public Map Convert()
         {
             if (ResearchList == null)
                 return null;
@@ -72,14 +78,12 @@ namespace DynamicParser
             Map curMap = new Map(); SignValue? sv = null;
             for (int n = 0, plus = SignValue.MaxValue.Value / Map.AllMax, p = 0; p < Map.AllMax; n += plus, p++)
             {
-                for (int k = 0; k < ResearchList.Count; k++)
+                foreach (Map map in ResearchList)
                 {
-                    Map convertMap = ResearchList[k];
-                    if (convertMap == null)
+                    if (map == null)
                         continue;
-                    if (convertMap.Count <= 0)
+                    if (map.Count <= 0)
                         continue;
-                    Map map = change ? convertMap : (Map)convertMap.Clone();
                     Processor proc = new Processor(map);
                     SignValue? sv1 = proc.Run(new SignValue(n));
                     sv = (sv == null) ? sv1.Value : sv.Value.Average(sv1.Value);

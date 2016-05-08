@@ -46,15 +46,20 @@ namespace DynamicParser
             if (assign.Count <= 0)
                 return null;
             int size = (ResearchList[0] == null) ? 0 : ResearchList[0].Count;
+            if (size <= 0)
+                throw new ArgumentException("Количество объектов на сопоставляемых картах должно быть больше нуля");
             foreach (Map map in ResearchList)
-                if (map != null)
-                    if (map.Count != size)
-                        throw new ArgumentException("Карты, содержащиеся в объекте \"ResearchList\" должны быть с одним и тем же количеством объектов");
+            {
+                if (map == null)
+                    continue;
+                if (map.Count <= 0)
+                    throw new ArgumentException("Количество объектов на сопоставляемых картах должно быть больше нуля");
+                if (map.Count != size)
+                    throw new ArgumentException("Карты, содержащиеся в объекте \"ResearchList\" должны быть с одним и тем же количеством объектов");
+            }
             if (assign.Count != size)
                 throw new ArgumentException(
                     string.Format("Количество объектов на сопоставляемых картах должно быть одинаковым: {0} сопоставляется с {1}", assign, size));
-            if (assign.Count <= 0 || size <= 0)
-                throw new ArgumentException("Количество объектов на сопоставляемых картах должно быть больше нуля");
             int diff = int.MaxValue, number = int.MaxValue;
             for (int k = 0; k < ResearchList.Count; k++)
             {
@@ -65,6 +70,8 @@ namespace DynamicParser
                     continue;
                 diff = diffSumm;
                 number = k;
+                if (diff == 0)
+                    break;
             }
             return new AssigmentResult { Difference = diff, Number = number };
         }
@@ -84,10 +91,12 @@ namespace DynamicParser
                         continue;
                     if (map.Count <= 0)
                         continue;
-                    Processor proc = new Processor(map);
+                    Processor proc = new Processor((Map)map.Clone());
                     SignValue? sv1 = proc.Run(new SignValue(n));
                     sv = (sv == null) ? sv1.Value : sv.Value.Average(sv1.Value);
                 }
+                if (sv == null)
+                    break;
                 curMap.Add(new MapObject { Sign = sv.Value });
                 sv = null;
             }

@@ -3,6 +3,8 @@ using DynamicProcessor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 
 namespace DynamicParserTest
 {
@@ -30,8 +32,13 @@ namespace DynamicParserTest
             map1.Add(new MapObject { Sign = new SignValue(600) });
             da.ResearchList.Add(map);
             da.ResearchList.Add(map1);
-            da.Convert();
-            //проверить значения
+            Map retMap = da.Convert();
+            Assert.AreEqual(40, retMap.Count);
+            Assert.AreEqual(0, retMap.CountDiscounted);
+            Assert.AreEqual(100, map[0].Sign.Value);
+            Assert.AreEqual(200, map[1].Sign.Value);
+            Assert.AreEqual(500, map1[0].Sign.Value);
+            Assert.AreEqual(600, map1[1].Sign.Value);
         }
 
         [TestMethod]
@@ -149,7 +156,9 @@ namespace DynamicParserTest
             testMap.Add(new MapObject { Sign = new SignValue(5000) });
             DynamicAssigment da = new DynamicAssigment();
             da.ResearchList.Add(testMap);
-            da.Assign(new Map());
+            Map tstMap = new Map();
+            tstMap.Add(new MapObject { Sign = new SignValue(1000) });
+            da.Assign(tstMap);
         }
 
         [TestMethod]
@@ -171,9 +180,17 @@ namespace DynamicParserTest
         public void AssignTest6()
         {
             DynamicAssigment da = new DynamicAssigment();
+            Map testMap = new Map();
+            testMap.Add(new MapObject { Sign = new SignValue(1000) });
+            testMap.Add(new MapObject { Sign = new SignValue(5000) });
+            testMap.Add(new MapObject { Sign = new SignValue(5000) });
+            da.ResearchList.Add(testMap);
             da.ResearchList.Add(new Map());
-            da.ResearchList.Add(new Map());
-            da.Assign(new Map());
+            testMap = new Map();
+            testMap.Add(new MapObject { Sign = new SignValue(1000) });
+            testMap.Add(new MapObject { Sign = new SignValue(5000) });
+            testMap.Add(new MapObject { Sign = new SignValue(5000) });
+            da.Assign(testMap);
         }
 
         [TestMethod]
@@ -182,7 +199,11 @@ namespace DynamicParserTest
         {
             DynamicAssigment da = new DynamicAssigment();
             da.ResearchList.Add(null);
-            da.Assign(new Map());
+            Map testMap = new Map();
+            testMap.Add(new MapObject { Sign = new SignValue(1000) });
+            testMap.Add(new MapObject { Sign = new SignValue(5000) });
+            testMap.Add(new MapObject { Sign = new SignValue(5000) });
+            da.Assign(testMap);
         }
     }
 }

@@ -4,18 +4,6 @@ using System.Collections.Generic;
 
 namespace DynamicParser
 {
-    public class AssigmentResult
-    {
-        public int Difference { get; set; }
-        public int Number { get; set; }
-
-        public AssigmentResult()
-        {
-            Difference = -1;
-            Number = -1;
-        }
-    }
-
     /// <summary>
     /// Представляет хранилище с координатами фрагментов сканируемого изображения и списками выходных знаков после их разбора.
     /// </summary>
@@ -35,16 +23,16 @@ namespace DynamicParser
         /// </summary>
         /// <param name="assigment">.</param>
         /// <returns>Возвращает номер наиболее подходящего изображения.</returns>
-        public AssigmentResult Assign(Map assign)
+        public int Assign(Map assign)
         {
             if (ResearchList == null)
-                return null;
+                return -1;
             if (ResearchList.Count <= 0)
-                return null;
+                return -1;
             if (assign == null)
-                return null;
+                return -1;
             if (assign.Count <= 0)
-                return null;
+                return -1;
             int size = (ResearchList[0] == null) ? 0 : ResearchList[0].Count;
             if (size <= 0)
                 throw new ArgumentException("Количество объектов на сопоставляемых картах должно быть больше нуля");
@@ -60,20 +48,39 @@ namespace DynamicParser
             if (assign.Count != size)
                 throw new ArgumentException(
                     string.Format("Количество объектов на сопоставляемых картах должно быть одинаковым: {0} сопоставляется с {1}", assign, size));
-            int diff = int.MaxValue, number = int.MaxValue;
-            for (int k = 0; k < ResearchList.Count; k++)
+            List<int> lstSv = new List<int>(size);
+            for (int j = 0; j < size; j++)
             {
-                int diffSumm = 0;
-                for (int n = 0; n < ResearchList[k].Count; n++)
-                    diffSumm += (ResearchList[k][n].Sign - assign[n].Sign).Value;
-                if (diffSumm > diff)
-                    continue;
-                diff = diffSumm;
-                number = k;
-                if (diff == 0)
-                    break;
+                int diffSumm = int.MaxValue, diffNum = int.MaxValue;
+                for (int k = 0; k < ResearchList.Count; k++)
+                {
+                    int d = (ResearchList[k][j].Sign - assign[j].Sign).Value;
+                    if (d > diffSumm)
+                        continue;
+                    diffNum = k;
+                    diffSumm = d;
+                    if (diffSumm <= 0)
+                        break;
+                }
+                lstSv.Add(diffNum);
             }
-            return new AssigmentResult { Difference = diff, Number = number };
+            List<int> lstMax = new List<int>(size);
+            for (int k = 0, count = 0; k < lstSv.Count; k++)
+            {
+                for (int n = 0; n < lstSv.Count; n++)
+                    if (lstSv[k] == lstSv[n])
+                        count++;
+                lstMax.Add(count);
+                count = 0;
+            }
+            int maxSv = 0, maxNum = 0;
+            for (int k = 0; k < lstMax.Count; k++)
+                if (lstMax[k] >= maxSv)
+                {
+                    maxSv = lstMax[k];
+                    maxNum = k;
+                }
+            return lstSv[maxNum];
         }
 
         public Map Convert()

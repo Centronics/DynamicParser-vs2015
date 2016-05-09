@@ -46,14 +46,14 @@ namespace DynamicParserTest
         {
             DynamicAssigment da = new DynamicAssigment();
             da.ResearchList = null;
-            Assert.AreEqual(null, da.Assign(new Map()));
+            Assert.AreEqual(-1, da.Assign(new Map()));
             da.ResearchList = new List<Map>();
             da.ResearchList.Add(null);
-            Assert.AreEqual(null, da.Assign(null));
+            Assert.AreEqual(-1, da.Assign(null));
             Map tstMap = new Map();
             tstMap.Add(new MapObject());
             da.ResearchList.Add(tstMap);
-            Assert.AreEqual(null, da.Assign(null));
+            Assert.AreEqual(-1, da.Assign(null));
             Map map1 = new Map();
             map1.Add(new MapObject { Sign = new SignValue(2000) });
             map1.Add(new MapObject { Sign = new SignValue(3000) });
@@ -79,18 +79,24 @@ namespace DynamicParserTest
             Map tst4 = new Map();
             tst4.Add(new MapObject { Sign = new SignValue(2000) });
             tst4.Add(new MapObject { Sign = new SignValue(500) });
-            AssigmentResult ar = da.Assign(tst1);
-            Assert.AreEqual(0, ar.Difference);
-            Assert.AreEqual(0, ar.Number);
+            Map tst5 = new Map();
+            tst5.Add(new MapObject { Sign = new SignValue(9000) });
+            tst5.Add(new MapObject { Sign = new SignValue(500) });
+            Map tst6 = new Map();
+            tst6.Add(new MapObject { Sign = new SignValue(300) });
+            tst6.Add(new MapObject { Sign = new SignValue(500) });
+            int ar = da.Assign(tst1);
+            Assert.AreEqual(0, ar);
             ar = da.Assign(tst2);
-            Assert.AreEqual(0, ar.Difference);
-            Assert.AreEqual(1, ar.Number);
+            Assert.AreEqual(1, ar);
             ar = da.Assign(tst3);
-            Assert.AreEqual(0, ar.Difference);
-            Assert.AreEqual(2, ar.Number);
+            Assert.AreEqual(2, ar);
             ar = da.Assign(tst4);
-            Assert.AreEqual(1000, ar.Difference);
-            Assert.AreEqual(1, ar.Number);
+            Assert.AreEqual(1, ar);
+            ar = da.Assign(tst5);
+            Assert.AreEqual(1, ar);
+            ar = da.Assign(tst6);
+            Assert.AreEqual(1, ar);
         }
 
         [TestMethod]

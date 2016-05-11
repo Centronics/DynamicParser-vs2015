@@ -83,31 +83,35 @@ namespace DynamicParser
             return lstSv[maxNum];
         }
 
-        public Map Convert()
+        public SignValue? Convert(SignValue sv, int count)
         {
             if (ResearchList == null)
                 return null;
             if (ResearchList.Count <= 0)
                 return null;
-            Map curMap = new Map(); SignValue? sv = null;
-            for (int n = 0, plus = SignValue.MaxValue.Value / Map.AllMax, p = 0; p < Map.AllMax; n += plus, p++)
-            {
+            SignValue? res = null;
+            for (int k = 0; k < count; k++)
                 foreach (Map map in ResearchList)
                 {
                     if (map == null)
                         continue;
                     if (map.Count <= 0)
                         continue;
-                    Processor proc = new Processor((Map)map.Clone());
-                    SignValue? sv1 = proc.Run(new SignValue(n));
-                    sv = (sv == null) ? sv1.Value : sv.Value.Average(sv1.Value);
+                    SignValue? sres = (new Processor(map)).Run(sv);
+                    res = (res == null) ? sres.Value : res.Value.Average(sres.Value);
                 }
-                if (sv == null)
-                    break;
-                curMap.Add(new MapObject { Sign = sv.Value });
-                sv = null;
-            }
-            return curMap;
+            return res;
+        }
+
+        public static void Convert(Map map, SignValue sv, int count)
+        {
+            if (map == null)
+                return;
+            if (map.Count == 0)
+                return;
+            Processor proc = new Processor(map);
+            for (int k = 0; k < count; k++)
+                proc.Run(sv);
         }
     }
 }

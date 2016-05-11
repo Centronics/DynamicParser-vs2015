@@ -15,15 +15,15 @@ namespace DynamicParserTest
         public void ConvertTest()
         {
             DynamicAssigment da = new DynamicAssigment();
-            Assert.AreEqual(null, da.Convert());
+            Assert.AreEqual(null, da.Convert(new SignValue(0), 100));
             da.ResearchList = null;
-            Assert.AreEqual(null, da.Convert());
+            Assert.AreEqual(null, da.Convert(new SignValue(0), 100));
             da.ResearchList = new List<Map>();
-            Assert.AreEqual(null, da.Convert());
+            Assert.AreEqual(null, da.Convert(new SignValue(0), 100));
             da.ResearchList = new List<Map>();
             da.ResearchList.Add(null);
             da.ResearchList.Add(new Map());
-            Assert.AreEqual(0, da.Convert().Count);
+            Assert.AreEqual(null, da.Convert(new SignValue(0), 100));
             Map map = new Map();
             map.Add(new MapObject { Sign = new SignValue(100) });
             map.Add(new MapObject { Sign = new SignValue(200) });
@@ -32,13 +32,46 @@ namespace DynamicParserTest
             map1.Add(new MapObject { Sign = new SignValue(600) });
             da.ResearchList.Add(map);
             da.ResearchList.Add(map1);
-            Map retMap = da.Convert();
-            Assert.AreEqual(40, retMap.Count);
-            Assert.AreEqual(0, retMap.CountDiscounted);
-            Assert.AreEqual(100, map[0].Sign.Value);
-            Assert.AreEqual(200, map[1].Sign.Value);
-            Assert.AreEqual(500, map1[0].Sign.Value);
-            Assert.AreEqual(600, map1[1].Sign.Value);
+            SignValue? retVal = da.Convert(new SignValue(1000), 1);
+            Assert.AreNotEqual(null, retVal);
+            Assert.AreEqual(500, retVal.Value.Value);
+            Assert.AreEqual(350, map[0].Sign.Value);
+            Assert.AreEqual(600, map[1].Sign.Value);
+            Assert.AreEqual(650, map1[0].Sign.Value);
+            Assert.AreEqual(800, map1[1].Sign.Value);
+        }
+
+        [TestMethod]
+        public void ConvertMapTest()
+        {
+            Map map = new Map();
+            for (int n = 0, plus = SignValue.MaxValue.Value / Map.AllMax, p = 0; p < Map.AllMax; n += plus, p++)
+                map.Add(new MapObject { Sign = new SignValue(n + 10) });
+
+            Assert.AreEqual(40, map.Count);
+
+            using (FileStream fs = new FileStream("C:\\mapДо.xml", FileMode.Create))
+            {
+                map.ObjectNumeration();
+                map.ToStream(fs);
+            }
+
+            //Map mapNew = null;
+            //for (int k = 0; k < 100; k++)
+            //mapNew = DynamicAssigment.Convert(map, true, new SignValue(100), 100);
+            DynamicAssigment.Convert(map, new SignValue(100), 80);
+
+            //using (FileStream fs = new FileStream("C:\\mapНовая.xml", FileMode.Create))
+            //{
+            //    mapNew.ObjectNumeration();
+            //    mapNew.ToStream(fs);
+            //}
+
+            using (FileStream fs = new FileStream("C:\\mapПосле.xml", FileMode.Create))
+            {
+                map.ObjectNumeration();
+                map.ToStream(fs);
+            }
         }
 
         [TestMethod]

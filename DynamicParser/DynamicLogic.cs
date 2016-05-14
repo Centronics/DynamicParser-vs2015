@@ -1,6 +1,7 @@
 ﻿using DynamicProcessor;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DynamicParser
 {
@@ -103,15 +104,32 @@ namespace DynamicParser
             return res;
         }
 
-        public static void Convert(Map map, SignValue sv, int count)
+        /// <summary>
+        /// Преобразует изображение в список знаков, размера, меньшего или равного Map.AllMax, чтобы уместить их на карту.
+        /// При этом, каждый знак, добавляемый в список, проходит прогон по определённому знаку.
+        /// Количество знаков для прогонов зависит от размера изображения.
+        /// </summary>
+        /// <param name="target">Преобразуемое изображение.</param>
+        /// <returns>Возвращает список знаков, размера, меньшего или равного Map.AllMax.</returns>
+        public static List<Map> GetMaps(List<SignValue> lst, SignValue? sv, int count)
         {
-            if (map == null)
-                return;
-            if (map.Count == 0)
-                return;
-            Processor proc = new Processor(map);
-            for (int k = 0; k < count; k++)
-                proc.Run(sv);
+            if (count <= 0)
+                throw new ArgumentException("Количество объектов, добавляемых на карту, не может быть меньше или равно нулю", "count");
+            if (count > Map.AllMax)
+                throw new ArgumentException("Количество объектов, добавляемых на карту, не может быть больше Map.Allmax", "count");
+            if (lst == null)
+                throw new ArgumentNullException("lst", "Список знаков не может быть null");
+            if (lst.Count <= 0)
+                throw new ArgumentNullException("lst", "Список знаков не может быть пустым");
+            List<Map> lstMap = new List<Map>();
+            for (int n = 0; n < lst.Count; )
+            {
+                Map map = new Map();
+                for (int k = 0; k < count; k++, n++)
+                    map.Add(new MapObject { Sign = (sv == null) ? lst[n] : sv.Value.Average(lst[n]) });
+                lstMap.Add(map);
+            }
+            return lstMap;
         }
     }
 }

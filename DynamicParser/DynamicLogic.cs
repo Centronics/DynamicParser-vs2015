@@ -84,24 +84,53 @@ namespace DynamicParser
             return lstSv[maxNum];
         }
 
-        public SignValue? Convert(SignValue sv, int count)
+        public SignValue? Convert(SignValue sv)
         {
             if (ResearchList == null)
                 return null;
             if (ResearchList.Count <= 0)
                 return null;
             SignValue? res = null;
-            for (int k = 0; k < count; k++)
-                foreach (Map map in ResearchList)
-                {
-                    if (map == null)
-                        continue;
-                    if (map.Count <= 0)
-                        continue;
-                    SignValue? sres = (new Processor(map)).Run(sv);
-                    res = (res == null) ? sres.Value : res.Value.Average(sres.Value);
-                }
+            foreach (Map map in ResearchList)
+            {
+                if (map == null)
+                    continue;
+                if (map.Count <= 0)
+                    continue;
+                SignValue? sres = (new Processor(map)).Run(sv);
+                res = (res == null) ? sres.Value : res.Value.Average(sres.Value);
+            }
             return res;
+        }
+
+        public DynamicAssigment AssignList(Map mapAssign, List<SignValue> lstMain)
+        {
+            if (mapAssign == null)
+                throw new ArgumentNullException("mapAssign", "AssignList: Карта должна быть указана");
+            if (lstMain == null)
+                throw new ArgumentNullException("lstMain", "AssignList: Список знаков должен быть указан");
+            if (mapAssign.Count <= 0 || lstMain.Count <= 0)
+                return null;
+            DynamicAssigment lst = new DynamicAssigment();
+            foreach (SignValue sv in lstMain)
+            {
+                Map nMap = (Map)mapAssign.Clone();
+                Processor proc = new Processor(nMap);
+                proc.Run(sv);
+                lst.ResearchList.Add(nMap);
+            }
+            return lst;
+        }
+
+        public static List<SignValue> GetSigns(int count)
+        {
+            if (count > SignValue.MaxValue.Value || count < SignValue.MinValue.Value)
+                throw new ArgumentException("Параметр находится вне допустимого диапазона", "count");
+            List<SignValue> lst = new List<SignValue>();
+            int plus = SignValue.MaxValue.Value / count;
+            for (int k = 0; k < count; k++)
+                lst.Add(new SignValue(plus * k));
+            return lst;
         }
 
         /// <summary>
@@ -111,7 +140,7 @@ namespace DynamicParser
         /// </summary>
         /// <param name="target">Преобразуемое изображение.</param>
         /// <returns>Возвращает список знаков, размера, меньшего или равного Map.AllMax.</returns>
-        public static List<Map> GetMaps(List<SignValue> lst, SignValue? sv, int count)
+        public static DynamicAssigment GetMaps(List<SignValue> lst, int count)
         {
             if (count <= 0)
                 throw new ArgumentException("Количество объектов, добавляемых на карту, не может быть меньше или равно нулю", "count");
@@ -126,10 +155,10 @@ namespace DynamicParser
             {
                 Map map = new Map();
                 for (int k = 0; k < count; k++, n++)
-                    map.Add(new MapObject { Sign = (sv == null) ? lst[n] : sv.Value.Average(lst[n]) });
+                    map.Add(new MapObject { Sign = lst[n] });
                 lstMap.Add(map);
             }
-            return lstMap;
+            return new DynamicAssigment { ResearchList = lstMap };
         }
     }
 }

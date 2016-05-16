@@ -8,7 +8,7 @@ namespace DynamicParser
     /// <summary>
     /// Представляет хранилище с координатами фрагментов сканируемого изображения и списками выходных знаков после их разбора.
     /// </summary>
-    public class DynamicAssigment
+    public class DynamicAssigment : ICloneable
     {
         public List<Map> ResearchList { get; set; }
 
@@ -103,7 +103,23 @@ namespace DynamicParser
             return res;
         }
 
-        public DynamicAssigment AssignList(Map mapAssign, List<SignValue> lstMain)
+        public SortedDictionary<SignValue, DynamicAssigment> ConvertRange(List<SignValue> lst)
+        {
+            if (lst == null)
+                throw new ArgumentNullException("lst", "Список знаков для прогона должен быть указан");
+            if (lst.Count <= 0)
+                return null;
+            SortedDictionary<SignValue, DynamicAssigment> dic = new SortedDictionary<SignValue, DynamicAssigment>();
+            foreach (SignValue sv in lst)
+            {
+                DynamicAssigment d = (DynamicAssigment)Clone();
+                d.Convert(sv);
+                dic.Add(sv, d);
+            }
+            return dic;
+        }
+
+        /*public static DynamicAssigment AssignList(Map mapAssign, List<SignValue> lstMain)
         {
             if (mapAssign == null)
                 throw new ArgumentNullException("mapAssign", "AssignList: Карта должна быть указана");
@@ -120,7 +136,7 @@ namespace DynamicParser
                 lst.ResearchList.Add(nMap);
             }
             return lst;
-        }
+        }*/
 
         public static List<SignValue> GetSigns(int count)
         {
@@ -159,6 +175,22 @@ namespace DynamicParser
                 lstMap.Add(map);
             }
             return new DynamicAssigment { ResearchList = lstMap };
+        }
+
+        public object Clone()
+        {
+            if (ResearchList == null)
+                return null;
+            if (ResearchList.Count <= 0)
+                return new DynamicAssigment();
+            List<Map> lst = new List<Map>();
+            foreach (Map map in ResearchList)
+            {
+                if (map == null)
+                    lst.Add(null);
+                lst.Add((Map)map.Clone());
+            }
+            return new DynamicAssigment { ResearchList = lst };
         }
     }
 }

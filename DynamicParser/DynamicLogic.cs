@@ -5,12 +5,66 @@ using System.Linq;
 
 namespace DynamicParser
 {
+    public class MapQuad
+    {
+        public int Mx { get; private set; }
+        public int My { get; private set; }
+        public List<SignValue> Signs { get; private set; }
+
+        public MapQuad(List<SignValue> lst, int mx, int my)
+        {
+            bool lstOk = lst != null;
+            if (lstOk)
+                lstOk = lst.Count > 0;
+            if (mx <= 0 || my <= 0 || !lstOk)
+                throw new ArgumentException(string.Format("MapQuad: некорректные значения аргументов: x = {0}, y = {1}, lst = {2}",
+                    mx, my, lst == null ? "null" : lst.Count.ToString()));
+            if (lst.Count != mx * my)
+                throw new ArgumentException(string.Format("MapQuad: длина списка знаков не равна (mx * my): {0} против {1}", lst.Count, mx * my));
+            Mx = mx;
+            My = my;
+            Signs = lst;
+        }
+
+        public SignValue GetSign(int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= Mx || y >= My)
+                throw new ArgumentException(string.Format("GetSign: некорректные параметры для получения знака: x = {0}, y = {1}", x, y));
+            return Signs[(y * Mx) + x];
+        }
+
+        public MapQuad GetQuad(int x, int y, int sx, int sy)
+        {
+            if (x >= Mx || y >= My || x < 0 || y < 0 || sx < 0 || sy < 0 || x + sx >= Mx || y + sy >= My)
+                throw new ArgumentException(string.Format(@"Некорректные параметры получения квадратной карты: x = {0}, y = {1}, sx = {2}, sy = {3},
+Mx = {4}, My = {5}, Signs.Count = {6}", x, y, sx, sy, Mx, My, Signs.Count.ToString()));
+            List<SignValue> lst = new List<SignValue>();
+            for (; y < sy; y++)
+                for (; x < sx; x++)
+                    lst.Add(GetSign(x, y));
+            return new MapQuad(lst, sx, sy);
+        }
+
+        public MapQuad[,] GetAllQuad(int sx, int sy)
+        {
+            if (sx > Mx || sy > My)
+                throw new ArgumentException(string.Format("GetAllQuad: некорректные параметры: sx = {0}, Mx = {1}, sy = {2}, My = {3}", sx, Mx, sy, My));
+            int mx = (Mx - sx) + 1, my = (My - sy) + 1;
+            MapQuad[,] mas = new MapQuad[mx, my];
+            for (int y = 0; y < my; y++)
+                for (int x = 0; x < mx; x++)
+                    mas[x, y] = GetQuad(x, y, sx, sy);
+            return mas;
+        }
+    }
+
     /// <summary>
     /// Представляет хранилище с координатами фрагментов сканируемого изображения и списками выходных знаков после их разбора.
     /// </summary>
     public class DynamicAssigment : ICloneable
     {
         public List<Map> ResearchList { get; set; }
+        public SignValue? ConvertedSign { get; private set; }
 
         public DynamicAssigment()
         {
@@ -100,6 +154,7 @@ namespace DynamicParser
                 SignValue? sres = (new Processor(map)).Run(sv);
                 res = (res == null) ? sres.Value : res.Value.Average(sres.Value);
             }
+            ConvertedSign = res;
             return res;
         }
 
@@ -119,24 +174,25 @@ namespace DynamicParser
             return dic;
         }
 
-        /*public static DynamicAssigment AssignList(Map mapAssign, List<SignValue> lstMain)
+        public static Map ToMap(SortedDictionary<SignValue, DynamicAssigment> lst)
         {
-            if (mapAssign == null)
-                throw new ArgumentNullException("mapAssign", "AssignList: Карта должна быть указана");
-            if (lstMain == null)
-                throw new ArgumentNullException("lstMain", "AssignList: Список знаков должен быть указан");
-            if (mapAssign.Count <= 0 || lstMain.Count <= 0)
+            if (lst == null)
+                throw new ArgumentNullException("lst", "ToMap: lst не может быть null");
+            if (lst.Count > Map.AllMax)
+                throw new ArgumentException(string.Format("ToMap: Количество знаков в списке больше максимального размера карты: {0}", Map.AllMax, "lst"));
+            if (lst.Count <= 0)
                 return null;
-            DynamicAssigment lst = new DynamicAssigment();
-            foreach (SignValue sv in lstMain)
+            Map map = new Map();
+            foreach (DynamicAssigment ds in lst.Values)
             {
-                Map nMap = (Map)mapAssign.Clone();
-                Processor proc = new Processor(nMap);
-                proc.Run(sv);
-                lst.ResearchList.Add(nMap);
+                if (ds == null)
+                    continue;
+                if (ds.ConvertedSign == null)
+                    throw new ArgumentException("ToMap: ConvertedSign должен быть указан");
+                map.Add(new MapObject { Sign = ds.ConvertedSign.Value });
             }
-            return lst;
-        }*/
+            return map;
+        }
 
         public static List<SignValue> GetSigns(int count)
         {

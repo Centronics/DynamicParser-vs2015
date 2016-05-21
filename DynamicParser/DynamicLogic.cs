@@ -41,19 +41,21 @@ namespace DynamicParser
             return maxNum;
         }
 
-        public Assigned Compare(DynamicMapCreator dmc)
+        public Assigned Compare(Mapping dmc)
         {
             if (Assigment == null)
                 throw new ArgumentException("Mapping.Compare: Assigment не может быть пустым");
+            if (Assigment.Length <= 0)
+                throw new ArgumentException("Mapping.Compare: Количество прогонов в основном объекте должно быть больше нуля (Count = 0)", "dmc");
             if (dmc == null)
                 throw new ArgumentNullException("dmc", "Mapping.Compare: Assigment не может быть пустым (null)");
-            if (dmc.Dictionary.Count <= 0)
-                throw new ArgumentException("Mapping.Compare: dmc не может быть пустым (Count = 0)", "dmc");
+            if (dmc.Assigment.Length != 1)
+                throw new ArgumentException("Mapping.Compare: Количество прогонов в сопоставляемом объекте должно быть равно одному (Count = 1)", "dmc");
             List<List<SignValue>> lst = new List<List<SignValue>>();
             int mx = Assigment.GetLength(0);
             for (int y = 0, my = Assigment.GetLength(1); y < my; y++)
                 for (int x = 0; x < mx; x++)
-                    lst.Add(Assigment[x, y].Compare(dmc));
+                    lst.Add(Assigment[x, y].Compare(dmc.Assigment[0, 0]));
             int eq;
             int num = Equal(lst, out eq);
             return new Assigned
@@ -108,6 +110,14 @@ namespace DynamicParser
             Signs = lst;
         }
 
+        public MapCube Cube
+        {
+            get
+            {
+                return GetAllQuad(Mx, My);
+            }
+        }
+
         public SignValue GetSign(int x, int y)
         {
             if (x < 0 || y < 0 || x >= Mx || y >= My)
@@ -115,7 +125,7 @@ namespace DynamicParser
             return Signs[(y * Mx) + x];
         }
 
-        public MapQuad GetQuad(int x, int y, int sx, int sy)
+        MapQuad GetQuad(int x, int y, int sx, int sy)
         {
             if (x >= Mx || y >= My || x < 0 || y < 0 || sx < 0 || sy < 0 || x + sx >= Mx || y + sy >= My)
                 throw new ArgumentException(string.Format(@"Некорректные параметры получения квадратной карты: x = {0}, y = {1}, sx = {2}, sy = {3},

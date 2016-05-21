@@ -5,6 +5,88 @@ using System.Linq;
 
 namespace DynamicParser
 {
+    public struct Assigned
+    {
+        public int X, Y, Equal;
+    }
+
+    public class Mapping
+    {
+        public DynamicMapCreator[,] Assigment { get; set; }
+
+        public Mapping()
+        {
+            Assigment = new DynamicMapCreator[0, 0];
+        }
+
+        int Equal(List<List<SignValue>> lstSv, out int equal)
+        {
+            List<int> lstMax = new List<int>(lstSv.Count);
+            for (int k = 0, count = 0; k < lstSv.Count; k++)
+            {
+                for (int n = 0; n < lstSv.Count; n++)
+                    if (lstSv[k] == lstSv[n])
+                        count++;
+                lstMax.Add(count);
+                count = 0;
+            }
+            int maxSv = 0, maxNum = 0;
+            for (int k = 0; k < lstMax.Count; k++)
+                if (lstMax[k] >= maxSv)
+                {
+                    maxSv = lstMax[k];
+                    maxNum = k;
+                }
+            equal = maxSv;
+            return maxNum;
+        }
+
+        public Assigned Compare(DynamicMapCreator dmc)
+        {
+            if (Assigment == null)
+                throw new ArgumentException("Mapping.Compare: Assigment не может быть пустым");
+            if (dmc == null)
+                throw new ArgumentNullException("dmc", "Mapping.Compare: Assigment не может быть пустым (null)");
+            if (dmc.Dictionary.Count <= 0)
+                throw new ArgumentException("Mapping.Compare: dmc не может быть пустым (Count = 0)", "dmc");
+            List<List<SignValue>> lst = new List<List<SignValue>>();
+            int mx = Assigment.GetLength(0);
+            for (int y = 0, my = Assigment.GetLength(1); y < my; y++)
+                for (int x = 0; x < mx; x++)
+                    lst.Add(Assigment[x, y].Compare(dmc));
+            int eq;
+            int num = Equal(lst, out eq);
+            return new Assigned
+            {
+                Equal = eq,
+                X = num % mx,
+                Y = num / mx
+            };
+        }
+    }
+
+    public class MapCube
+    {
+        public MapQuad[,] Cube { get; set; }
+        public DynamicAssigment[,] Assign { get; set; }
+
+        public MapCube()
+        {
+            Cube = new MapQuad[0, 0];
+            Assign = new DynamicAssigment[0, 0];
+        }
+
+        public Mapping Mapping(List<SignValue> signs)
+        {
+            DynamicMapCreator[,] assigment = new DynamicMapCreator[Cube.GetLength(0), Cube.GetLength(1)];
+            Assign = new DynamicAssigment[Cube.GetLength(0), Cube.GetLength(1)];
+            for (int y = 0, my = Cube.GetLength(1); y < my; y++)
+                for (int x = 0, mx = Cube.GetLength(0); x < mx; x++)
+                    assigment[x, y] = (Assign[x, y] = new DynamicAssigment(Cube[x, y].Signs, 2)).ConvertRange(signs);
+            return new Mapping { Assigment = assigment };
+        }
+    }
+
     public class MapQuad
     {
         public int Mx { get; private set; }
@@ -45,7 +127,7 @@ Mx = {4}, My = {5}, Signs.Count = {6}", x, y, sx, sy, Mx, My, Signs.Count.ToStri
             return new MapQuad(lst, sx, sy);
         }
 
-        public MapQuad[,] GetAllQuad(int sx, int sy)
+        public MapCube GetAllQuad(int sx, int sy)
         {
             if (sx > Mx || sy > My)
                 throw new ArgumentException(string.Format("GetAllQuad: некорректные параметры: sx = {0}, Mx = {1}, sy = {2}, My = {3}", sx, Mx, sy, My));
@@ -54,7 +136,37 @@ Mx = {4}, My = {5}, Signs.Count = {6}", x, y, sx, sy, Mx, My, Signs.Count.ToStri
             for (int y = 0; y < my; y++)
                 for (int x = 0; x < mx; x++)
                     mas[x, y] = GetQuad(x, y, sx, sy);
-            return mas;
+            return new MapCube { Cube = mas };
+        }
+    }
+
+    public class DynamicMapCreator
+    {
+        public SortedDictionary<SignValue, DynamicAssigment> Dictionary { get; set; }
+
+        public DynamicMapCreator()
+        {
+            Dictionary = new SortedDictionary<SignValue, DynamicAssigment>();
+        }
+
+        public List<SignValue> Compare(DynamicMapCreator dmc)
+        {
+            if (dmc == null)
+                throw new ArgumentNullException("dmc", "Compare: dmc не может быть null");
+            if (Dictionary == null)
+                throw new ArgumentNullException("Dictionary", "Compare: Dictionary не может быть null");
+            if (dmc.Dictionary == null)
+                throw new ArgumentNullException("dmc", "Compare: Dictionary не может быть null");
+            if (Dictionary.Count != dmc.Dictionary.Count)
+                throw new ArgumentException("dmc", "Compare: Невозможно сопоставить объекты, которые прогонялись с различным количеством знаков");
+            if (dmc.Dictionary.Count <= 0)
+                throw new ArgumentException("dmc", "Compare: dmc не проходил диагностику");
+            if (Dictionary.Count <= 0)
+                throw new ArgumentException("Compare: Сопоставляемый объект не проходил диагностику");
+            List<SignValue> lstSv = new List<SignValue>(dmc.Dictionary.Count);
+            for (int k = 0; k < Dictionary.Count; k++)
+                lstSv.Add(Dictionary.ElementAt(k).Value.ConvertedSign.Value - dmc.Dictionary.ElementAt(k).Value.ConvertedSign.Value);
+            return lstSv;
         }
     }
 
@@ -72,70 +184,31 @@ Mx = {4}, My = {5}, Signs.Count = {6}", x, y, sx, sy, Mx, My, Signs.Count.ToStri
         }
 
         /// <summary>
-        /// Находит наиболее подходящие друг к другу изображения, сравнивая знаки, содержащиеся в списках, и вычисляя, какое изображение соответствует более всего,
-        /// т.е. имеет наименьшую разницу в знаках и встречающееся более всего раз. Его номер возвращается. Количество раз, которое оно встретилось,
-        /// возвращается в переменную "count".
+        /// Преобразует изображение в список знаков, размера, меньшего или равного Map.AllMax, чтобы уместить их на карту.
+        /// При этом, каждый знак, добавляемый в список, проходит прогон по определённому знаку.
+        /// Количество знаков для прогонов зависит от размера изображения.
         /// </summary>
-        /// <param name="assigment">.</param>
-        /// <returns>Возвращает номер наиболее подходящего изображения.</returns>
-        public int Assign(Map assign)
+        /// <param name="target">Преобразуемое изображение.</param>
+        /// <returns>Возвращает список знаков, размера, меньшего или равного Map.AllMax.</returns>
+        public DynamicAssigment(List<SignValue> lst, int count)
         {
-            if (ResearchList == null)
-                return -1;
-            if (ResearchList.Count <= 0)
-                return -1;
-            if (assign == null)
-                return -1;
-            if (assign.Count <= 0)
-                return -1;
-            int size = (ResearchList[0] == null) ? 0 : ResearchList[0].Count;
-            if (size <= 0)
-                throw new ArgumentException("Количество объектов на сопоставляемых картах должно быть больше нуля");
-            foreach (Map map in ResearchList)
+            if (count <= 0)
+                throw new ArgumentException("Количество объектов, добавляемых на карту, не может быть меньше или равно нулю", "count");
+            if (count > Map.AllMax)
+                throw new ArgumentException("Количество объектов, добавляемых на карту, не может быть больше Map.Allmax", "count");
+            if (lst == null)
+                throw new ArgumentNullException("lst", "Список знаков не может быть null");
+            if (lst.Count <= 0)
+                throw new ArgumentNullException("lst", "Список знаков не может быть пустым");
+            List<Map> lstMap = new List<Map>();
+            for (int n = 0; n < lst.Count; )
             {
-                if (map == null)
-                    continue;
-                if (map.Count <= 0)
-                    throw new ArgumentException("Количество объектов на сопоставляемых картах должно быть больше нуля");
-                if (map.Count != size)
-                    throw new ArgumentException("Карты, содержащиеся в объекте \"ResearchList\" должны быть с одним и тем же количеством объектов");
+                Map map = new Map();
+                for (int k = 0; k < count; k++, n++)
+                    map.Add(new MapObject { Sign = lst[n] });
+                lstMap.Add(map);
             }
-            if (assign.Count != size)
-                throw new ArgumentException(
-                    string.Format("Количество объектов на сопоставляемых картах должно быть одинаковым: {0} сопоставляется с {1}", assign, size));
-            List<int> lstSv = new List<int>(size);
-            for (int j = 0; j < size; j++)
-            {
-                int diffSumm = int.MaxValue, diffNum = int.MaxValue;
-                for (int k = 0; k < ResearchList.Count; k++)
-                {
-                    int d = (ResearchList[k][j].Sign - assign[j].Sign).Value;
-                    if (d > diffSumm)
-                        continue;
-                    diffNum = k;
-                    diffSumm = d;
-                    if (diffSumm <= 0)
-                        break;
-                }
-                lstSv.Add(diffNum);
-            }
-            List<int> lstMax = new List<int>(size);
-            for (int k = 0, count = 0; k < lstSv.Count; k++)
-            {
-                for (int n = 0; n < lstSv.Count; n++)
-                    if (lstSv[k] == lstSv[n])
-                        count++;
-                lstMax.Add(count);
-                count = 0;
-            }
-            int maxSv = 0, maxNum = 0;
-            for (int k = 0; k < lstMax.Count; k++)
-                if (lstMax[k] >= maxSv)
-                {
-                    maxSv = lstMax[k];
-                    maxNum = k;
-                }
-            return lstSv[maxNum];
+            ResearchList = lstMap;
         }
 
         public SignValue? Convert(SignValue sv)
@@ -158,7 +231,7 @@ Mx = {4}, My = {5}, Signs.Count = {6}", x, y, sx, sy, Mx, My, Signs.Count.ToStri
             return res;
         }
 
-        public SortedDictionary<SignValue, DynamicAssigment> ConvertRange(List<SignValue> lst)
+        public DynamicMapCreator ConvertRange(List<SignValue> lst)
         {
             if (lst == null)
                 throw new ArgumentNullException("lst", "Список знаков для прогона должен быть указан");
@@ -171,66 +244,7 @@ Mx = {4}, My = {5}, Signs.Count = {6}", x, y, sx, sy, Mx, My, Signs.Count.ToStri
                 d.Convert(sv);
                 dic.Add(sv, d);
             }
-            return dic;
-        }
-
-        public static Map ToMap(SortedDictionary<SignValue, DynamicAssigment> lst)
-        {
-            if (lst == null)
-                throw new ArgumentNullException("lst", "ToMap: lst не может быть null");
-            if (lst.Count > Map.AllMax)
-                throw new ArgumentException(string.Format("ToMap: Количество знаков в списке больше максимального размера карты: {0}", Map.AllMax, "lst"));
-            if (lst.Count <= 0)
-                return null;
-            Map map = new Map();
-            foreach (DynamicAssigment ds in lst.Values)
-            {
-                if (ds == null)
-                    continue;
-                if (ds.ConvertedSign == null)
-                    throw new ArgumentException("ToMap: ConvertedSign должен быть указан");
-                map.Add(new MapObject { Sign = ds.ConvertedSign.Value });
-            }
-            return map;
-        }
-
-        public static List<SignValue> GetSigns(int count)
-        {
-            if (count > SignValue.MaxValue.Value || count < SignValue.MinValue.Value)
-                throw new ArgumentException("Параметр находится вне допустимого диапазона", "count");
-            List<SignValue> lst = new List<SignValue>();
-            int plus = SignValue.MaxValue.Value / count;
-            for (int k = 0; k < count; k++)
-                lst.Add(new SignValue(plus * k));
-            return lst;
-        }
-
-        /// <summary>
-        /// Преобразует изображение в список знаков, размера, меньшего или равного Map.AllMax, чтобы уместить их на карту.
-        /// При этом, каждый знак, добавляемый в список, проходит прогон по определённому знаку.
-        /// Количество знаков для прогонов зависит от размера изображения.
-        /// </summary>
-        /// <param name="target">Преобразуемое изображение.</param>
-        /// <returns>Возвращает список знаков, размера, меньшего или равного Map.AllMax.</returns>
-        public static DynamicAssigment GetMaps(List<SignValue> lst, int count)
-        {
-            if (count <= 0)
-                throw new ArgumentException("Количество объектов, добавляемых на карту, не может быть меньше или равно нулю", "count");
-            if (count > Map.AllMax)
-                throw new ArgumentException("Количество объектов, добавляемых на карту, не может быть больше Map.Allmax", "count");
-            if (lst == null)
-                throw new ArgumentNullException("lst", "Список знаков не может быть null");
-            if (lst.Count <= 0)
-                throw new ArgumentNullException("lst", "Список знаков не может быть пустым");
-            List<Map> lstMap = new List<Map>();
-            for (int n = 0; n < lst.Count; )
-            {
-                Map map = new Map();
-                for (int k = 0; k < count; k++, n++)
-                    map.Add(new MapObject { Sign = lst[n] });
-                lstMap.Add(map);
-            }
-            return new DynamicAssigment { ResearchList = lstMap };
+            return new DynamicMapCreator { Dictionary = dic };
         }
 
         public object Clone()

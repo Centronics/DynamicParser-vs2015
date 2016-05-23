@@ -7,7 +7,7 @@ namespace DynamicParser
 {
     public struct Assigned
     {
-        public int X, Y, Equal;
+        public int X, Y;
     }
 
     public class MapQuad
@@ -154,6 +154,7 @@ namespace DynamicParser
                 throw new ArgumentNullException("lstConvert", "Список знаков для прогона карт должен быть указан");
             if (lstConvert.Count <= 0)
                 throw new ArgumentException("Список знаков для прогона карт должен содержать хотя бы один знак", "lstConvert");
+            ResultList = new List<SignValue>();
             Map map = new Map();
             Processor proc = new Processor(map);
             foreach (SignValue sv in lstConvert)
@@ -167,8 +168,8 @@ namespace DynamicParser
                             break;
                         map.Add(new MapObject { Sign = lst[n] });
                     }
-                    SignValue? sres = proc.Run(sv);
-                    res = (res == null) ? sres.Value : res.Value.Average(sres.Value);
+                    SignValue sres = proc.Run(sv).Value;
+                    res = (res == null) ? sres : res.Value.Average(sres);
                     map.Clear();
                 }
                 ResultList.Add(res.Value);

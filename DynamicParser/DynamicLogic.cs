@@ -44,7 +44,12 @@ namespace DynamicParser
             return Signs[(y * Mx) + x];
         }
 
-        public MapQuad GetQuad(int x, int y, int sx, int sy)
+        public Map GetQuadMap()
+        {
+            return GetQuadMap(0, 0, Mx, My);
+        }
+
+        public Map GetQuadMap(int x, int y, int sx, int sy)
         {
             int lx = x + sx, ly = y + sy;
             if (x >= Mx || y >= My || x < 0 || y < 0 || sx < 0 || sy < 0 || lx > Mx || ly > My)
@@ -53,52 +58,45 @@ namespace DynamicParser
             for (; y < ly; y++)
                 for (int px = x; px < lx; px++)
                     lst.Add(GetSign(px, y));
-            return new MapQuad(lst, sx, sy);
+            return GetMap(lst);
         }
 
-        public Assigned GetAllQuad(int sx, int sy, List<SignValue> signs, int partSize)
+        public Assigned GetAllQuad(int sx, int sy, Map cmp)
         {
             if (sx > Mx || sy > My)
                 throw new ArgumentException(string.Format("GetAllQuad: некорректные параметры: sx = {0}, Mx = {1}, sy = {2}, My = {3}", sx, Mx, sy, My));
-            if (signs == null)
-                throw new ArgumentNullException("signs", "GetAllQuad: Знаки для разбора должны быть указаны (null)");
-            if (signs.Count <= 0)
-                throw new ArgumentException("GetAllQuad: Знаки для разбора должны быть указаны (0)", "signs");
-            if (partSize <= 0)
-                throw new ArgumentException(string.Format("GetAllQuad: Размер диагностируемой части должен быть больше нуля ({0})", partSize), "partSize");
             int mx = (Mx - sx) + 1, my = (My - sy) + 1;
-            Compared?[] masAssigned = new Compared?[signs.Count];
+            Compared?[] masAssigned = new Compared?[Map.AllMax];
+            Map mapTested = MapTest(cmp, true);
             for (int y = 0; y < my; y++)
                 for (int x = 0; x < mx; x++)
-                    Compare(new MapTester(GetQuad(x, y, sx, sy).Signs, partSize, signs), masAssigned, x, y);
+                    Compare(MapTest(GetQuadMap(x, y, sx, sy), false), mapTested, masAssigned, x, y);
             return Equal(masAssigned);
         }
 
-        void Compare(MapTester mt, Compared?[] assigned, int x, int y)
+        static void Compare(Map Signs, Map mapTested, Compared?[] assigned, int x, int y)
         {
-            if (mt == null)
+            if (mapTested == null)
                 throw new ArgumentNullException("dmc", "Compare: dmc не может быть null");
+            if (mapTested.Count != Map.AllMax)
+                throw new ArgumentException("Compare: Сопоставляемый объект не проходил диагностику", "mt");
             if (Signs == null)
                 throw new ArgumentNullException("Dictionary", "Compare: Dictionary не может быть null");
-            if (mt.ResultList == null)
-                throw new ArgumentNullException("dmc", "Compare: Dictionary не может быть null");
-            if (Signs.Count != mt.ResultList.Count)
-                throw new ArgumentException("dmc", "Compare: Невозможно сопоставить объекты, которые прогонялись с различным количеством знаков");
-            if (mt.ResultList.Count <= 0)
-                throw new ArgumentException("dmc", "Compare: dmc не проходил диагностику");
-            if (Signs.Count <= 0)
-                throw new ArgumentException("Compare: Сопоставляемый объект не проходил диагностику");
+            if (Signs.Count != Map.AllMax)
+                throw new ArgumentException("Compare: Сопоставляемый объект не проходил диагностику", "Signs");
             if (assigned == null)
                 throw new ArgumentNullException("assigned", "Compare: Список сопоставляемых объектов должен быть указан");
+            if (assigned.Length != Map.AllMax)
+                throw new ArgumentException("Compare: Массив сопоставляемых знаков не может быть длины, отличной от Map.AllMax", "assigned");
             for (int k = 0; k < Signs.Count; k++)
             {
-                SignValue sv = Signs.ElementAt(k) - mt.ResultList.ElementAt(k);
+                SignValue sv = Signs[k].Sign - mapTested[k].Sign;
                 if (assigned[k] == null)
                 {
                     assigned[k] = new Compared { Difference = sv, X = x, Y = y };
                     continue;
                 }
-                if (assigned[k].Value.Difference > sv)
+                if (assigned[k].Value.Difference < sv)
                     continue;
                 assigned[k] = new Compared { Difference = sv, X = x, Y = y };
             }
@@ -108,7 +106,7 @@ namespace DynamicParser
         {
             if (assigned == null)
                 throw new ArgumentException("Equal: assigned = null");
-            if (assigned.Length <= 0)
+            if (assigned.Length != Map.AllMax)
                 throw new ArgumentException("Equal: Список сопоставляемых объектов должен содержать хотя бы один элемент", "assigned");
             List<int> lstMax = new List<int>(assigned.Length);
             for (int k = 0, count = 0; k < assigned.Length; k++, count = 0)
@@ -127,11 +125,34 @@ namespace DynamicParser
                 }
             return new Assigned { X = assigned[maxNum].Value.X, Y = assigned[maxNum].Value.Y };
         }
-    }
 
-    public class MapTester
-    {
-        public List<SignValue> ResultList { get; private set; }
+        static Map MapTest(Map map, bool clone)
+        {
+            if (map == null)
+                throw new ArgumentNullException("map", "Compare: map не может быть null");
+            if (map.Count <= 0)
+                throw new ArgumentException("Compare: Сопоставляемый объект не проходил диагностику", "map");
+            Map svMap = new Map();
+            Processor ce = new Processor(clone ? (Map)map.Clone() : map);
+            for (int k = 0, plus = SignValue.MaxValue.Value / Map.AllMax, p = 0; p < Map.AllMax; k += plus, p++)
+                svMap.Add(new MapObject { Sign = ce.Run(new SignValue(k)).Value });
+            return svMap;
+        }
+
+        /// <summary>
+        /// Создаёт карту, полученную в результате прогона карты указанного изображения по ряду знаков, количество которых зависит от размера изображения.
+        /// </summary>
+        /// <param name="target">Разбираемое изображение.</param>
+        /// <returns>Возвращает карту, полученную в результате прогона карты изображения по ряду знаков.</returns>
+        static Map GetMap(List<SignValue> lst)
+        {
+            if (lst == null)
+                return null;
+            Map map = new Map();
+            GetSign(lst).ForEach(it => map.Add(new MapObject { Sign = it }));
+            map.ObjectNumeration();
+            return map;
+        }
 
         /// <summary>
         /// Преобразует изображение в список знаков, размера, меньшего или равного Map.AllMax, чтобы уместить их на карту.
@@ -140,40 +161,36 @@ namespace DynamicParser
         /// </summary>
         /// <param name="target">Преобразуемое изображение.</param>
         /// <returns>Возвращает список знаков, размера, меньшего или равного Map.AllMax.</returns>
-        public MapTester(List<SignValue> lst, int partSize, List<SignValue> lstConvert)
+        static List<SignValue> GetSign(List<SignValue> lst)
         {
-            if (partSize <= 0)
-                throw new ArgumentException("Количество объектов, добавляемых на карту, не может быть меньше или равно нулю", "count");
-            if (partSize > Map.AllMax)
-                throw new ArgumentException("Количество объектов, добавляемых на карту, не может быть больше Map.Allmax", "count");
-            if (lst == null)
-                throw new ArgumentNullException("lst", "Список знаков не может быть null");
-            if (lst.Count <= 0)
-                throw new ArgumentNullException("lst", "Список знаков не может быть пустым");
-            if (lstConvert == null)
-                throw new ArgumentNullException("lstConvert", "Список знаков для прогона карт должен быть указан");
-            if (lstConvert.Count <= 0)
-                throw new ArgumentException("Список знаков для прогона карт должен содержать хотя бы один знак", "lstConvert");
-            ResultList = new List<SignValue>();
-            Map map = new Map();
-            Processor proc = new Processor(map);
-            foreach (SignValue sv in lstConvert)
+            int plus = SignValue.MaxValue.Value / Map.AllMax; SignValue sv = SignValue.MinValue;
+            while (lst.Count > Map.AllMax)
             {
-                SignValue? res = null;
-                for (int n = 0; n < lst.Count; )
-                {
-                    for (int k = 0; k < partSize; k++, n++)
-                    {
-                        if (n >= lst.Count)
-                            break;
-                        map.Add(new MapObject { Sign = lst[n] });
-                    }
-                    SignValue sres = proc.Run(sv).Value;
-                    res = (res == null) ? sres : res.Value.Average(sres);
-                    map.Clear();
-                }
-                ResultList.Add(res.Value);
+                List<SignValue> nlst = new List<SignValue>();
+                int k = 0; SignValue? val = null;
+                while ((val = Parse(lst, ref k, sv)) != null)
+                    nlst.Add(val.Value);
+                sv = new SignValue(sv + plus);
+                lst = nlst;
             }
+            return lst;
+        }
+
+        /// <summary>
+        /// Сжимает указанный список знаков по две позиции за каждый раз.
+        /// </summary>
+        /// <param name="target">Преобразуемый список.</param>
+        /// <param name="k">Стартовая позиция для преобразования.</param>
+        /// <param name="sv">Знак для преобразования.</param>
+        /// <returns>Возвращает знак после преобразования или null в случае окончания операции.</returns>
+        static SignValue? Parse(List<SignValue> target, ref int k, SignValue sv)
+        {
+            Map map = new Map();
+            int mx = (target.Count % 2 != 0) ? target.Count - 1 : target.Count;
+            for (int x = 0; x < 2 && k < mx; x++, k++)
+                map.Add(new MapObject { Sign = target[k] });
+            Processor ce = new Processor(map);
+            return ce.Run(sv);
         }
     }
 }

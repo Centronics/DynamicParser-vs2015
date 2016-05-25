@@ -44,12 +44,12 @@ namespace DynamicParser
             return Signs[(y * Mx) + x];
         }
 
-        public Map GetQuadMap()
+        public Map GetQuadMap(SignValue sv)
         {
-            return GetQuadMap(0, 0, Mx, My);
+            return GetQuadMap(0, 0, Mx, My, sv);
         }
 
-        public Map GetQuadMap(int x, int y, int sx, int sy)
+        public Map GetQuadMap(int x, int y, int sx, int sy, SignValue sv)
         {
             int lx = x + sx, ly = y + sy;
             if (x >= Mx || y >= My || x < 0 || y < 0 || sx < 0 || sy < 0 || lx > Mx || ly > My)
@@ -58,19 +58,19 @@ namespace DynamicParser
             for (; y < ly; y++)
                 for (int px = x; px < lx; px++)
                     lst.Add(GetSign(px, y));
-            return GetMap(lst);
+            return GetMap(lst, sv);
         }
 
-        public Assigned GetAllQuad(int sx, int sy, Map cmp)
+        public Assigned GetAllQuad(int sx, int sy, Map cmp, SignValue sv, Map mapTest)
         {
             if (sx > Mx || sy > My)
                 throw new ArgumentException(string.Format("GetAllQuad: некорректные параметры: sx = {0}, Mx = {1}, sy = {2}, My = {3}", sx, Mx, sy, My));
             int mx = (Mx - sx) + 1, my = (My - sy) + 1;
             Compared?[] masAssigned = new Compared?[Map.AllMax];
-            Map mapTested = MapTest(cmp, true);
+            Map mapTested = MapTest(cmp, true, mapTest);
             for (int y = 0; y < my; y++)
                 for (int x = 0; x < mx; x++)
-                    Compare(MapTest(GetQuadMap(x, y, sx, sy), false), mapTested, masAssigned, x, y);
+                    Compare(MapTest(GetQuadMap(x, y, sx, sy, sv), false, mapTest), mapTested, masAssigned, x, y);
             return Equal(masAssigned);
         }
 
@@ -126,16 +126,21 @@ namespace DynamicParser
             return new Assigned { X = assigned[maxNum].Value.X, Y = assigned[maxNum].Value.Y };
         }
 
-        static Map MapTest(Map map, bool clone)
+        static Map MapTest(Map map, bool clone, Map signs)
         {
             if (map == null)
                 throw new ArgumentNullException("map", "Compare: map не может быть null");
             if (map.Count <= 0)
                 throw new ArgumentException("Compare: Сопоставляемый объект не проходил диагностику", "map");
+            if (signs == null)
+                throw new Exception();
+            if (signs.Count != Map.AllMax)
+                throw new Exception();
             Map svMap = new Map();
             Processor ce = new Processor(clone ? (Map)map.Clone() : map);
-            for (int k = 0, plus = SignValue.MaxValue.Value / Map.AllMax, p = 0; p < Map.AllMax; k += plus, p++)
-                svMap.Add(new MapObject { Sign = ce.Run(new SignValue(k)).Value });
+            //for (int k = 0, plus = SignValue.MaxValue.Value / Map.AllMax, p = 0; p < Map.AllMax; k += plus, p++)
+            for (int k = 0; k < signs.Count; k++)
+                svMap.Add(new MapObject { Sign = ce.Run(signs[k].Sign).Value });
             return svMap;
         }
 
@@ -144,12 +149,12 @@ namespace DynamicParser
         /// </summary>
         /// <param name="target">Разбираемое изображение.</param>
         /// <returns>Возвращает карту, полученную в результате прогона карты изображения по ряду знаков.</returns>
-        static Map GetMap(List<SignValue> lst)
+        static Map GetMap(List<SignValue> lst, SignValue sv)
         {
             if (lst == null)
                 return null;
             Map map = new Map();
-            GetSign(lst).ForEach(it => map.Add(new MapObject { Sign = it }));
+            GetSign(lst, sv).ForEach(it => map.Add(new MapObject { Sign = it }));
             map.ObjectNumeration();
             return map;
         }
@@ -161,16 +166,14 @@ namespace DynamicParser
         /// </summary>
         /// <param name="target">Преобразуемое изображение.</param>
         /// <returns>Возвращает список знаков, размера, меньшего или равного Map.AllMax.</returns>
-        static List<SignValue> GetSign(List<SignValue> lst)
+        static List<SignValue> GetSign(List<SignValue> lst, SignValue sv)
         {
-            int plus = SignValue.MaxValue.Value / Map.AllMax; SignValue sv = SignValue.MinValue;
             while (lst.Count > Map.AllMax)
             {
                 List<SignValue> nlst = new List<SignValue>();
                 int k = 0; SignValue? val = null;
                 while ((val = Parse(lst, ref k, sv)) != null)
                     nlst.Add(val.Value);
-                sv = new SignValue(sv + plus);
                 lst = nlst;
             }
             return lst;

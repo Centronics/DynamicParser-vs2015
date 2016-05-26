@@ -1,13 +1,12 @@
 ﻿using DynamicProcessor;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DynamicParser
 {
     public struct Assigned
     {
-        public int X, Y;
+        public int X, Y, Width, Height;
     }
 
     public class MapQuad
@@ -44,34 +43,37 @@ namespace DynamicParser
             return Signs[(y * Mx) + x];
         }
 
-        public Map GetQuadMap(SignValue sv)
+        public Map CompressToMap(SignValue sv, Map signs)
         {
-            return GetQuadMap(0, 0, Mx, My, sv);
+            return GetQuadMap(new Assigned { X = 0, Y = 0, Width = Mx, Height = My }, sv, true, signs);
         }
 
-        public Map GetQuadMap(int x, int y, int sx, int sy, SignValue sv)
+        Map GetQuadMap(Assigned assigned, SignValue sv, bool clone, Map signs)
         {
-            int lx = x + sx, ly = y + sy;
-            if (x >= Mx || y >= My || x < 0 || y < 0 || sx < 0 || sy < 0 || lx > Mx || ly > My)
+            int lx = assigned.X + assigned.Width, ly = assigned.Y + assigned.Height;
+            if (assigned.X >= Mx || assigned.Y >= My || assigned.X < 0 || assigned.Y < 0 || assigned.Width < 0 || assigned.Height < 0 || lx > Mx || ly > My)
                 return null;
             List<SignValue> lst = new List<SignValue>();
-            for (; y < ly; y++)
-                for (int px = x; px < lx; px++)
-                    lst.Add(GetSign(px, y));
-            return GetMap(lst, sv);
+            for (; assigned.Y < ly; assigned.Y++)
+                for (int px = assigned.X; px < lx; px++)
+                    lst.Add(GetSign(px, assigned.Y));
+            return MapTest(GetMap(lst, sv), clone, signs);
         }
 
-        public Assigned GetAllQuad(int sx, int sy, Map cmp, SignValue sv, Map mapTest)
+        public Assigned GetAllQuad(int sx, int sy, Map cmp, bool cmpTest, SignValue sv, Map mapTest)
         {
             if (sx > Mx || sy > My)
                 throw new ArgumentException(string.Format("GetAllQuad: некорректные параметры: sx = {0}, Mx = {1}, sy = {2}, My = {3}", sx, Mx, sy, My));
             int mx = (Mx - sx) + 1, my = (My - sy) + 1;
             Compared?[] masAssigned = new Compared?[Map.AllMax];
-            Map mapTested = MapTest(cmp, true, mapTest);
+            Map mapTested = cmpTest ? MapTest(cmp, true, mapTest) : (Map)cmp.Clone();
             for (int y = 0; y < my; y++)
                 for (int x = 0; x < mx; x++)
-                    Compare(MapTest(GetQuadMap(x, y, sx, sy, sv), false, mapTest), mapTested, masAssigned, x, y);
-            return Equal(masAssigned);
+                    Compare(GetQuadMap(new Assigned { X = x, Y = y, Width = sx, Height = sy }, sv, false, mapTest), mapTested, masAssigned, x, y);
+            Assigned assigned = Equal(masAssigned);
+            assigned.Width = sx;
+            assigned.Height = sy;
+            return assigned;
         }
 
         static void Compare(Map Signs, Map mapTested, Compared?[] assigned, int x, int y)
@@ -129,16 +131,16 @@ namespace DynamicParser
         static Map MapTest(Map map, bool clone, Map signs)
         {
             if (map == null)
-                throw new ArgumentNullException("map", "Compare: map не может быть null");
+                throw new ArgumentNullException("map", "MapTest: map не может быть null");
             if (map.Count <= 0)
-                throw new ArgumentException("Compare: Сопоставляемый объект не проходил диагностику", "map");
+                throw new ArgumentException("MapTest: Сопоставляемый объект не проходил диагностику", "map");
             if (signs == null)
-                throw new Exception();
+                throw new ArgumentException("MapTest: Карта для тестирования должна быть указана (null)", "signs");
             if (signs.Count != Map.AllMax)
-                throw new Exception();
+                throw new ArgumentException(string.Format("MapTest: Карта для тестирования должна быть полностью заполненной ({0} против {1})",
+                    signs.Count, Map.AllMax), "signs");
             Map svMap = new Map();
             Processor ce = new Processor(clone ? (Map)map.Clone() : map);
-            //for (int k = 0, plus = SignValue.MaxValue.Value / Map.AllMax, p = 0; p < Map.AllMax; k += plus, p++)
             for (int k = 0; k < signs.Count; k++)
                 svMap.Add(new MapObject { Sign = ce.Run(signs[k].Sign).Value });
             return svMap;

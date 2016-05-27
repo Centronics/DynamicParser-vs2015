@@ -43,33 +43,33 @@ namespace DynamicParser
             return Signs[(y * Mx) + x];
         }
 
-        public Map CompressToMap(SignValue sv, Map signs)
+        public Map CompressToMap(SignValue sv)
         {
-            return GetQuadMap(new Assigned { X = 0, Y = 0, Width = Mx, Height = My }, sv, true, signs);
+            return GetQuadMap(new Assigned { X = 0, Y = 0, Width = Mx, Height = My }, sv);
         }
 
-        Map GetQuadMap(Assigned assigned, SignValue sv, bool clone, Map signs)
+        Map GetQuadMap(Assigned assigned, SignValue sv)
         {
             int lx = assigned.X + assigned.Width, ly = assigned.Y + assigned.Height;
-            if (assigned.X >= Mx || assigned.Y >= My || assigned.X < 0 || assigned.Y < 0 || assigned.Width < 0 || assigned.Height < 0 || lx > Mx || ly > My)
+            if (assigned.X >= Mx || assigned.Y >= My || assigned.X < 0 || assigned.Y < 0 || assigned.Width <= 0 || assigned.Height <= 0 || lx > Mx || ly > My)
                 return null;
             List<SignValue> lst = new List<SignValue>();
             for (; assigned.Y < ly; assigned.Y++)
                 for (int px = assigned.X; px < lx; px++)
                     lst.Add(GetSign(px, assigned.Y));
-            return MapTest(GetMap(lst, sv), clone, signs);
+            return GetMap(lst, sv);
         }
 
-        public Assigned GetAllQuad(int sx, int sy, Map cmp, bool cmpTest, SignValue sv, Map mapTest)
+        public Assigned GetAllQuad(int sx, int sy, Map cmp, SignValue sv, Map mapTest)
         {
             if (sx > Mx || sy > My)
                 throw new ArgumentException(string.Format("GetAllQuad: некорректные параметры: sx = {0}, Mx = {1}, sy = {2}, My = {3}", sx, Mx, sy, My));
             int mx = (Mx - sx) + 1, my = (My - sy) + 1;
             Compared?[] masAssigned = new Compared?[Map.AllMax];
-            Map mapTested = cmpTest ? MapTest(cmp, true, mapTest) : (Map)cmp.Clone();
+            Map mapTested = MapTest(cmp, true, mapTest);
             for (int y = 0; y < my; y++)
                 for (int x = 0; x < mx; x++)
-                    Compare(GetQuadMap(new Assigned { X = x, Y = y, Width = sx, Height = sy }, sv, false, mapTest), mapTested, masAssigned, x, y);
+                    Compare(MapTest(GetQuadMap(new Assigned { X = x, Y = y, Width = sx, Height = sy }, sv), false, mapTest), mapTested, masAssigned, x, y);
             Assigned assigned = Equal(masAssigned);
             assigned.Width = sx;
             assigned.Height = sy;

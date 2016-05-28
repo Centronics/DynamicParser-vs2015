@@ -45,10 +45,10 @@ namespace DynamicParser
 
         public Map CompressToMap(SignValue sv)
         {
-            return GetQuadMap(new Assigned { X = 0, Y = 0, Width = Mx, Height = My }, sv);
+            return GetMap(GetQuadMap(new Assigned { X = 0, Y = 0, Width = Mx, Height = My }).Signs, sv);
         }
 
-        Map GetQuadMap(Assigned assigned, SignValue sv)
+        public MapQuad GetQuadMap(Assigned assigned)
         {
             int lx = assigned.X + assigned.Width, ly = assigned.Y + assigned.Height;
             if (assigned.X >= Mx || assigned.Y >= My || assigned.X < 0 || assigned.Y < 0 || assigned.Width <= 0 || assigned.Height <= 0 || lx > Mx || ly > My)
@@ -57,7 +57,7 @@ namespace DynamicParser
             for (; assigned.Y < ly; assigned.Y++)
                 for (int px = assigned.X; px < lx; px++)
                     lst.Add(GetSign(px, assigned.Y));
-            return GetMap(lst, sv);
+            return new MapQuad(lst, assigned.Width, assigned.Height);
         }
 
         public Assigned GetAllQuad(int sx, int sy, Map cmp, SignValue sv, Map mapTest)
@@ -65,11 +65,15 @@ namespace DynamicParser
             if (sx > Mx || sy > My)
                 throw new ArgumentException(string.Format("GetAllQuad: некорректные параметры: sx = {0}, Mx = {1}, sy = {2}, My = {3}", sx, Mx, sy, My));
             int mx = (Mx - sx) + 1, my = (My - sy) + 1;
-            Compared?[] masAssigned = new Compared?[Map.AllMax];
             Map mapTested = MapTest(cmp, true, mapTest);
+            Compared?[] masAssigned = new Compared?[Map.AllMax];
             for (int y = 0; y < my; y++)
                 for (int x = 0; x < mx; x++)
-                    Compare(MapTest(GetQuadMap(new Assigned { X = x, Y = y, Width = sx, Height = sy }, sv), false, mapTest), mapTested, masAssigned, x, y);
+                {
+                    Assigned assign = new Assigned { X = x, Y = y, Width = sx, Height = sy };
+                    MapQuad mq = GetQuadMap(assign);
+                    Compare(MapTest(GetMap(mq.Signs, sv), false, mapTest), mapTested, masAssigned, x, y);
+                }
             Assigned assigned = Equal(masAssigned);
             assigned.Width = sx;
             assigned.Height = sy;
@@ -157,7 +161,6 @@ namespace DynamicParser
                 return null;
             Map map = new Map();
             GetSign(lst, sv).ForEach(it => map.Add(new MapObject { Sign = it }));
-            map.ObjectNumeration();
             return map;
         }
 

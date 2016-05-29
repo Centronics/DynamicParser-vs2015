@@ -45,7 +45,41 @@ namespace DynamicParser
 
         public Map CompressToMap(SignValue sv)
         {
-            return GetMap(GetQuadMap(new Assigned { X = 0, Y = 0, Width = Mx, Height = My }).Signs, sv);
+            return GetMap(Signs, sv);
+        }
+
+        public Map QuadToMap(MapQuad target, Map signs, SignValue sv)
+        {
+            if (target == null)
+                throw new ArgumentNullException("target", "MapToMap: Карта, от которой необходимо выполнить приведение, должна быть указана (null)");
+            if (Signs.Count != target.Signs.Count)
+                throw new ArgumentException(string.Format("MapToMap: Сопоставляемые карты должна иметь одинаковый размер: {0} и {1}",
+                    Signs.Count, target.Signs.Count));
+            if (signs == null)
+                throw new ArgumentException("MapToMap: Карта для тестирования должна быть указана (null)", "signs");
+            if (signs.Count != Map.AllMax)
+                throw new ArgumentException(string.Format("MapToMap: Карта для тестирования должна быть полностью заполненной ({0} против {1})",
+                    signs.Count, Map.AllMax), "signs");
+            Map pSigns = (Map)signs.Clone();
+            Map origMainMap = MapTest(CompressToMap(sv), false, signs), origTargetMap = target.CompressToMap(sv);
+            Compared?[] masAssigned = new Compared?[Map.AllMax];
+            Map[] maps = new Map[Map.AllMax];
+            for (int k = 0; k < Map.AllMax; k++)
+            {
+                maps[k] = (Map)pSigns.Clone();
+                MapRotate(pSigns);
+            }
+            for (int k = 0; k < Map.AllMax; k++)
+                Compare(origMainMap, MapTest(origTargetMap, true, maps[k]), masAssigned, k, k);
+            return maps[Equal(masAssigned).X];
+        }
+
+        static void MapRotate(Map map)
+        {
+            SignValue sv = map[0].Sign;
+            for (int k = 0; k < map.Count - 1; k++)
+                map[k].Sign = map[k + 1].Sign;
+            map[map.Count - 1].Sign = sv;
         }
 
         public MapQuad GetQuadMap(Assigned assigned)

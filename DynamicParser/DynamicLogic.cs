@@ -6,7 +6,13 @@ namespace DynamicParser
 {
     public struct Assigned
     {
-        public int X, Y, Width, Height;
+        public int X, Y, Width, Height, MaxNumber;
+    }
+
+    public struct MapOnMap
+    {
+        public Map CurrentMap;
+        public int MaxNumber;
     }
 
     public class MapQuad
@@ -48,12 +54,24 @@ namespace DynamicParser
             return GetMap(Signs, sv);
         }
 
-        public Map QuadToMap(MapQuad target, Map signs, SignValue sv)
+        public MapOnMap QuadToMap(MapQuad target, Map signs, Map svs)
+        {
+            MapOnMap mnp = QuadToMap(target, signs, svs[0].Sign);
+            for (int k = 1; k < svs.Count; k++)
+            {
+                MapOnMap mp = QuadToMap(target, signs, svs[k].Sign);
+                if (mp.MaxNumber > mnp.MaxNumber)
+                    mnp = mp;
+            }
+            return mnp;
+        }
+
+        MapOnMap QuadToMap(MapQuad target, Map signs, SignValue sv)
         {
             if (target == null)
                 throw new ArgumentNullException("target", "MapToMap: Карта, от которой необходимо выполнить приведение, должна быть указана (null)");
             if (Signs.Count != target.Signs.Count)
-                throw new ArgumentException(string.Format("MapToMap: Сопоставляемые карты должна иметь одинаковый размер: {0} и {1}",
+                throw new ArgumentException(string.Format("MapToMap: Сопоставляемые карты должны иметь одинаковый размер: {0} и {1}",
                     Signs.Count, target.Signs.Count));
             if (signs == null)
                 throw new ArgumentException("MapToMap: Карта для тестирования должна быть указана (null)", "signs");
@@ -71,7 +89,8 @@ namespace DynamicParser
             }
             for (int k = 0; k < Map.AllMax; k++)
                 Compare(origMainMap, MapTest(origTargetMap, true, maps[k]), masAssigned, k, k);
-            return maps[Equal(masAssigned).X];
+            Assigned assign = Equal(masAssigned);
+            return new MapOnMap { CurrentMap = maps[assign.X], MaxNumber = assign.MaxNumber };
         }
 
         static void MapRotate(Map map)
@@ -117,7 +136,7 @@ namespace DynamicParser
         static void Compare(Map Signs, Map mapTested, Compared?[] assigned, int x, int y)
         {
             if (mapTested == null)
-                throw new ArgumentNullException("dmc", "Compare: dmc не может быть null");
+                throw new ArgumentNullException("mapTested", "Compare: mapTested не может быть null");
             if (mapTested.Count != Map.AllMax)
                 throw new ArgumentException("Compare: Сопоставляемый объект не проходил диагностику", "mt");
             if (Signs == null)
@@ -163,7 +182,7 @@ namespace DynamicParser
                     max = lstMax[k];
                     maxNum = k;
                 }
-            return new Assigned { X = assigned[maxNum].Value.X, Y = assigned[maxNum].Value.Y };
+            return new Assigned { X = assigned[maxNum].Value.X, Y = assigned[maxNum].Value.Y, MaxNumber = maxNum };
         }
 
         static Map MapTest(Map map, bool clone, Map signs)

@@ -31,17 +31,14 @@ namespace DynamicParser
         {
             List<SignValue> mapTested = new List<SignValue>(_maps.Count);
             foreach (Map map in _maps)
-            {
-                Processor proc = new Processor(map);
-                mapTested.Add(proc.Run(sv).Value);
-            }
+                mapTested.Add((new Processor(map)).Run(sv).Value);
             try
             {
                 if (_lists.Count <= 0)
                     return -1;
                 Compared?[] assigned = new Compared?[_maps.Count];
-                for (int j = 0; j < _lists.Count; j++)
-                    Compare(_lists[j], mapTested, assigned, j);
+                for (int n = 0; n < _lists.Count; n++)
+                    Compare(_lists[n], mapTested, assigned, n);
                 return Equal(assigned);
             }
             finally

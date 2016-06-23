@@ -13,7 +13,8 @@ namespace DynamicParser
         }
 
         List<Map> _maps;
-        List<List<SignValue>> _lists = new List<List<SignValue>>();
+        public List<List<SignValue>> _lists { get; private set; }
+        public List<SignValue> _compares { get; private set; }
 
         public MapContainer(int ctxLen, List<Map> svs)
         {
@@ -25,13 +26,23 @@ namespace DynamicParser
                 if (map.Count != ctxLen)
                     throw new ArgumentException(string.Format("MapContainer: Размеры карт для прогона не соответствуют заявленным: {0} против {1}", map.Count, ctxLen), "svs");
             _maps = svs;
+            _lists = new List<List<SignValue>>();
+            _compares = new List<SignValue>();
+        }
+
+        public bool this[SignValue sign]//должна получать массив знаков??? или должно быть соответствие по всем версиям... может, надо проверять карты целиком?
+        {
+            get
+            {
+
+            }
         }
 
         public int Update(SignValue sv)
         {
             List<SignValue> mapTested = new List<SignValue>(_maps.Count);
             foreach (Map map in _maps)
-                mapTested.Add((new Processor(map)).Run(sv).Value);
+                mapTested.Add((new Processor((Map)map.Clone())).Run(sv).Value);
             try
             {
                 if (_lists.Count <= 0)
@@ -96,72 +107,59 @@ namespace DynamicParser
                 }
             return assigned[maxNum].Value.N;
         }
-    }
 
-    public struct Assigned
-    {
-        public int X, Y, Width, Height, MaxNumber;
-        public MapQuad Mapq;
-    }
-
-    public class MapQuad
-    {
-
-
-        public int Mx { get; private set; }
-        public int My { get; private set; }
-        public List<SignValue> Signs { get; private set; }
-        public List<MapQuad> MapLayer { get; private set; }
-        public object AssignedObject { get; set; }
-
-        public MapQuad(List<SignValue> lst, int mx, int my)
+        /// <summary>
+        /// Создаёт карту, полученную в результате прогона карты указанного изображения по ряду знаков, количество которых зависит от размера изображения.
+        /// </summary>
+        /// <param name="target">Разбираемое изображение.</param>
+        /// <returns>Возвращает карту, полученную в результате прогона карты изображения по ряду знаков.</returns>
+        public static Map GetMap(List<SignValue> target)
         {
-            bool lstOk = lst != null;
-            if (lstOk)
-                lstOk = lst.Count > 0;
-            if (mx <= 0 || my <= 0 || !lstOk)
-                throw new ArgumentException(string.Format("MapQuad: некорректные значения аргументов: x = {0}, y = {1}, lst = {2}",
-                    mx, my, lst == null ? "null" : lst.Count.ToString()));
-            if (lst.Count != mx * my)
-                throw new ArgumentException(string.Format("MapQuad: длина списка знаков не равна (mx * my): {0} против {1}", lst.Count, mx * my));
-            Mx = mx;
-            My = my;
-            Signs = lst;
-            MapLayer = new List<MapQuad>();
+            if (target == null)
+                return null;
+            Map map = new Map();
+            GetSign(target).ForEach(it => map.Add(new MapObject { Sign = it }));
+            map.ObjectNumeration();
+            return map;
         }
 
-        public void GetAllQuad(int sx, int sy, MapQuad cmps)
+        /// <summary>
+        /// Преобразует изображение в список знаков, размера, меньшего или равного Map.AllMax, чтобы уместить их на карту.
+        /// При этом, каждый знак, добавляемый в список, проходит прогон по определённому знаку.
+        /// Количество знаков для прогонов зависит от размера изображения.
+        /// </summary>
+        /// <param name="target">Преобразуемое изображение.</param>
+        /// <returns>Возвращает список знаков, размера, меньшего или равного Map.AllMax.</returns>
+        static List<SignValue> GetSign(List<SignValue> target)
         {
-            if (sx > Mx || sy > My || sx <= 0 || sy <= 0)
-                throw new ArgumentException(string.Format("GetAllQuad: некорректные параметры: sx = {0}, Mx = {1}, sy = {2}, My = {3}", sx, Mx, sy, My));
-            if (cmps == null)
-                throw new ArgumentNullException("cmps", "GetAllQuad: Сопоставляемые карты должны быть указаны (null)");
-            if (cmps.MapLayer.Count <= 0)
-                throw new ArgumentException("GetAllQuad: Сопоставляемые карты должны быть указаны (Count = 0)", "cmps");
-            if (cmps.Mx != Mx)
-                throw new ArgumentException(string.Format("GetAllQuad: Сопоставляемые карты должны быть одинаковых размеров основных карт (Mx): {0} против {1}",
-                    cmps.Mx, Mx), "cmps");
-            if (cmps.My != My)
-                throw new ArgumentException(string.Format("GetAllQuad: Сопоставляемые карты должны быть одинаковых размеров основных карт (My): {0} против {1}",
-                    cmps.My, My), "cmps");
-            if ((Mx % sx) != 0)
-                throw new ArgumentException("GetAllQuad: Размеры загружаемых карт должны быть кратны размерам основной карты", "sx");
-            if ((My % sy) != 0)
-                throw new ArgumentException("GetAllQuad: Размеры загружаемых карт должны быть кратны размерам основной карты", "sy");
-            foreach (MapQuad mq in cmps.MapLayer)
+            int plus = SignValue.MaxValue.Value / Map.AllMax; SignValue sv = SignValue.MinValue;
+            while (target.Count > Map.AllMax)
             {
-                if (mq == null)
-                    throw new ArgumentNullException("cmps", "GetAllQuad: Массив не должен содержать пустые карты");
-                if (mq.Mx != sx || mq.My != sy)
-                    throw new ArgumentOutOfRangeException("cmps", "GetAllQuad: Анализируемые карты не могут иметь различные размеры");
+                List<SignValue> nlst = new List<SignValue>();
+                int k = 0; SignValue? val = null;
+                while ((val = Parse(target, ref k, sv)) != null)
+                    nlst.Add(val.Value);
+                sv = new SignValue(sv + plus);
+                target = nlst;
             }
-            for (int k = 0; k < cmps.MapLayer.Count; k++)
-            {
-                Compared?[] comp = new Compared?[Signs.Count / (cmps.Mx * cmps.My)];
-
-            }
+            return target;
         }
 
-
+        /// <summary>
+        /// Сжимает указанный список знаков по две позиции за каждый раз.
+        /// </summary>
+        /// <param name="target">Преобразуемый список.</param>
+        /// <param name="k">Стартовая позиция для преобразования.</param>
+        /// <param name="sv">Знак для преобразования.</param>
+        /// <returns>Возвращает знак после преобразования или null в случае окончания операции.</returns>
+        static SignValue? Parse(List<SignValue> target, ref int k, SignValue sv)
+        {
+            Map map = new Map();
+            int mx = (target.Count % 2 != 0) ? target.Count - 1 : target.Count;
+            for (int x = 0; x < 2 && k < mx; x++, k++)
+                map.Add(new MapObject { Sign = target[k] });
+            Processor ce = new Processor(map);
+            return ce.Run(sv);
+        }
     }
 }

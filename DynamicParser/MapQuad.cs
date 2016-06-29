@@ -4,6 +4,41 @@ using System.Collections.Generic;
 
 namespace DynamicParser
 {
+    public class Maps
+    {
+        public List<SignValue[,]> Values { get; private set; }
+
+        public int LengthX { get; private set; }
+        public int LengthY { get; private set; }
+
+        public int Square { get { return LengthX * LengthY; } }
+
+        public Maps(Map map, SignValue[,] sv)
+        {
+            LengthX = sv.GetLength(0);
+            LengthY = sv.GetLength(1);
+            Values = new List<SignValue[,]>(Square);
+            for (int j1 = 0; j1 < LengthY; j1++)
+                for (int i1 = 0; i1 < LengthX; i1++)
+                {
+                    SignValue[,] svs = new SignValue[LengthX - i1, LengthY - j1];
+                    SignValue? cursv = null;
+                    for (int j = j1, jp = 0; j < LengthY; j++, jp++)
+                        for (int i = i1, ip = 0; i < LengthY - j; i++, ip++)
+                        {
+                            SignValue procsv = (new Processor((Map)map.Clone())).Run(sv[i, j]).Value;
+                            cursv = (cursv == null) ? procsv : cursv.Value.Average(procsv);
+                        }
+                    Values.Add(svs);
+                }
+        }
+
+        public int Compare(out int level)
+        {
+            //найти подходящий по значению на каком-либо уровне
+        }
+    }
+
     public class MapContainer
     {
         struct Compared

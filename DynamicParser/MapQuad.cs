@@ -1,146 +1,23 @@
 ﻿using DynamicProcessor;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace DynamicParser
 {
-    public class Maps
+    public class Context
     {
-        public List<SignValue[,]> Values { get; private set; }
-
-        public int LengthX { get; private set; }
-        public int LengthY { get; private set; }
-
-        public int Square { get { return LengthX * LengthY; } }
-
-        public Maps(Map map, SignValue[,] sv)
+        struct Difference
         {
-            LengthX = sv.GetLength(0);
-            LengthY = sv.GetLength(1);
-            Values = new List<SignValue[,]>(Square);
-            for (int j1 = 0; j1 < LengthY; j1++)
-                for (int i1 = 0; i1 < LengthX; i1++)
-                {
-                    SignValue[,] svs = new SignValue[LengthX - i1, LengthY - j1];
-                    SignValue? cursv = null;
-                    for (int j = j1, jp = 0; j < LengthY; j++, jp++)
-                        for (int i = i1, ip = 0; i < LengthY - j; i++, ip++)
-                        {
-                            SignValue procsv = (new Processor((Map)map.Clone())).Run(sv[i, j]).Value;
-                            cursv = (cursv == null) ? procsv : cursv.Value.Average(procsv);
-                        }
-                    Values.Add(svs);
-                }
+            public int Number;
+            public SignValue Diff;
         }
 
-        public int Compare(out int level)
+        struct NumberCount
         {
-            //найти подходящий по значению на каком-либо уровне
-        }
-    }
-
-    public class MapContainer
-    {
-        struct Compared
-        {
-            public int N;
-            public SignValue Difference;
-        }
-
-        List<Map> _maps;
-        public List<List<SignValue>> _lists { get; private set; }
-        public List<SignValue> _compares { get; private set; }
-
-        public MapContainer(int ctxLen, List<Map> svs)
-        {
-            if (ctxLen <= 0)
-                throw new ArgumentException(string.Format("MapContainer: Параметр длины контекста должен быть больше или равен нулю: {0}", ctxLen), "ctxLen");
-            if (svs.Count <= 0)
-                throw new ArgumentException(string.Format("MapContainer: Параметр разрядности контекста должен быть больше или равен нулю: {0}", svs.Count), "svs");
-            foreach (Map map in svs)
-                if (map.Count != ctxLen)
-                    throw new ArgumentException(string.Format("MapContainer: Размеры карт для прогона не соответствуют заявленным: {0} против {1}", map.Count, ctxLen), "svs");
-            _maps = svs;
-            _lists = new List<List<SignValue>>();
-            _compares = new List<SignValue>();
-        }
-
-        public bool this[SignValue sign]//должна получать массив знаков??? или должно быть соответствие по всем версиям... может, надо проверять карты целиком?
-        {
-            get
-            {
-
-            }
-        }
-
-        public int Update(SignValue sv)
-        {
-            List<SignValue> mapTested = new List<SignValue>(_maps.Count);
-            foreach (Map map in _maps)
-                mapTested.Add((new Processor((Map)map.Clone())).Run(sv).Value);
-            try
-            {
-                if (_lists.Count <= 0)
-                    return -1;
-                Compared?[] assigned = new Compared?[_maps.Count];
-                for (int n = 0; n < _lists.Count; n++)
-                    Compare(_lists[n], mapTested, assigned, n);
-                return Equal(assigned);
-            }
-            finally
-            {
-                _lists.Add(mapTested);
-            }
-        }
-
-        static void Compare(List<SignValue> signs, List<SignValue> mapTested, Compared?[] assigned, int n)
-        {
-            if (mapTested == null)
-                throw new ArgumentNullException("mapTested", "Compare: mapTested не может быть null");
-            if (signs == null)
-                throw new ArgumentNullException("Dictionary", "Compare: Dictionary не может быть null");
-            if (signs.Count != mapTested.Count)
-                throw new ArgumentException("Compare: Сопоставляемый объект не проходил диагностику", "Signs");
-            if (assigned == null)
-                throw new ArgumentNullException("assigned", "Compare: Список сопоставляемых объектов должен быть указан");
-            if (assigned.Length != mapTested.Count)
-                throw new ArgumentException("Compare: Массив сопоставляемых знаков не может быть длины, отличной от Map.AllMax", "assigned");
-            for (int k = 0; k < signs.Count; k++)
-            {
-                SignValue sv = signs[k] - mapTested[k];
-                if (assigned[k] == null)
-                {
-                    assigned[k] = new Compared { Difference = sv, N = n };
-                    continue;
-                }
-                if (assigned[k].Value.Difference < sv)
-                    continue;
-                assigned[k] = new Compared { Difference = sv, N = n };
-            }
-        }
-
-        static int Equal(Compared?[] assigned)
-        {
-            if (assigned == null)
-                throw new ArgumentException("Equal: assigned = null");
-            if (assigned.Length != Map.AllMax)
-                throw new ArgumentException("Equal: Список сопоставляемых объектов должен содержать хотя бы один элемент", "assigned");
-            List<int> lstMax = new List<int>(assigned.Length);
-            for (int k = 0, count = 0; k < assigned.Length; k++, count = 0)
-            {
-                for (int n = 0; n < assigned.Length; n++)
-                    if (assigned[k].Value.N == assigned[n].Value.N && assigned[k].Value.Y == assigned[n].Value.Y)
-                        count++;
-                lstMax.Add(count);
-            }
-            int maxNum = -1;
-            for (int k = 0, max = 0; k < lstMax.Count; k++)
-                if (lstMax[k] >= max)
-                {
-                    max = lstMax[k];
-                    maxNum = k;
-                }
-            return assigned[maxNum].Value.N;
+            public int? Number;
+            public uint Count;
+            public int X, Y;
         }
 
         /// <summary>
@@ -148,53 +25,125 @@ namespace DynamicParser
         /// </summary>
         /// <param name="target">Разбираемое изображение.</param>
         /// <returns>Возвращает карту, полученную в результате прогона карты изображения по ряду знаков.</returns>
-        public static Map GetMap(List<SignValue> target)
+        static SignValue[,] GetMap(Bitmap target)
         {
             if (target == null)
-                return null;
-            Map map = new Map();
-            GetSign(target).ForEach(it => map.Add(new MapObject { Sign = it }));
-            map.ObjectNumeration();
-            return map;
+                throw new ArgumentNullException();
+            if (target.Width <= 0)
+                throw new ArgumentException();
+            if (target.Height <= 0)
+                throw new ArgumentException();
+            SignValue[,] lst = new SignValue[target.Width, target.Height];
+            for (int y = 0; y < target.Height; y++)
+                for (int x = 0; x < target.Width; x++)
+                    lst[x, y] = new SignValue(target.GetPixel(x, y));
+            return lst;
+        }
+
+        static NumberCount Find(Bitmap btmMain, List<Bitmap> bitSubject)
+        {
+            List<SignValue[,]> lstSub = new List<SignValue[,]>(bitSubject.Count);
+            foreach (Bitmap btm in bitSubject)
+                lstSub.Add(GetMap(btm));
+            SignValue[,] lstDiff = GetMap(btmMain);
+            Difference?[,] lstWorkArray = new Difference?[bitSubject[0].Width, bitSubject[0].Height];
+            for (int y = 0; y < btmMain.Height; y++)
+                for (int x = 0; x < btmMain.Width; x++)
+                    for (int k = 0; k < bitSubject.Count; k++)
+                    {
+                        if (bitSubject[k].Height < (btmMain.Height - bitSubject[k].Height))
+                            break;
+                        if (bitSubject[k].Width < (btmMain.Width - bitSubject[k].Width))
+                            break;
+                        ToArray(lstWorkArray, lstDiff, lstSub[k], x, y, k);
+                    }
+            return GetCount(lstWorkArray);
+        }
+
+        static void ToArray(Difference?[,] lstDiff, SignValue[,] masMain, SignValue[,] masSubject, int sx, int sy, int number)
+        {
+            for (int y = sy, _y = 0, ly = masSubject.GetLength(1); y < ly; y++)
+                for (int x = sx, _x = 0, lx = masSubject.GetLength(0); x < lx; x++)
+                {
+                    SignValue sv = masMain[x++, y++] - masSubject[_x, _y];
+                    if (!lstDiff[_x, _y].HasValue)
+                    {
+                        lstDiff[_x, _y] = new Difference { Diff = sv, Number = number };
+                        continue;
+                    }
+                    if (lstDiff[_x, _y].Value.Diff > sv)
+                        lstDiff[_x, _y] = new Difference { Diff = sv, Number = number };
+                }
+        }
+
+        static NumberCount GetCount(Difference?[,] lstDiff)
+        {
+            SortedDictionary<int, NumberCount> dic = new SortedDictionary<int, NumberCount>();
+            for (int y = 0, ly = lstDiff.GetLength(1); y < ly; y++)
+                for (int x = 0, lx = lstDiff.GetLength(0); x < lx; x++)
+                    if (lstDiff[x, y].Value.Number != null)
+                    {
+                        if (!dic.ContainsKey(lstDiff[x, y].Value.Number))
+                        {
+                            NumberCount nc = new NumberCount();
+                            nc.Number = lstDiff[x, y].Value.Number;
+                            nc.X = x;
+                            nc.Y = y;
+                            dic[lstDiff[x, y].Value.Number] = nc;
+                        }
+                        else
+                        {
+                            NumberCount dif = dic[lstDiff[x, y].Value.Number];
+                            dif.Count++;
+                            dic[lstDiff[x, y].Value.Number] = dif;
+                        }
+                        lstDiff[x, y] = null;
+                    }
+            uint max = 0; int maxnum = -1;
+            foreach (KeyValuePair<int, NumberCount> pair in dic)
+                if (pair.Value.Count >= max)
+                {
+                    max = pair.Value.Count;
+                    maxnum = pair.Key;
+                }
+            if (maxnum < 0)
+                throw new Exception("GetCount: Не могу найти подходящий элемент.");
+            return dic[maxnum];
         }
 
         /// <summary>
-        /// Преобразует изображение в список знаков, размера, меньшего или равного Map.AllMax, чтобы уместить их на карту.
-        /// При этом, каждый знак, добавляемый в список, проходит прогон по определённому знаку.
-        /// Количество знаков для прогонов зависит от размера изображения.
+        /// Копирует указанную часть изображения в отдельное изображение.
+        /// Если по ширине достигнут конец, то переход на новую строку осуществляется автоматически.
         /// </summary>
-        /// <param name="target">Преобразуемое изображение.</param>
-        /// <returns>Возвращает список знаков, размера, меньшего или равного Map.AllMax.</returns>
-        static List<SignValue> GetSign(List<SignValue> target)
+        /// <param name="target">Изображение, копию участка которого требуется снять.</param>
+        /// <param name="x">Стартовый X.</param>
+        /// <param name="y">Стартовый Y.</param>
+        /// <param name="wid">Требуемая ширина.</param>
+        /// <param name="hei">Требуемая высота.</param>
+        /// <returns>Возвращает изображение, представляющее собой указанную часть исходного изображения.</returns>
+        static Bitmap GetCurrentBitmap(Bitmap target, int x, int y, int wid, int hei)
         {
-            int plus = SignValue.MaxValue.Value / Map.AllMax; SignValue sv = SignValue.MinValue;
-            while (target.Count > Map.AllMax)
+            int mx = x + wid, my = y + hei;
+            if (mx > target.Width)
             {
-                List<SignValue> nlst = new List<SignValue>();
-                int k = 0; SignValue? val = null;
-                while ((val = Parse(target, ref k, sv)) != null)
-                    nlst.Add(val.Value);
-                sv = new SignValue(sv + plus);
-                target = nlst;
+                if (my > target.Height)
+                    return null;
+                x = 0;
+                mx = wid;
+                y++;
+                my++;
             }
-            return target;
-        }
-
-        /// <summary>
-        /// Сжимает указанный список знаков по две позиции за каждый раз.
-        /// </summary>
-        /// <param name="target">Преобразуемый список.</param>
-        /// <param name="k">Стартовая позиция для преобразования.</param>
-        /// <param name="sv">Знак для преобразования.</param>
-        /// <returns>Возвращает знак после преобразования или null в случае окончания операции.</returns>
-        static SignValue? Parse(List<SignValue> target, ref int k, SignValue sv)
-        {
-            Map map = new Map();
-            int mx = (target.Count % 2 != 0) ? target.Count - 1 : target.Count;
-            for (int x = 0; x < 2 && k < mx; x++, k++)
-                map.Add(new MapObject { Sign = target[k] });
-            Processor ce = new Processor(map);
-            return ce.Run(sv);
+            if (my > target.Height)
+                return null;
+            Bitmap ret = new Bitmap(wid, hei);
+            int sy = y;
+            for (int xr = 0; x < mx; x++, xr++)
+            {
+                for (int yr = 0; y < my; y++, yr++)
+                    ret.SetPixel(xr, yr, target.GetPixel(x, y));
+                y = sy;
+            }
+            return ret;
         }
     }
 }

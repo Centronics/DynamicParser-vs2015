@@ -9,7 +9,7 @@ namespace DynamicParser
     {
         struct Difference
         {
-            public List<int> lstNumber;
+            public List<int> LstNumber;
             public SignValue Diff;
         }
 
@@ -71,17 +71,17 @@ namespace DynamicParser
                     SignValue sv = masMain[x++, y++] - masSubject[px, py];
                     if (!lstDiff[px, py].HasValue)
                     {
-                        lstDiff[px, py] = new Difference { Diff = sv, lstNumber = new List<int> { number } };
+                        lstDiff[px, py] = new Difference { Diff = sv, LstNumber = new List<int> { number } };
                         continue;
                     }
                     if (lstDiff[px, py].Value.Diff > sv)
                     {
-                        lstDiff[px, py] = new Difference { Diff = sv, lstNumber = lstDiff[px, py].Value.lstNumber };
-                        lstDiff[px, py].Value.lstNumber.Clear();
+                        lstDiff[px, py] = new Difference { Diff = sv, LstNumber = lstDiff[px, py].Value.LstNumber };
+                        lstDiff[px, py].Value.LstNumber.Clear();
                     }
                     else
                         if (lstDiff[px, py].Value.Diff == sv)
-                            lstDiff[px, py].Value.lstNumber.Add(number);
+                            lstDiff[px, py].Value.LstNumber.Add(number);
                 }
         }
 
@@ -92,10 +92,10 @@ namespace DynamicParser
                 for (int x = 0, lx = lstDiff.GetLength(0); x < lx; x++)
                 {
                     Difference? difference = lstDiff[x, y];
-                    if (difference == null || difference.Value.lstNumber == null) continue;
+                    if (difference == null || difference.Value.LstNumber == null) continue;
                     Difference? o = lstDiff[x, y];
                     if (o != null)
-                        foreach (int num in o.Value.lstNumber)
+                        foreach (int num in o.Value.LstNumber)
                             if (!dic.ContainsKey(num))
                             {
                                 NumberCount nc = new NumberCount

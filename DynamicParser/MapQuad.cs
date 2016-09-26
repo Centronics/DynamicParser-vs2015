@@ -1,27 +1,15 @@
-﻿using DynamicProcessor;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using DynamicProcessor;
 
 namespace DynamicParser
 {
     public class Context
     {
-        struct Difference
-        {
-            public List<int> LstNumber;
-            public SignValue Diff;
-        }
-
-        struct NumberCount
-        {
-            public int? Number;
-            public uint Count;
-            public int X, Y;
-        }
-
         /// <summary>
-        /// Создаёт карту, полученную в результате прогона карты указанного изображения по ряду знаков, количество которых зависит от размера изображения.
+        ///     Создаёт карту, полученную в результате прогона карты указанного изображения по ряду знаков, количество которых
+        ///     зависит от размера изображения.
         /// </summary>
         /// <param name="target">Разбираемое изображение.</param>
         /// <returns>Возвращает карту, полученную в результате прогона карты изображения по ряду знаков.</returns>
@@ -51,16 +39,17 @@ namespace DynamicParser
                 for (int x = 0; x < btmMain.Width; x++)
                     for (int k = 0; k < bitSubject.Count; k++)
                     {
-                        if (bitSubject[k].Height < (btmMain.Height - bitSubject[k].Height))
+                        if (bitSubject[k].Height < btmMain.Height - bitSubject[k].Height)
                             break;
-                        if (bitSubject[k].Width < (btmMain.Width - bitSubject[k].Width))
+                        if (bitSubject[k].Width < btmMain.Width - bitSubject[k].Width)
                             break;
                         ToArray(lstWorkArray, lstDiff, lstSub[k], x, y, k);
                     }
             NumberCount nc = GetCount(lstWorkArray);
             if (nc.Number == null)
                 throw new Exception("Find: Не могу найти подходящий образ");
-            return GetCurrentBitmap(btmMain, nc.X, nc.Y, bitSubject[nc.Number.Value].Width, bitSubject[nc.Number.Value].Height);
+            return GetCurrentBitmap(btmMain, nc.X, nc.Y, bitSubject[nc.Number.Value].Width,
+                bitSubject[nc.Number.Value].Height);
         }
 
         static void ToArray(Difference?[,] lstDiff, SignValue[,] masMain, SignValue[,] masSubject, int sx, int sy, int number)
@@ -78,10 +67,10 @@ namespace DynamicParser
                     {
                         lstDiff[px, py] = new Difference { Diff = sv, LstNumber = lstDiff[px, py].Value.LstNumber };
                         lstDiff[px, py].Value.LstNumber.Clear();
+                        continue;
                     }
-                    else
-                        if (lstDiff[px, py].Value.Diff == sv)
-                            lstDiff[px, py].Value.LstNumber.Add(number);
+                    if (lstDiff[px, py].Value.Diff == sv)
+                        lstDiff[px, py].Value.LstNumber.Add(number);
                 }
         }
 
@@ -92,7 +81,7 @@ namespace DynamicParser
                 for (int x = 0, lx = lstDiff.GetLength(0); x < lx; x++)
                 {
                     Difference? difference = lstDiff[x, y];
-                    if (difference == null || difference.Value.LstNumber == null) continue;
+                    if ((difference == null) || (difference.Value.LstNumber == null)) continue;
                     Difference? o = lstDiff[x, y];
                     if (o != null)
                         foreach (int num in o.Value.LstNumber)
@@ -114,7 +103,8 @@ namespace DynamicParser
                             }
                     lstDiff[x, y] = null;
                 }
-            uint max = 0; int maxnum = -1;
+            uint max = 0;
+            int maxnum = -1;
             foreach (KeyValuePair<int, NumberCount> pair in dic)
                 if (pair.Value.Count >= max)
                 {
@@ -127,8 +117,8 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Копирует указанную часть изображения в отдельное изображение.
-        /// Если по ширине достигнут конец, то переход на новую строку осуществляется автоматически.
+        ///     Копирует указанную часть изображения в отдельное изображение.
+        ///     Если по ширине достигнут конец, то переход на новую строку осуществляется автоматически.
         /// </summary>
         /// <param name="target">Изображение, копию участка которого требуется снять.</param>
         /// <param name="x">Стартовый X.</param>
@@ -159,6 +149,19 @@ namespace DynamicParser
                 y = sy;
             }
             return ret;
+        }
+
+        struct Difference
+        {
+            public List<int> LstNumber;
+            public SignValue Diff;
+        }
+
+        struct NumberCount
+        {
+            public int? Number;
+            public uint Count;
+            public int X, Y;
         }
     }
 }

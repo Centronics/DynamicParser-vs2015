@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using DynamicProcessor;
 
 namespace DynamicParser
@@ -31,8 +32,7 @@ namespace DynamicParser
         public static Bitmap Find(Bitmap btmMain, List<Bitmap> bitSubject)
         {
             List<SignValue[,]> lstSub = new List<SignValue[,]>(bitSubject.Count);
-            foreach (Bitmap btm in bitSubject)
-                lstSub.Add(GetMap(btm));
+            lstSub.AddRange(bitSubject.Select(GetMap));
             SignValue[,] lstDiff = GetMap(btmMain);
             Difference?[,] lstWorkArray = new Difference?[bitSubject[0].Width, bitSubject[0].Height];
             for (int y = 0; y < btmMain.Height; y++)

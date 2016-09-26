@@ -48,7 +48,7 @@ namespace DynamicParser
                     }
             NumberCount nc = GetCount(lstWorkArray);
             if (nc.Number == null)
-                throw new Exception("Find: Не могу найти подходящий образ");
+                throw new Exception($"{nameof(Find)}: Не могу найти подходящий образ");
             return GetCurrentBitmap(btmMain, nc.X, nc.Y, bitSubject[nc.Number.Value].Width,
                 bitSubject[nc.Number.Value].Height);
         }
@@ -115,7 +115,7 @@ namespace DynamicParser
                     maxnum = pair.Key;
                 }
             if (maxnum < 0)
-                throw new Exception("GetCount: Не могу найти подходящий элемент.");
+                throw new Exception($"{nameof(GetCount)}: Не могу найти подходящий элемент.");
             return dic[maxnum];
         }
 

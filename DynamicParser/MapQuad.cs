@@ -31,7 +31,8 @@ namespace DynamicParser
 
         public static Bitmap Find(Bitmap btmMain, List<Bitmap> bitSubject)
         {
-            List<SignValue[,]> lstSub = new List<SignValue[,]>(bitSubject.Count);
+            List<SignValue[,]> lstSub =
+                new List<SignValue[,]>(bitSubject.Count);
             lstSub.AddRange(bitSubject.Select(GetMap));
             SignValue[,] lstDiff = GetMap(btmMain);
             Difference?[,] lstWorkArray = new Difference?[bitSubject[0].Width, bitSubject[0].Height];
@@ -60,7 +61,11 @@ namespace DynamicParser
                     SignValue sv = masMain[x++, y++] - masSubject[px, py];
                     if (!lstDiff[px, py].HasValue)
                     {
-                        lstDiff[px, py] = new Difference { Diff = sv, LstNumber = new List<int> { number } };
+                        lstDiff[px, py] = new Difference
+                        {
+                            Diff = sv,
+                            LstNumber = new List<int> { number }
+                        };
                         continue;
                     }
                     if (lstDiff[px, py].Value.Diff > sv)
@@ -76,7 +81,8 @@ namespace DynamicParser
 
         static NumberCount GetCount(Difference?[,] lstDiff)
         {
-            SortedDictionary<int, NumberCount> dic = new SortedDictionary<int, NumberCount>();
+            SortedDictionary<int, NumberCount> dic =
+                new SortedDictionary<int, NumberCount>();
             for (int y = 0, ly = lstDiff.GetLength(1); y < ly; y++)
                 for (int x = 0, lx = lstDiff.GetLength(0); x < lx; x++)
                 {
@@ -86,15 +92,12 @@ namespace DynamicParser
                     if (o != null)
                         foreach (int num in o.Value.LstNumber)
                             if (!dic.ContainsKey(num))
-                            {
-                                NumberCount nc = new NumberCount
+                                dic[num] = new NumberCount
                                 {
                                     Number = num,
                                     X = x,
                                     Y = y
                                 };
-                                dic[num] = nc;
-                            }
                             else
                             {
                                 NumberCount dif = dic[num];

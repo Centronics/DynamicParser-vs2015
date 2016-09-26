@@ -9,7 +9,7 @@ namespace DynamicParser
     {
         struct Difference
         {
-            public int Number;
+            public List<int> lstNumber;
             public SignValue Diff;
         }
 
@@ -40,7 +40,7 @@ namespace DynamicParser
             return lst;
         }
 
-        static NumberCount Find(Bitmap btmMain, List<Bitmap> bitSubject)
+        public static Bitmap Find(Bitmap btmMain, List<Bitmap> bitSubject)
         {
             List<SignValue[,]> lstSub = new List<SignValue[,]>(bitSubject.Count);
             foreach (Bitmap btm in bitSubject)
@@ -57,22 +57,31 @@ namespace DynamicParser
                             break;
                         ToArray(lstWorkArray, lstDiff, lstSub[k], x, y, k);
                     }
-            return GetCount(lstWorkArray);
+            NumberCount nc = GetCount(lstWorkArray);
+            if (nc.Number == null)
+                throw new Exception("Find: Не могу найти подходящий образ");
+            return GetCurrentBitmap(btmMain, nc.X, nc.Y, bitSubject[nc.Number.Value].Width, bitSubject[nc.Number.Value].Height);
         }
 
         static void ToArray(Difference?[,] lstDiff, SignValue[,] masMain, SignValue[,] masSubject, int sx, int sy, int number)
         {
-            for (int y = sy, _y = 0, ly = masSubject.GetLength(1); y < ly; y++)
-                for (int x = sx, _x = 0, lx = masSubject.GetLength(0); x < lx; x++)
+            for (int y = sy, py = 0, ly = masSubject.GetLength(1); y < ly; y++)
+                for (int x = sx, px = 0, lx = masSubject.GetLength(0); x < lx; x++)
                 {
-                    SignValue sv = masMain[x++, y++] - masSubject[_x, _y];
-                    if (!lstDiff[_x, _y].HasValue)
+                    SignValue sv = masMain[x++, y++] - masSubject[px, py];
+                    if (!lstDiff[px, py].HasValue)
                     {
-                        lstDiff[_x, _y] = new Difference { Diff = sv, Number = number };
+                        lstDiff[px, py] = new Difference { Diff = sv, lstNumber = new List<int> { number } };
                         continue;
                     }
-                    if (lstDiff[_x, _y].Value.Diff > sv)
-                        lstDiff[_x, _y] = new Difference { Diff = sv, Number = number };
+                    if (lstDiff[px, py].Value.Diff > sv)
+                    {
+                        lstDiff[px, py] = new Difference { Diff = sv, lstNumber = lstDiff[px, py].Value.lstNumber };
+                        lstDiff[px, py].Value.lstNumber.Clear();
+                    }
+                    else
+                        if (lstDiff[px, py].Value.Diff == sv)
+                            lstDiff[px, py].Value.lstNumber.Add(number);
                 }
         }
 
@@ -81,24 +90,30 @@ namespace DynamicParser
             SortedDictionary<int, NumberCount> dic = new SortedDictionary<int, NumberCount>();
             for (int y = 0, ly = lstDiff.GetLength(1); y < ly; y++)
                 for (int x = 0, lx = lstDiff.GetLength(0); x < lx; x++)
-                    if (lstDiff[x, y].Value.Number != null)
-                    {
-                        if (!dic.ContainsKey(lstDiff[x, y].Value.Number))
-                        {
-                            NumberCount nc = new NumberCount();
-                            nc.Number = lstDiff[x, y].Value.Number;
-                            nc.X = x;
-                            nc.Y = y;
-                            dic[lstDiff[x, y].Value.Number] = nc;
-                        }
-                        else
-                        {
-                            NumberCount dif = dic[lstDiff[x, y].Value.Number];
-                            dif.Count++;
-                            dic[lstDiff[x, y].Value.Number] = dif;
-                        }
-                        lstDiff[x, y] = null;
-                    }
+                {
+                    Difference? difference = lstDiff[x, y];
+                    if (difference == null || difference.Value.lstNumber == null) continue;
+                    Difference? o = lstDiff[x, y];
+                    if (o != null)
+                        foreach (int num in o.Value.lstNumber)
+                            if (!dic.ContainsKey(num))
+                            {
+                                NumberCount nc = new NumberCount
+                                {
+                                    Number = num,
+                                    X = x,
+                                    Y = y
+                                };
+                                dic[num] = nc;
+                            }
+                            else
+                            {
+                                NumberCount dif = dic[num];
+                                dif.Count++;
+                                dic[num] = dif;
+                            }
+                    lstDiff[x, y] = null;
+                }
             uint max = 0; int maxnum = -1;
             foreach (KeyValuePair<int, NumberCount> pair in dic)
                 if (pair.Value.Count >= max)

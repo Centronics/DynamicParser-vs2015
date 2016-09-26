@@ -1,0 +1,9 @@
+D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\DynamicParserTest.dll
+D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\DynamicParserTest.pdb
+D:\разработки\DynamicParser\DynamicParserTest\obj\Debug\DynamicParserTest.csprojResolveAssemblyReference.cache
+D:\разработки\DynamicParser\DynamicParserTest\obj\Debug\DynamicParserTest.dll
+D:\разработки\DynamicParser\DynamicParserTest\obj\Debug\DynamicParserTest.pdb
+D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\DynamicParser.dll
+D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\DynamicProcessor.dll
+D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\DynamicParser.pdb
+D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\DynamicProcessor.xml

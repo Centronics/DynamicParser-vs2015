@@ -2,12 +2,55 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using DynamicProcessor;
 
 namespace DynamicParser
 {
     public class Context
     {
+        readonly Thread _parser;
+        public string ErrorString { get; private set; }
+        readonly ContextObject[,] _contextObjects;
+        readonly byte[,] _matrix;
+
+        public Context(Bitmap btm, byte[,] matrix)
+        {
+            if (btm == null)
+                throw new ArgumentNullException();
+            if (btm.Width <= 0)
+                throw new ArgumentException();
+            if (btm.Height <= 0)
+                throw new ArgumentException();
+            _contextObjects = new ContextObject[btm.Width, btm.Height];
+            _matrix = matrix;
+            (_parser = new Thread(BitmapParser)
+            {
+                IsBackground = true,
+                Name = nameof(BitmapParser),
+                Priority = ThreadPriority.AboveNormal
+            }).Start(btm);
+        }
+
+        void BitmapParser(object b)
+        {
+            try
+            {
+                Bitmap btm = (Bitmap)b;
+                for (int y = 0; y < btm.Height; y++)
+                    for (int x = 0; x < btm.Width; x++)
+                        _contextObjects[x, y] = new ContextObject
+                        {
+                            Group = _matrix[x, y],
+                            Sign = new SignValue(btm.GetPixel(x, y))
+                        };
+            }
+            catch (Exception ex)
+            {
+                ErrorString = ex.Message;
+            }
+        }
+
         /// <summary>
         ///     Создаёт карту, полученную в результате прогона карты указанного изображения по ряду знаков, количество которых
         ///     зависит от размера изображения.
@@ -29,8 +72,9 @@ namespace DynamicParser
             return lst;
         }
 
-        public static Bitmap Find(Bitmap btmMain, List<Bitmap> bitSubject)
+        public Bitmap Find(ContextObject[,] btmMain, List<Bitmap> bitSubject)
         {
+            _parser.Join();
             List<SignValue[,]> lstSub =
                 new List<SignValue[,]>(bitSubject.Count);
             lstSub.AddRange(bitSubject.Select(GetMap));
@@ -164,7 +208,19 @@ namespace DynamicParser
         {
             public int? Number;
             public uint Count;
+            public byte Group;
             public int X, Y;
+        }
+
+        struct ContextObject
+        {
+            public bool IsElapsed;
+            public byte Group;
+            public SignValue Sign;
+
+            public bool IsGroup3 => Group == 3;
+            public bool IsGroup2 => Group == 2;
+            public bool IsGroup1 => Group == 1;
         }
     }
 }

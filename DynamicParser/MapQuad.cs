@@ -219,6 +219,42 @@ namespace DynamicParser
             return ret;
         }
 
+        struct ContextLine
+        {
+            readonly List<SignValue> _signList;
+            SignValue? _midSign;
+
+            public SignValue this[int index] => _signList[index];
+
+            public ContextLine(List<SignValue> signList)
+            {
+                if (signList == null)
+                    throw new ArgumentNullException();
+                if (signList.Count <= 0)
+                    throw new ArgumentException();
+                _signList = signList;
+                _midSign = null;
+            }
+
+            public SignValue MidSign
+            {
+                get
+                {
+                    if (_midSign != null)
+                        return _midSign.Value;
+                    if (_signList == null)
+                        throw new Exception();
+                    if (_signList.Count <= 0)
+                        throw new Exception();
+                    SignValue? svs = _signList.Aggregate<SignValue, SignValue?>(null, (current, sv) => current?.Average(sv) ?? sv);
+                    if (svs == null)
+                        throw new Exception();
+                    _midSign = svs;
+                    return svs.Value;
+                }
+            }
+        }
+
         struct Difference
         {
             public List<int> LstNumber;

@@ -219,12 +219,45 @@ namespace DynamicParser
             return ret;
         }
 
+        struct ContextLoader
+        {
+            readonly List<ContextLine> _contextLines;
+
+            public uint GetCount(ContextLoader cl)
+            {
+                if (cl._contextLines == null)
+                    throw new ArgumentNullException();
+                if (cl._contextLines.Count <= 0)
+                    throw new ArgumentException();
+                if (cl._contextLines.Count != _contextLines.Count)
+                    throw new ArgumentException();
+                uint count = 0;
+                for (int k = 0; k < _contextLines.Count; k++)
+                    for (int j = 0; j < _contextLines[k]._signList.Count; j++)
+                        ;
+                return count;
+            }
+        }
+
         struct ContextLine
         {
-            readonly List<SignValue> _signList;
+            public readonly List<SignValue> _signList;
             SignValue? _midSign;
 
-            public SignValue this[int index] => _signList[index];
+            public uint GetTargetCount(ContextLine ctl)
+            {
+                if (ctl._midSign == null)
+                    throw new ArgumentNullException();
+                if (ctl._signList.Count <= 0)
+                    throw new ArgumentException();
+                if (ctl._signList.Count != _signList.Count)
+                    throw new ArgumentException();
+                uint count = 0;
+                for (int k = 0; k < ctl._signList.Count; k++)
+                    if (_signList[k] == ctl._signList[k])
+                        count++;
+                return count;
+            }
 
             public ContextLine(List<SignValue> signList)
             {

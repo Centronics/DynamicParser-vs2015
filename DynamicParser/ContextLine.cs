@@ -5,13 +5,13 @@ using DynamicProcessor;
 
 namespace DynamicParser
 {
-    struct Points
+    public struct Points
     {
         public Point Pt;
         public SignValue Sign;
     }
 
-    struct Line
+    public struct Line
     {
         public Points PtX, PtY;
 
@@ -32,7 +32,7 @@ namespace DynamicParser
             : (PtX.Pt.Y > PtY.Pt.Y ? PtX.Pt.Y - PtY.Pt.Y : PtY.Pt.Y - PtX.Pt.Y);
     }
 
-    class ContextLine
+    public class ContextLine
     {
         readonly List<Points> _points = new List<Points>();
         public int Width { get; }

@@ -69,12 +69,12 @@ namespace DynamicParser
             return _points[Width * y + x];
         }
 
-        public Line? GetLine(SignValue diff)
+        public IEnumerable<Line> GetHorizontalLine(SignValue diff)
         {
             if (_lastY >= Height)
             {
                 _lastX = _lastY = 0;
-                return null;
+                yield break;
             }
             Points pts = GetPixel(_lastX, _lastY);
             Points? pt = null;
@@ -91,7 +91,32 @@ namespace DynamicParser
             }
             if (pt == null)
                 throw new Exception();
-            return new Line(pts, pt.Value);
+            yield return new Line(pts, pt.Value);
+        }
+
+        public IEnumerable<Line> GetVerticalLine(SignValue diff)
+        {
+            if (_lastX >= Width)
+            {
+                _lastX = _lastY = 0;
+                yield break;
+            }
+            Points pts = GetPixel(_lastX, _lastY);
+            Points? pt = null;
+            for (_lastY++; _lastY < Height; _lastY++)
+            {
+                pt = GetPixel(_lastX, _lastY);
+                if (pts.Sign - pt.Value.Sign > diff)
+                    pt = new Points { Sign = pts.Sign - pt.Value.Sign, Pt = pt.Value.Pt };
+            }
+            if (_lastY >= Height)
+            {
+                _lastY = 0;
+                _lastX++;
+            }
+            if (pt == null)
+                throw new Exception();
+            yield return new Line(pts, pt.Value);
         }
     }
 }

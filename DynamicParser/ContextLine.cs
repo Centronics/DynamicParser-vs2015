@@ -13,7 +13,7 @@ namespace DynamicParser
 
     public struct Line
     {
-        public Points PtX, PtY;
+        public Points PtStart, PtEnd;
 
         public Line(Points ptx, Points pty)
         {
@@ -23,13 +23,13 @@ namespace DynamicParser
             if (ptx.Pt.X != pty.Pt.X)
                 if (ptx.Pt.Y != pty.Pt.Y)
                     throw new Exception();
-            PtX = ptx;
-            PtY = pty;
+            PtStart = ptx;
+            PtEnd = pty;
         }
 
-        public int Length => PtX.Pt.Y == PtY.Pt.Y
-            ? (PtX.Pt.X > PtY.Pt.X ? PtX.Pt.X - PtY.Pt.X : PtY.Pt.X - PtX.Pt.X)
-            : (PtX.Pt.Y > PtY.Pt.Y ? PtX.Pt.Y - PtY.Pt.Y : PtY.Pt.Y - PtX.Pt.Y);
+        public int Length => PtStart.Pt.Y == PtEnd.Pt.Y
+            ? (PtStart.Pt.X > PtEnd.Pt.X ? PtStart.Pt.X - PtEnd.Pt.X : PtEnd.Pt.X - PtStart.Pt.X)
+            : (PtStart.Pt.Y > PtEnd.Pt.Y ? PtStart.Pt.Y - PtEnd.Pt.Y : PtEnd.Pt.Y - PtStart.Pt.Y);
     }
 
     public class ContextLine

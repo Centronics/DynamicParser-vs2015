@@ -45,10 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContextCube.cs" />
-    <Compile Include="ContextDistance.cs" />
-    <Compile Include="ContextLength.cs" />
     <Compile Include="ContextLine.cs" />
-    <Compile Include="ContextPriority.cs" />
     <Compile Include="ContextWidth.cs" />
     <Compile Include="MapQuad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

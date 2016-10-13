@@ -7,5 +7,6 @@ namespace DynamicParser
 {
     class ContextCube
     {
+
     }
 }

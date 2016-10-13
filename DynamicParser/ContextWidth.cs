@@ -6,6 +6,7 @@ namespace DynamicParser
     public struct ObjectQuad
     {
         public int X, Y, Width, Height;
+        public SignValue ColorValue;
     }
 
     public static class ContextWidth
@@ -33,7 +34,8 @@ namespace DynamicParser
                     X = line.PtStart.Pt.X,
                     Y = line.PtStart.Pt.Y,
                     Height = line1.Value.PtStart.Pt.Y - line.PtStart.Pt.Y,
-                    Width = line.Length
+                    Width = line.Length,
+                    ColorValue = line.PtStart.Sign
                 };
             }
         }

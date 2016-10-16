@@ -48,6 +48,7 @@
     <Compile Include="ContextLine.cs" />
     <Compile Include="ContextWidth.cs" />
     <Compile Include="MapQuad.cs" />
+    <Compile Include="Processor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

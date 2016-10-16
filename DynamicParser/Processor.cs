@@ -11,28 +11,43 @@ namespace DynamicParser
         static long _idCount;
 
         readonly List<SignValue> _signList = new List<SignValue>();
-        public long Id { get; }
-        int _nextDataCounter, currentDataCounter;
-        List<List<Data>> _nextData { get; } = new List<List<Data>>();
+        readonly List<Data> _nextData = new List<Data>();
+        public long Id { get; private set; }
+        int _nextDataCounter = -1, _currentDataCounter;
 
-        List<Data> GetNextData()
+        Data GetNextData()
         {
-            if (_nextDataCounter <= 0)
+            if (_nextDataCounter < 0)
             {
-                _nextDataCounter = 1;
-                return null;
+                _nextDataCounter = 0;
+                return this;
             }
             if (_nextDataCounter < _nextData.Count) return _nextData[_nextDataCounter++];
-            if (currentDataCounter < _nextData.Count)
+            if (_currentDataCounter < _nextData.Count)
             {
-                List<Data> nd = _nextData[currentDataCounter];
-
+                if (_currentDataCounter < _nextData.Count)
+                    return _nextData[_currentDataCounter++];
+                _currentDataCounter = 0;
             }
-            _nextDataCounter = 0;
+            _nextDataCounter = -1;
             return null;
         }
 
         public Data()
+        {
+            IdInit();
+        }
+
+        public Data(ICollection<SignValue> lstSv)
+        {
+            if (lstSv == null)
+                return;
+            if (lstSv.Count <= 0)
+                return;
+            _signList.AddRange(lstSv);
+        }
+
+        void IdInit()
         {
             if (_idCount == long.MaxValue)
                 throw new ArgumentException();
@@ -62,7 +77,7 @@ namespace DynamicParser
 
         public Data ReadValues(List<SignValue> lstSv)
         {
-            for (Data nd = this; nd != null; nd = nd._nextData)
+            for (Data nd = GetNextData(); nd != null; nd = nd.GetNextData())
                 if (nd.InCase(lstSv))
                     return this;
             return null;
@@ -75,14 +90,15 @@ namespace DynamicParser
             if (lstSv.Count <= 0)
                 return -1;
             Data data = ReadValues(lstSv);
-            if (data == null)
-                return -1;
-            if ()
-        }
-
-        public Data WriteValues(List<SignValue> lstSv, long id)
-        {
-
+            if (data != null) return data.WriteValues(lstSv);
+            if (_signList.Count <= 0)
+            {
+                _signList.AddRange(lstSv);
+                return Id;
+            }
+            Data dt = new Data(lstSv);
+            _nextData.Add(dt);
+            return dt.Id;
         }
     }
 

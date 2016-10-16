@@ -104,12 +104,14 @@ namespace DynamicParser
 
     public sealed class Processor
     {
-        public Processor ReadValues(List<Data> lstData)
+        List<Data> _lstBuffer;
+
+        public Processor ReadData(List<SignValue> lstSv)
         {
 
         }
 
-        public Processor ReadValues(List<SignValue> lstSv)
+        public void StopRec()
         {
 
         }

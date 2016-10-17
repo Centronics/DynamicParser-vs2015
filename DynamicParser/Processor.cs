@@ -15,6 +15,11 @@ namespace DynamicParser
         public long Id { get; private set; }
         int _nextDataCounter = -1, _currentDataCounter;
 
+        public Data()
+        {
+            IdInit();
+        }
+
         Data GetNextData()
         {
             if (_nextDataCounter < 0)
@@ -31,11 +36,6 @@ namespace DynamicParser
             }
             _nextDataCounter = -1;
             return null;
-        }
-
-        public Data()
-        {
-            IdInit();
         }
 
         public Data(ICollection<SignValue> lstSv)
@@ -83,41 +83,60 @@ namespace DynamicParser
             return null;
         }
 
-        public long WriteValues(List<SignValue> lstSv)
+        public Data WriteValues(List<SignValue> lstSv)
         {
             if (lstSv == null)
-                return -1;
+                return null;
             if (lstSv.Count <= 0)
-                return -1;
+                return null;
             Data data = ReadValues(lstSv);
             if (data != null) return data.WriteValues(lstSv);
             if (_signList.Count <= 0)
             {
                 _signList.AddRange(lstSv);
-                return Id;
+                return this;
             }
             Data dt = new Data(lstSv);
             _nextData.Add(dt);
-            return dt.Id;
+            return dt;
         }
     }
 
     public sealed class Processor
     {
-        List<Data> _lstBuffer;
+        public readonly Data CurrentData = new Data();
+        readonly List<Data> _lstBuffer = new List<Data>();
+        readonly List<SignValue> _lstSv = new List<SignValue>();
 
         public Processor ReadData(List<SignValue> lstSv)
+        {
+            if (lstSv == null)
+                throw new ArgumentNullException();
+            if (lstSv.Count <= 0)
+                throw new ArgumentException();
+            _lstBuffer.Clear();
+
+            for (int k = 0; k < lstSv.Count; k++)
+                _lstBuffer.Add(CurrentData.WriteValues(lstSv));
+            _lstSv.AddRange(lstSv);
+        }
+
+        IEnumerable<List<SignValue>> GetListFormat(List<SignValue> lst)
         {
 
         }
 
         public void StopRec()
         {
-
+            _lstSv.Clear();
         }
 
         public Data WriteData(List<Data> lstData)
         {
+            if (lstData == null)
+                throw new ArgumentNullException();
+            if (lstData.Count <= 0)
+                throw new ArgumentException();
 
         }
     }

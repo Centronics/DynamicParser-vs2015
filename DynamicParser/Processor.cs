@@ -129,7 +129,7 @@ namespace DynamicParser
 
     public static class DataProcessor
     {
-        static IEnumerable<List<SignValue>> GetData(ICollection<SignValue> lstSv)
+        static IEnumerable<List<SignValue>> GetData(IList<SignValue> lstSv)
         {
             if (lstSv == null || lstSv.Count <= 0)
                 yield break;
@@ -139,14 +139,16 @@ namespace DynamicParser
                 lst.RemoveAt(0);
                 yield return lst;
             }
-            lst.Clear();
-            lst.AddRange(lst);
-            for (int j = 0; j < lstSv.Count; j++)
-                for (int k = 0; k < lst.Count; k++)
+            for (int h = 0; h < lstSv.Count; h++)
+                for (int j = 1; j <= lstSv.Count; j++)
                 {
                     List<SignValue> lst1 = new List<SignValue>(j);
-                    for (int i = 0; i <= j && lst.Count - k <= j; i++)
-                        lst1.Add(lst[k]);
+                    for (int k = h; k < lstSv.Count; k++)
+                    {
+                        if (lstSv.Count - k > j)
+                            break;
+                        lst1.Add(lstSv[k]);
+                    }
                     yield return lst1;
                 }
         }

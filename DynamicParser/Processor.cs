@@ -13,7 +13,6 @@ namespace DynamicParser
         readonly List<SignValue> _signList = new List<SignValue>();
         readonly List<Data> _nextData = new List<Data>();
         public long Id { get; private set; }
-        int _nextDataCounter = -1, _currentDataCounter;
 
         public Data()
         {
@@ -31,22 +30,14 @@ namespace DynamicParser
             Id = -1;
         }
 
-        Data GetNextData()
+        IEnumerable<Data> NextData
         {
-            if (_nextDataCounter < 0)
+            get
             {
-                _nextDataCounter = 0;
-                return this;
+                yield return this;
+                foreach (Data dt in _nextData)
+                    yield return dt;
             }
-            if (_nextDataCounter < _nextData.Count) return _nextData[_nextDataCounter++];
-            if (_currentDataCounter < _nextData.Count)
-            {
-                if (_currentDataCounter < _nextData.Count)
-                    return _nextData[_currentDataCounter++];
-                _currentDataCounter = 0;
-            }
-            _nextDataCounter = -1;
-            return null;
         }
 
         public Data(ICollection<SignValue> lstSv)
@@ -78,34 +69,29 @@ namespace DynamicParser
 
         public Data ReadValues(long id)
         {
-            if (id < 0)
-                return null;
-            for (Data nd = this; nd != null; nd = nd.GetNextData())
-                if (nd.Id == Id)
-                    return nd;
-            return null;
+            return id < 0 ? null : NextData.FirstOrDefault(nd => (nd?.Id ?? -1) == Id);
         }
 
         public Data ReadValues(List<SignValue> lstSv)
         {
-            for (Data nd = GetNextData(); nd != null; nd = nd.GetNextData())
-                if (nd.InCase(lstSv))
-                    return this;
-            return null;
+            return NextData.Any(nd => nd.InCase(lstSv)) ? this : null;
         }
 
         public Data ReadValues(Data data)
         {
-            if (data == null)
-                return null;
-            return data.IsEmpty ? null : ReadValues(data._signList);
+            return (data?.IsEmpty ?? true) ? null : ReadValues(data._signList);
         }
 
         public Data WriteValues(Data data)
         {
-            if (data == null)
-                return null;
-            return data.IsEmpty ? null : WriteValues(data._signList);
+            return (data?.IsEmpty ?? true) ? null : WriteValues(data._signList);
+        }
+
+        public void AddValues(Data data)
+        {
+            if (data?.IsEmpty ?? true)
+                return;
+            _nextData.Add(data);
         }
 
         public Data WriteValues(List<SignValue> lstSv)
@@ -158,7 +144,7 @@ namespace DynamicParser
             if (dt == null || dt.Count <= 0 || (readData?.IsEmpty ?? true)) return null;
             Data data = readData.ReadValues(dt);
             foreach (List<SignValue> lst in GetData(dt))
-                data.ReadValues(readData.ReadValues(lst));
+                data.AddValues(readData.ReadValues(lst));
             return data;
         }
 
@@ -167,7 +153,7 @@ namespace DynamicParser
             if ((dt?.IsEmpty ?? true) || (writeData?.IsEmpty ?? true)) return null;
             Data data = writeData.WriteValues(dt);
             for (int k = 1; k < dt.Length; k++)
-                data.WriteValues(writeData.WriteValues(dt));
+                data.AddValues(writeData.WriteValues(dt));
             return data;
         }
     }

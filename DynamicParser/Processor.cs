@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace DynamicParser
 {
     public enum SignColor : byte
     {
+        Nothing,
         Red,
         Orange,
         Yellow,
@@ -25,6 +27,15 @@ namespace DynamicParser
     {
         readonly SignColor[,] _bitmap;
 
+        public Map(int width, int height)
+        {
+            if (width <= 0)
+                throw new ArgumentException();
+            if (height <= 0)
+                throw new ArgumentException();
+            _bitmap = new SignColor[width, height];
+        }
+
         public Map(Bitmap btm)
         {
             if (btm == null)
@@ -42,6 +53,36 @@ namespace DynamicParser
         public int Height => _bitmap.GetLength(1);
 
         public int Length => Width * Height;
+
+        public IEnumerable<Map> GetSymbols(IEnumerable<Map> lstFunc)
+        {
+            if (lstFunc == null)
+                throw new ArgumentNullException();
+            IEnumerable<Map> enumerable = lstFunc as IList<Map> ?? lstFunc.ToList();
+            if (!IsEqual(enumerable))
+                throw new ArgumentException();
+            foreach (Map map in enumerable)
+            {
+                Map operations = new Map(map.Width, map.Height);
+                for (int y = 0; y < map.Height; y++)
+                    for (int x = 0; x < map.Width; x++)
+                    {
+                        SignColor sc = _bitmap[x, y];
+                        operations._bitmap[x, y] = map._bitmap[x, y] == sc
+                            ? SignColor.Nothing
+                            : sc;
+                    }
+                yield return operations;
+            }
+        }
+
+        bool IsEqual(IEnumerable<Map> lstFunc)
+        {
+            if (lstFunc == null)
+                return false;
+            int len = Length;
+            return lstFunc.All(map => len == map?.Length);
+        }
 
         public IEnumerable<Information[,]> GetMap(IList<Map> lstFunc)
         {

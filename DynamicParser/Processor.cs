@@ -7,14 +7,14 @@ namespace DynamicParser
 {
     public enum SignColor : byte
     {
-        Nothing,
         Red,
         Orange,
         Yellow,
         Green,
         LightBlue,
         Blue,
-        Violet
+        Violet,
+        Nothing = 8
     }
 
     public struct Information

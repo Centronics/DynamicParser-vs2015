@@ -26,7 +26,12 @@ namespace DynamicParser
             _bitmap = new SignValue[btm.Width, btm.Height];
             for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
-                    _bitmap[x, y] = new SignValue(btm.GetPixel(x, y).ToArgb() / 2396745);
+                    _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
+        }
+
+        public Processor GetMap()
+        {
+
         }
 
         public int Width => _bitmap.GetLength(0);

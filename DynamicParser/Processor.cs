@@ -4,20 +4,14 @@ using DynamicProcessor;
 
 namespace DynamicParser
 {
+    [Serializable]
     public sealed class Processor
     {
-        readonly SignValue[,] _bitmap;
+        SignValue[,] _bitmap;
+        int? _x, _y;
+        Processor _nextProcessor;
 
-        public Processor(int width, int height)
-        {
-            if (width <= 0)
-                throw new ArgumentException();
-            if (height <= 0)
-                throw new ArgumentException();
-            _bitmap = new SignValue[width, height];
-        }
-
-        public Processor(Bitmap btm)
+        public void Add(Bitmap btm)
         {
             if (btm == null)
                 throw new ArgumentNullException();
@@ -29,9 +23,30 @@ namespace DynamicParser
                     _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
         }
 
-        public Processor GetMap()
+        public void Add(Processor proc, int x, int y)
         {
+            if (_nextProcessor != null || _x == null || _y == null)
+                throw new ArgumentException();
+            if (proc == null)
+                throw new ArgumentNullException();
+            if (proc.Length <= 0)
+                throw new ArgumentException();
+            if (x < 0 || y < 0)
+                throw new ArgumentException();
+            if (proc.Width + x >= Width)
+                throw new ArgumentException();
+            if (proc.Height + y >= Height)
+                throw new ArgumentException();
+            _x = x;
+            _y = y;
+            _nextProcessor = proc;
+        }
 
+        public ulong GetEqual(int level)
+        {
+            for(int y=0;y< Height;y++)
+                for (int x = 0; x < Width; x++)
+                
         }
 
         public int Width => _bitmap.GetLength(0);

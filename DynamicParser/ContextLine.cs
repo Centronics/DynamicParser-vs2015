@@ -7,7 +7,7 @@ namespace DynamicParser
 {
     public struct Points
     {
-        public Point Pt;
+        public System.Drawing.Point Pt;
         public SignValue Sign;
     }
 
@@ -52,7 +52,7 @@ namespace DynamicParser
                     _points.Add(new Points
                     {
                         Sign = new SignValue(btm.GetPixel(x, y)),
-                        Pt = new Point
+                        Pt = new System.Drawing.Point
                         {
                             X = x,
                             Y = y

@@ -32,7 +32,7 @@ namespace DynamicParser
 
         public int Length => Width * Height;
 
-        SignValue?[,] _bitmap;
+        readonly SignValue?[,] _bitmap;
         readonly List<ProcStruct> _lstProcs = new List<ProcStruct>();
 
         public SignValue? GetSignValue(int x, int y)
@@ -40,7 +40,7 @@ namespace DynamicParser
             return _bitmap[x, y];
         }
 
-        public void Add(Bitmap btm)
+        public Processor(Bitmap btm, Color? color = null)
         {
             if (btm == null)
                 throw new ArgumentNullException();
@@ -49,7 +49,16 @@ namespace DynamicParser
             _bitmap = new SignValue?[btm.Width, btm.Height];
             for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
-                    _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
+                {
+                    SignValue sv = new SignValue(btm.GetPixel(x, y));
+                    if (color == null)
+                    {
+                        _bitmap[x, y] = sv;
+                        continue;
+                    }
+                    if (sv.ValueColor == color.Value)
+                        _bitmap[x, y] = sv;
+                }
         }
 
         public void Add(Processor proc, int x, int y)

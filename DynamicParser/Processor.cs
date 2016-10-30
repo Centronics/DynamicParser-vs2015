@@ -32,10 +32,10 @@ namespace DynamicParser
 
         public int Length => Width * Height;
 
-        SignValue[,] _bitmap;
+        SignValue?[,] _bitmap;
         readonly List<ProcStruct> _lstProcs = new List<ProcStruct>();
 
-        public SignValue GetSignValue(int x, int y)
+        public SignValue? GetSignValue(int x, int y)
         {
             return _bitmap[x, y];
         }
@@ -46,7 +46,7 @@ namespace DynamicParser
                 throw new ArgumentNullException();
             if (btm.Width <= 0 || btm.Height <= 0)
                 throw new ArgumentException();
-            _bitmap = new SignValue[btm.Width, btm.Height];
+            _bitmap = new SignValue?[btm.Width, btm.Height];
             for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
                     _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
@@ -89,22 +89,25 @@ namespace DynamicParser
                         for (int x = ps.X; x < Width; x++)
                         {
                             Tpoint tp = signValues[x, y];
+                            SignValue? sv = _bitmap[x, y], sv1 = ps.Proc.GetSignValue(x, y);
+                            if (sv == null || sv1 == null)
+                                continue;
                             if (tp != null)
                             {
-                                SignValue val = _bitmap[x, y] - ps.Proc.GetSignValue(x, y);
-                                if (val > tp.Value) continue;
-                                if (tp.Value == val)
+                                SignValue? val = sv.Value - sv1.Value;
+                                if (val.Value > tp.Value) continue;
+                                if (tp.Value == val.Value)
                                 {
                                     tp.Number.Add(k);
                                     continue;
                                 }
-                                tp.Value = val;
+                                tp.Value = val.Value;
                                 tp.Number.Add(k);
                                 continue;
                             }
                             signValues[x, y] = new Tpoint
                             {
-                                Value = _bitmap[x, y] - ps.Proc.GetSignValue(x, y),
+                                Value = sv.Value - sv1.Value,
                                 Number = new List<int> { k }
                             };
                         }

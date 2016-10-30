@@ -26,6 +26,12 @@ namespace DynamicParser
             public int Count;
         }
 
+        public int Width => _bitmap.GetLength(0);
+
+        public int Height => _bitmap.GetLength(1);
+
+        public int Length => Width * Height;
+
         SignValue[,] _bitmap;
         readonly List<ProcStruct> _lstProcs = new List<ProcStruct>();
 
@@ -129,11 +135,5 @@ namespace DynamicParser
                 }
             return cur;
         }
-
-        public int Width => _bitmap.GetLength(0);
-
-        public int Height => _bitmap.GetLength(1);
-
-        public int Length => Width * Height;
     }
 }

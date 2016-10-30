@@ -20,12 +20,6 @@ namespace DynamicParser
             public int X, Y;
         }
 
-        struct Equal
-        {
-            public ProcStruct Proc;
-            public int Count;
-        }
-
         public int Width => _bitmap.GetLength(0);
 
         public int Height => _bitmap.GetLength(1);
@@ -69,9 +63,9 @@ namespace DynamicParser
                 throw new ArgumentException();
             if (x < 0 || y < 0)
                 throw new ArgumentException();
-            if (proc.Width + x >= Width)
+            if (proc.Width + x > Width)
                 throw new ArgumentException();
-            if (proc.Height + y >= Height)
+            if (proc.Height + y > Height)
                 throw new ArgumentException();
             _lstProcs.Add(new ProcStruct
             {
@@ -85,67 +79,50 @@ namespace DynamicParser
         {
             if (_bitmap == null)
                 throw new ArgumentNullException();
-            List<Equal> lstEq = new List<Equal>();
-            foreach (ProcStruct ps in _lstProcs)
+            Tpoint[,] signValues = new Tpoint[Width, Height];
+            for (int j = 0; j < _lstProcs.Count; j++)
             {
-                if (ps.X < 0)
-                    throw new ArgumentException();
-                if (ps.Y < 0)
-                    throw new ArgumentException();
-                Tpoint[,] signValues = new Tpoint[Width, Height];
-                for (int k = 0; k < ps.Proc._lstProcs.Count; k++)
-                    for (int y = ps.Y; y < Height; y++)
-                        for (int x = ps.X; x < Width; x++)
+                ProcStruct ps = _lstProcs[j];
+                for (int y = ps.Y; y < ps.Proc.Height; y++)
+                    for (int x = ps.X; x < ps.Proc.Width; x++)
+                    {
+                        Tpoint tp = signValues[x, y];
+                        SignValue? sv = _bitmap[x, y], sv1 = ps.Proc.GetSignValue(x, y);
+                        if (sv == null || sv1 == null)
+                            continue;
+                        if (tp != null)
                         {
-                            Tpoint tp = signValues[x, y];
-                            SignValue? sv = _bitmap[x, y], sv1 = ps.Proc.GetSignValue(x, y);
-                            if (sv == null || sv1 == null)
-                                continue;
-                            if (tp != null)
+                            SignValue? val = sv.Value - sv1.Value;
+                            if (val.Value > tp.Value) continue;
+                            if (tp.Value == val.Value)
                             {
-                                SignValue? val = sv.Value - sv1.Value;
-                                if (val.Value > tp.Value) continue;
-                                if (tp.Value == val.Value)
-                                {
-                                    tp.Number.Add(k);
-                                    continue;
-                                }
-                                tp.Value = val.Value;
-                                tp.Number.Add(k);
+                                tp.Number.Add(j);
                                 continue;
                             }
-                            signValues[x, y] = new Tpoint
-                            {
-                                Value = sv.Value - sv1.Value,
-                                Number = new List<int> { k }
-                            };
+                            tp.Value = val.Value;
+                            tp.Number.Add(j);
+                            continue;
                         }
-                int[] lst = new int[ps.Proc._bitmap.Length];
-                for (int k = 0; k < ps.Proc._bitmap.Length; k++)
-                    foreach (Tpoint tp in signValues)
-                        if (tp.Number.Contains(k))
-                            lst[k]++;
-                int index = -1, ind = 0;
-                for (int k = 0; k < lst.Length; k++)
-                    if (lst[k] > ind)
-                    {
-                        index = k;
-                        ind = lst[k];
+                        signValues[x, y] = new Tpoint
+                        {
+                            Value = sv.Value - sv1.Value,
+                            Number = new List<int> { j }
+                        };
                     }
-                lstEq.Add(new Equal
-                {
-                    Count = ind,
-                    Proc = _lstProcs[index]
-                });
             }
-            ProcStruct? cur = null;
-            for (int k = 0, cou = -1; k < lstEq.Count; k++)
-                if (lstEq[k].Count > cou)
+            int[] lst = new int[Length];
+            for (int k = 0; k < Length; k++)
+                foreach (Tpoint tp in signValues)
+                    if (tp.Number.Contains(k))
+                        lst[k]++;
+            int index = -1, ind = 0;
+            for (int k = 0; k < lst.Length; k++)
+                if (lst[k] > ind)
                 {
-                    cou = lstEq[k].Count;
-                    cur = lstEq[k].Proc;
+                    index = k;
+                    ind = lst[k];
                 }
-            return cur;
+            return _lstProcs[index];
         }
     }
 }

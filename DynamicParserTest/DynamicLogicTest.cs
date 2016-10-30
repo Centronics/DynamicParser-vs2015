@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Drawing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DynamicParser;
 
 namespace DynamicParserTest
@@ -9,12 +10,10 @@ namespace DynamicParserTest
         [TestMethod]
         public void ParserTest()
         {
-            Context ctx = new Context(30);
-            ctx.Add(10);//Assert.AreEqual(true, 
-            ctx.Add(17);
-            ctx.Add(15);
-            ctx.Add(30);
-            ctx.Add(15);
+            Processor proc = new Processor(new Bitmap(@"D:\разработки\tst\A_My.png"));
+            proc.Add(new Processor(new Bitmap(@"D:\разработки\tst\A_orig.png")), 0, 0);
+            proc.Add(new Processor(new Bitmap(@"D:\разработки\tst\L_orig.png")), 0, 0);
+            Processor.ProcStruct? ps = proc.GetEqual();
         }
     }
 }

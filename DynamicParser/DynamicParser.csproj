@@ -47,6 +47,7 @@
     <Compile Include="ContextCube.cs" />
     <Compile Include="ContextLine.cs" />
     <Compile Include="ContextWidth.cs" />
+    <Compile Include="Map.cs" />
     <Compile Include="MapQuad.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

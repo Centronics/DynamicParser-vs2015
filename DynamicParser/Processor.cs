@@ -6,7 +6,7 @@ using DynamicProcessor;
 
 namespace DynamicParser
 {
-    public sealed class Processor
+    public sealed class Processor : ICloneable
     {
         sealed class Tpoint
         {
@@ -73,6 +73,19 @@ namespace DynamicParser
             return _bitmap[x, y];
         }
 
+        Processor(SignValue[,] lst)
+        {
+            if (lst == null)
+                throw new ArgumentNullException();
+            if (lst.Length <= 0)
+                throw new ArgumentException();
+            SignValue[,] list = new SignValue[lst.GetLength(0), lst.GetLength(1)];
+            for (int y = 0, ly = lst.GetLength(1); y < ly; y++)
+                for (int x = 0, lx = lst.GetLength(0); x < lx; x++)
+                    list[x, y] = lst[x, y];
+            _bitmap = list;
+        }
+
         public Processor(Bitmap btm)
         {
             if (btm == null)
@@ -120,6 +133,11 @@ namespace DynamicParser
                 for (int k = 0; k < lst.Count; k++)
                     if (lst[k].MaxItemCount > lst[j].MaxItemCount)
                         lst[j] = lst[k];
+        }
+
+        public Processor GetProcessor(Processor proc)
+        {
+
         }
 
         public IEnumerable<ProcStruct> GetEqual()
@@ -235,6 +253,11 @@ namespace DynamicParser
             Sort(lst);
             foreach (ProcStruct t in lst)
                 yield return t;
+        }
+
+        public object Clone()
+        {
+            return new Processor(_bitmap);
         }
     }
 }

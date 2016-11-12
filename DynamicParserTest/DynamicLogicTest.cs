@@ -13,7 +13,7 @@ namespace DynamicParserTest
             Processor proc = new Processor(new Bitmap(@"D:\разработки\tst\A_My.png"));
             proc.Add(new Processor(new Bitmap(@"D:\разработки\tst\A_orig.png")), 0, 0);
             proc.Add(new Processor(new Bitmap(@"D:\разработки\tst\L_orig.png")), 0, 0);
-            Processor.ProcStruct? ps = proc.GetEqual();
+            Processor.ProcClass? ps = proc.GetEqual();
         }
     }
 }

@@ -8,26 +8,27 @@ namespace DynamicParser
 {
     public sealed class Processor : ICloneable
     {
-        public struct ProcCount
+        sealed class ProcClass : ICloneable
         {
-            public uint Count;
-            public Processor Proc;
-            public SignValue Sign;
+            public struct ProcCount
+            {
+                public int Index;
+                public Processor Proc;
+                public SignValue Sign;
 
-            public decimal Percentage => Proc == null ? 0 : Count / Convert.ToDecimal(Proc.Length);
-        }
+                public decimal Percentage => Proc == null ? 0 : Index / Convert.ToDecimal(Proc.Length);
+            }
 
-        public class ProcStruct
-        {
             public int X { get; }
             public int Y { get; }
+            public SignValue Value { get; set; }
             public List<ProcCount> Procs { get; } = new List<ProcCount>();
             public ProcCount MaxElement => Procs[MaxIndex];
-            public uint MaxItemCount => Procs[MaxIndex].Count;
+            public int MaxItemCount => Procs[MaxIndex].Index;
             public decimal MaxItemPercentage => Procs[MaxIndex].Percentage;
             public Processor MaxItemProcessor => Procs[MaxIndex].Proc;
 
-            public ProcStruct(int x, int y)
+            public ProcClass(int x, int y, SignValue? sv = null)
             {
                 if (x < 0)
                     throw new ArgumentException();
@@ -35,6 +36,7 @@ namespace DynamicParser
                     throw new ArgumentException();
                 X = x;
                 Y = y;
+                Value = sv ?? SignValue.MaxValue;
             }
 
             public int MaxIndex
@@ -52,9 +54,17 @@ namespace DynamicParser
                     return t;
                 }
             }
+
+            public object Clone()
+            {
+                ProcClass pc = new ProcClass(X, Y, Value);
+                for (int k = 0; k < Procs.Count; k++)
+                    pc.Procs.Add(Procs[k]);
+                return pc;
+            }
         }
 
-        readonly ProcCount[,] _bitmap;
+        readonly ProcClass[,] _bitmap;
         readonly List<Processor> _lstProcs = new List<Processor>();
 
         public int Width => _bitmap.GetLength(0);
@@ -65,13 +75,13 @@ namespace DynamicParser
 
         public static event Action<string> LogEvent;
 
-        Processor(ProcCount[,] lst)
+        Processor(ProcClass[,] lst)
         {
             if (lst == null)
                 throw new ArgumentNullException();
             if (lst.Length <= 0)
                 throw new ArgumentException();
-            ProcCount[,] list = new ProcCount[lst.GetLength(0), lst.GetLength(1)];
+            ProcClass[,] list = new ProcClass[lst.GetLength(0), lst.GetLength(1)];
             for (int y = 0, ly = lst.GetLength(1); y < ly; y++)
                 for (int x = 0, lx = lst.GetLength(0); x < lx; x++)
                     list[x, y] = lst[x, y];
@@ -84,10 +94,22 @@ namespace DynamicParser
                 throw new ArgumentNullException();
             if (btm.Width <= 0 || btm.Height <= 0)
                 throw new ArgumentException();
-            _bitmap = new ProcCount[btm.Width, btm.Height];
+            _bitmap = new ProcClass[btm.Width, btm.Height];
             for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
-                    _bitmap[x, y] = new ProcCount { Sign = new SignValue(btm.GetPixel(x, y)) };
+                    _bitmap[x, y] = new ProcClass(x, y, new SignValue(btm.GetPixel(x, y)));
+        }
+
+        public Processor(int mx, int my)
+        {
+            if (mx <= 0)
+                throw new ArgumentException($"{nameof(Processor)}: mx < 0: ({mx})", nameof(mx));
+            if (my <= 0)
+                throw new ArgumentException($"{nameof(Processor)}: my < 0: ({my})", nameof(my));
+            _bitmap = new ProcClass[mx, my];
+            for (int y = 0; y < my; y++)
+                for (int x = 0; x < mx; x++)
+                    _bitmap[x, y] = new ProcClass(x, y);
         }
 
         static void WriteLog(string message)
@@ -117,75 +139,49 @@ namespace DynamicParser
 
         public Processor GetEqual()
         {
-            Tpoint[,] signValues = new Tpoint[Width, Height];//сменить на ProcCount
-            object thisLock = new object();
-            ParallelLoopResult pr = Parallel.For(0, _lstProcs.Count, j =>
+            Processor processor = new Processor(Width, Height);
+            ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
             {
                 try
                 {
-                    ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
+                    ParallelLoopResult ptx = Parallel.For(0, Width, x1 =>
                     {
                         try
                         {
-                            ParallelLoopResult ptx = Parallel.For(0, Width, x1 =>
+                            ParallelLoopResult pr1 = Parallel.For(0, _lstProcs.Count, j =>
                             {
                                 try
                                 {
                                     Processor ps = _lstProcs[j];
-                                    ParallelLoopResult pry = Parallel.For(0, ps.Height, y =>
-                                    {
-                                        try
+                                    if (ps.Width < Width - x1 || ps.Height < Height - y1)
+                                        return;
+                                    for (int y = 0; y < ps.Height; y++)
+                                        for (int x = 0; x < ps.Width; x++)
                                         {
-                                            ParallelLoopResult prx = Parallel.For(0, ps.Width, x =>
-                                            {
-                                                try
-                                                {
-                                                    if (ps.Width < Width - x || ps.Height < Height - y)
-                                                        return;
-                                                    lock (thisLock)
-                                                    {
-                                                        Tpoint tp = signValues[x1, y1];
-                                                        SignValue val = _bitmap[x1, y1].Sign - ps._bitmap[x, y].Sign;
-                                                        if (tp != null)
-                                                        {
-                                                            if (val > tp.Value) return;
-                                                            tp.Value = val;
-                                                            tp.Proc = ps;
-                                                            return;
-                                                        }
-                                                        signValues[x, y] = new Tpoint { Value = val, Proc = ps };
-                                                    }
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    WriteLog(ex.Message);
-                                                }
-                                            });
-                                            if (!prx.IsCompleted)
-                                                throw new Exception("Ошибка при выполнении цикла обработки изображения (X)");
+                                            ProcClass tp = processor._bitmap[x1, y1], tpps = ps._bitmap[x, y];
+                                            if (tp == null)
+                                                throw new ArgumentException("Элемент проверяемой карты равен null");
+                                            if (tpps == null)
+                                                throw new ArgumentException("Элемент проверяющей карты равен null");
+                                            SignValue val = tp.Value - tpps.Value;
+                                            if (val > tp.Value.Value) continue;
+                                            tp.Value = val;
                                         }
-                                        catch (Exception ex)
-                                        {
-                                            WriteLog(ex.Message);
-                                        }
-                                    });
-                                    if (!pry.IsCompleted)
-                                        throw new Exception("Ошибка при выполнении цикла обработки изображения (Y)");
                                 }
                                 catch (Exception ex)
                                 {
                                     WriteLog(ex.Message);
                                 }
                             });
-                            if (!ptx.IsCompleted)
-                                throw new Exception("Ошибка при выполнении цикла обработки изображения (общий)");
+                            if (!pr1.IsCompleted)
+                                throw new Exception("Ошибка при выполнении цикла обработки изображений (J)");
                         }
                         catch (Exception ex)
                         {
                             WriteLog(ex.Message);
                         }
                     });
-                    if (!pty.IsCompleted)
+                    if (!ptx.IsCompleted)
                         throw new Exception("Ошибка при выполнении цикла обработки изображения (общий)");
                 }
                 catch (Exception ex)
@@ -193,59 +189,9 @@ namespace DynamicParser
                     WriteLog(ex.Message);
                 }
             });
-            if (!pr.IsCompleted)
+            if (!pty.IsCompleted)
                 throw new Exception("Ошибка при выполнении цикла обработки изображения (общий)");
-            ProcStruct[] lst = new ProcStruct[_lstProcs.Count];
-            ParallelLoopResult prx1 = Parallel.For(0, Width, x =>
-            {
-                try
-                {
-                    ParallelLoopResult pry1 = Parallel.For(0, Height, y =>
-                    {
-                        try
-                        {
-                            ParallelLoopResult prj1 = Parallel.For(0, _lstProcs.Count, j =>
-                            {
-                                try
-                                {
-                                    if (Width - x < _lstProcs[j].Width || Height - y < _lstProcs[j].Height)
-                                        return;
-                                    uint count = 0;
-                                    for (int x1 = x; x1 < Width; x1++)
-                                        for (int y1 = y; y1 < Height; y1++)
-                                            if (signValues[x, y].Proc.Contains(j))
-                                                count++;
-                                    lock (thisLock)
-                                    {
-                                        if (lst[j] == null)
-                                            lst[j] = new ProcStruct(x, y);
-                                        lst[j].Procs.Add(new ProcCount { Count = count, Proc = _lstProcs[j] });
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    WriteLog(ex.Message);
-                                }
-                            });
-                            if (!prj1.IsCompleted)
-                                throw new Exception("Ошибка при выполнении цикла обработки изображения (J1)");
-                        }
-                        catch (Exception ex)
-                        {
-                            WriteLog(ex.Message);
-                        }
-                    });
-                    if (!pry1.IsCompleted)
-                        throw new Exception("Ошибка при выполнении цикла обработки изображения (Y1)");
-                }
-                catch (Exception ex)
-                {
-                    WriteLog(ex.Message);
-                }
-            });
-            if (!prx1.IsCompleted)
-                throw new Exception("Ошибка при выполнении цикла обработки изображения (X1)");
-
+            return processor;
         }
 
         public object Clone()

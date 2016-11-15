@@ -8,31 +8,67 @@ using DynamicProcessor;
 
 namespace DynamicParser
 {
-    public sealed class Processor : ICloneable
+    public enum ProcType
     {
-        sealed class ProcClass
+        None,
+        ProcList,
+        Sign,
+        Error
+    }
+
+    public sealed class ProcClass
+    {
+        public ConcurrentDictionary<int, SignValue> Procs { get; } = new ConcurrentDictionary<int, SignValue>();
+        public List<Processor> CurrentProcessors { get; } = new List<Processor>();
+        readonly SignValue? _currentSignValue;
+
+        public ProcClass(SignValue? sv = null)
         {
-            public SignValue Value { get; }
-            public ConcurrentDictionary<int, SignValue> Procs { get; } = new ConcurrentDictionary<int, SignValue>();
+            _currentSignValue = sv;
+        }
 
-            public int MaxEqualIndex
+        public void Recognize()//Определить процедуру "распознавания"
+        {
+            //"Знак" или "карта"
+        }
+
+        public ProcType Type
+        {
+            get
             {
-                get
-                {
-                    if (Procs.IsEmpty)
-                        return -1;
-                    return Procs.Min().Key;
-                }
-            }
-
-            public List<Processor> CurrentProcessors { get; } = new List<Processor>();
-
-            public ProcClass(SignValue? sv = null)
-            {
-                Value = sv ?? SignValue.MaxValue;
+                if (CurrentProcessors.Count > 0 && _currentSignValue != null)
+                    return ProcType.Error;
+                if (_currentSignValue != null)
+                    return ProcType.Sign;
+                return CurrentProcessors.Count > 0 ? ProcType.ProcList : ProcType.None;
             }
         }
 
+        public SignValue Value
+        {
+            get
+            {
+                if (Type != ProcType.Sign)
+                    throw new ArgumentException($"Знак должен быть указан ({Type})", nameof(Value));
+                if (_currentSignValue == null)
+                    throw new ArgumentException("Знак должен быть указан (null)", nameof(Value));
+                return _currentSignValue.Value;
+            }
+        }
+
+        public int MaxEqualIndex
+        {
+            get
+            {
+                if (Procs.IsEmpty)
+                    return -1;
+                return Procs.Min().Key;
+            }
+        }
+    }
+
+    public sealed class Processor : ICloneable
+    {
         readonly ProcClass[,] _bitmap;
         readonly List<Processor> _lstProcs = new List<Processor>();
 
@@ -48,9 +84,9 @@ namespace DynamicParser
 
         public Processor GetMaxProcessor => new Processor(MaxWidth, MaxHeight);
 
-        public static event Action<string> LogEvent;
+        public event Action<string> LogEvent;
 
-        Processor(ProcClass[,] lst)
+        public Processor(ProcClass[,] lst)
         {
             if (lst == null)
                 throw new ArgumentNullException();
@@ -87,7 +123,7 @@ namespace DynamicParser
                     _bitmap[x, y] = new ProcClass();
         }
 
-        static void WriteLog(string message)
+        void WriteLog(string message)
         {
             try
             {
@@ -112,6 +148,11 @@ namespace DynamicParser
             _lstProcs.Add(proc);
         }
 
+        public object Clone()
+        {
+            return new Processor(_bitmap);
+        }
+
         public Processor GetEqual()
         {
             Processor processor = new Processor(Width, Height);
@@ -133,14 +174,18 @@ namespace DynamicParser
                                         return;
                                     for (int y = 0; y < ps.Height; y++, y1++)
                                         for (int x = 0; x < ps.Width; x++, x1++)
-                                        {
+                                        {//СДЕЛАТЬ УНИВЕРСАЛЬНЫЙ МЕХАНИЗМ ДЛЯ РАСЧЁТА КАРТ И ПИКСЕЛЕЙ
                                             ProcClass tp = proc._bitmap[x, y], tpps = ps._bitmap[x, y], curp = _bitmap[x1, y1];
                                             if (tp == null)
-                                                throw new ArgumentException("Элемент проверяемой карты равен null", nameof(tp));
+                                                throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяемой карты равен null", nameof(tp));
                                             if (tpps == null)
-                                                throw new ArgumentException("Элемент проверяющей карты равен null", nameof(tpps));
+                                                throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
-                                                throw new ArgumentException("Элемент текущей карты равен null", nameof(curp));
+                                                throw new ArgumentException($"{nameof(GetEqual)}: Элемент текущей карты равен null", nameof(curp));
+                                            if (curp.Type != ProcType.Sign)
+                                                throw new ArgumentException($"{nameof(GetEqual)}: Элемент не является знаковым", nameof(curp));
+                                            if (tpps.Type != ProcType.Sign)
+                                                throw new ArgumentException($"{nameof(GetEqual)}: Элемент не является знаковым", nameof(tpps));
                                             tp.Procs[j] = curp.Value - tpps.Value;
                                         }
                                 }
@@ -217,11 +262,6 @@ namespace DynamicParser
             if (!pty.IsCompleted)
                 throw new Exception("Ошибка при выполнении цикла обработки изображения (общий)");
             return processor;
-        }
-
-        public object Clone()
-        {
-            return new Processor(_bitmap);
         }
     }
 }

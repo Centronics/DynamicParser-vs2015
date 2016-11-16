@@ -27,9 +27,19 @@ namespace DynamicParser
             _currentSignValue = sv;
         }
 
-        public void Recognize()//Определить процедуру "распознавания"
+        public void Recognize(ProcClass pc1, ProcClass pc2)
         {
-            //"Знак" или "карта"
+            if (pc1 == null)
+                throw new ArgumentNullException();
+            if (pc2 == null)
+                throw new ArgumentNullException();
+            for (int k = 0; k < pc1.CurrentProcessors.Count; k++)
+            {
+                Processor proc = pc1.CurrentProcessors[k];
+                foreach (Processor t in pc2.CurrentProcessors)
+                    proc.Add(t);
+                CurrentProcessors.Add(proc.GetEqual());
+            }
         }
 
         public ProcType Type
@@ -174,7 +184,7 @@ namespace DynamicParser
                                         return;
                                     for (int y = 0; y < ps.Height; y++, y1++)
                                         for (int x = 0; x < ps.Width; x++, x1++)
-                                        {//СДЕЛАТЬ УНИВЕРСАЛЬНЫЙ МЕХАНИЗМ ДЛЯ РАСЧЁТА КАРТ И ПИКСЕЛЕЙ
+                                        {
                                             ProcClass tp = proc._bitmap[x, y], tpps = ps._bitmap[x, y], curp = _bitmap[x1, y1];
                                             if (tp == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяемой карты равен null", nameof(tp));
@@ -182,11 +192,18 @@ namespace DynamicParser
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент текущей карты равен null", nameof(curp));
-                                            if (curp.Type != ProcType.Sign)
-                                                throw new ArgumentException($"{nameof(GetEqual)}: Элемент не является знаковым", nameof(curp));
-                                            if (tpps.Type != ProcType.Sign)
-                                                throw new ArgumentException($"{nameof(GetEqual)}: Элемент не является знаковым", nameof(tpps));
-                                            tp.Procs[j] = curp.Value - tpps.Value;
+                                            if (tpps.Type == ProcType.Sign && curp.Type == ProcType.Sign)
+                                            {
+                                                tp.Procs[j] = curp.Value - tpps.Value;
+                                                continue;
+                                            }
+                                            if (tpps.Type == ProcType.ProcList && curp.Type == ProcType.ProcList)
+                                            {
+                                                tp.Recognize(tpps, curp);
+                                                continue;
+                                            }
+                                            if (tpps.Type == ProcType.Error || curp.Type == ProcType.Error)
+                                                throw new ArgumentException();
                                         }
                                 }
                                 catch (Exception ex)

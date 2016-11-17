@@ -19,7 +19,7 @@ namespace DynamicParser
     public sealed class ProcClass
     {
         public ConcurrentDictionary<int, SignValue> Procs { get; } = new ConcurrentDictionary<int, SignValue>();
-        public List<Processor> CurrentProcessors { get; } = new List<Processor>();
+        public ConcurrentDictionary<double, Processor> CurrentProcessors { get; } = new ConcurrentDictionary<double, Processor>();
         readonly SignValue? _currentSignValue;
 
         public ProcClass(SignValue? sv = null)
@@ -27,19 +27,29 @@ namespace DynamicParser
             _currentSignValue = sv;
         }
 
-        public void Recognize(ProcClass pc1, ProcClass pc2)
+        public SignValue? Difference(ProcClass pc1, ProcClass pc2)
         {
             if (pc1 == null)
                 throw new ArgumentNullException();
             if (pc2 == null)
                 throw new ArgumentNullException();
+            if (pc1.Type == ProcType.Sign && pc2.Type == ProcType.Sign)
+                return pc1.Value - pc2.Value;
+            if (pc1.Type != ProcType.ProcList)
+                throw new ArgumentException();
+            if (pc2.Type != ProcType.ProcList)
+                throw new ArgumentException();
             for (int k = 0; k < pc1.CurrentProcessors.Count; k++)
             {
-                Processor proc = pc1.CurrentProcessors[k];
-                foreach (Processor t in pc2.CurrentProcessors)
-                    proc.Add(t);
-                CurrentProcessors.Add(proc.GetEqual());
+                foreach (double pr in pc1.CurrentProcessors.Keys)
+                {
+                    foreach (Processor t in pc2.CurrentProcessors)
+                        Add(t);
+                    proc.GetEqual();
+                    CurrentProcessors.Add(proc);
+                }
             }
+            return null;
         }
 
         public ProcType Type
@@ -163,9 +173,8 @@ namespace DynamicParser
             return new Processor(_bitmap);
         }
 
-        public Processor GetEqual()
+        public void GetEqual()
         {
-            Processor processor = new Processor(Width, Height);
             ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
             {
                 try
@@ -192,14 +201,10 @@ namespace DynamicParser
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент текущей карты равен null", nameof(curp));
-                                            if (tpps.Type == ProcType.Sign && curp.Type == ProcType.Sign)
+                                            SignValue? sv = tp.Difference(tpps, curp);
+                                            if (sv != null)
                                             {
-                                                tp.Procs[j] = curp.Value - tpps.Value;
-                                                continue;
-                                            }
-                                            if (tpps.Type == ProcType.ProcList && curp.Type == ProcType.ProcList)
-                                            {
-                                                tp.Recognize(tpps, curp);
+                                                tp.Procs[j] = sv.Value;
                                                 continue;
                                             }
                                             if (tpps.Type == ProcType.Error || curp.Type == ProcType.Error)
@@ -245,7 +250,7 @@ namespace DynamicParser
                                             IEnumerable<int> lst = from svv in dct where Math.Abs(svv.Value - db.Value) < 0.0000000000000001 select svv.Key;
                                             ProcClass pc = _bitmap[x, y];
                                             foreach (int i in lst)
-                                                pc.CurrentProcessors.Add(_lstProcs[i]);
+                                                pc.CurrentProcessors[i] = proc._lstProcs[i];//проблема с уточнением карты _bitmap[x3, y3]
                                         }
                                         catch (Exception ex)
                                         {
@@ -278,7 +283,6 @@ namespace DynamicParser
             });
             if (!pty.IsCompleted)
                 throw new Exception("Ошибка при выполнении цикла обработки изображения (общий)");
-            return processor;
         }
     }
 }

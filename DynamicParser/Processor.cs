@@ -18,38 +18,42 @@ namespace DynamicParser
 
     public sealed class ProcClass
     {
-        public ConcurrentDictionary<int, SignValue> Procs { get; } = new ConcurrentDictionary<int, SignValue>();
-        public ConcurrentDictionary<double, Processor> CurrentProcessors { get; } = new ConcurrentDictionary<double, Processor>();
+        public ConcurrentDictionary<int, double> Procs { get; } = new ConcurrentDictionary<int, double>();
+        public ConcurrentDictionary<int, Processor> CurrentProcessors { get; } = new ConcurrentDictionary<int, Processor>();
         readonly SignValue? _currentSignValue;
+        public Processor CurrentProcessor { get; private set; }
 
         public ProcClass(SignValue? sv = null)
         {
             _currentSignValue = sv;
         }
 
-        public SignValue? Difference(ProcClass pc1, ProcClass pc2)
+        public double Difference(ProcClass pc1, ProcClass pc2)
         {
             if (pc1 == null)
                 throw new ArgumentNullException();
             if (pc2 == null)
                 throw new ArgumentNullException();
+            CurrentProcessor = null;
+            if (pc1.Type == ProcType.Error || pc2.Type == ProcType.Error)
+                throw new ArgumentException();
             if (pc1.Type == ProcType.Sign && pc2.Type == ProcType.Sign)
-                return pc1.Value - pc2.Value;
+                return (pc1.Value - pc2.Value).Value;
             if (pc1.Type != ProcType.ProcList)
                 throw new ArgumentException();
             if (pc2.Type != ProcType.ProcList)
                 throw new ArgumentException();
-            for (int k = 0; k < pc1.CurrentProcessors.Count; k++)
-            {
-                foreach (double pr in pc1.CurrentProcessors.Keys)
+            double perc = double.MaxValue;
+            for (int pf = 0; pf < pc1.CurrentProcessors.Keys.Count; pf++)
+                for (int pr = 0; pr < pc2.CurrentProcessors.Keys.Count; pr++)
                 {
-                    foreach (Processor t in pc2.CurrentProcessors)
-                        Add(t);
-                    proc.GetEqual();
-                    CurrentProcessors.Add(proc);
+                    double db = Math.Abs(pc1.CurrentProcessors.Keys.ElementAt(pf) -
+                        pc2.CurrentProcessors.Keys.ElementAt(pr));
+                    if (perc < db) continue;
+                    perc = db;
+                    CurrentProcessor = pc2.CurrentProcessors.Values.ElementAt(pr);
                 }
-            }
-            return null;
+            return perc;
         }
 
         public ProcType Type
@@ -201,14 +205,7 @@ namespace DynamicParser
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент текущей карты равен null", nameof(curp));
-                                            SignValue? sv = tp.Difference(tpps, curp);
-                                            if (sv != null)
-                                            {
-                                                tp.Procs[j] = sv.Value;
-                                                continue;
-                                            }
-                                            if (tpps.Type == ProcType.Error || curp.Type == ProcType.Error)
-                                                throw new ArgumentException();
+                                            tp.Procs[j] = tp.Difference(tpps, curp);
                                         }
                                 }
                                 catch (Exception ex)
@@ -247,10 +244,9 @@ namespace DynamicParser
                                             if (dct.Count <= 0)
                                                 throw new Exception();
                                             KeyValuePair<int, double> db = dct.Max();
-                                            IEnumerable<int> lst = from svv in dct where Math.Abs(svv.Value - db.Value) < 0.0000000000000001 select svv.Key;
                                             ProcClass pc = _bitmap[x, y];
-                                            foreach (int i in lst)
-                                                pc.CurrentProcessors[i] = proc._lstProcs[i];//проблема с уточнением карты _bitmap[x3, y3]
+                                            foreach (int i in from svv in dct where Math.Abs(svv.Value - db.Value) < 0.0000000000000001 select svv.Key)
+                                                pc.CurrentProcessors[i] = proc._lstProcs[i];
                                         }
                                         catch (Exception ex)
                                         {

@@ -18,10 +18,10 @@ namespace DynamicParser
 
     public sealed class ProcClass
     {
-        public ConcurrentDictionary<int, double> Procs { get; } = new ConcurrentDictionary<int, double>();
+        public ConcurrentDictionary<int, double> ProcPercent { get; } = new ConcurrentDictionary<int, double>();
         public ConcurrentDictionary<int, Processor> CurrentProcessors { get; } = new ConcurrentDictionary<int, Processor>();
         readonly SignValue? _currentSignValue;
-        public Processor CurrentProcessor { get; private set; }
+        public List<Processor> ProcessorDifferences { get; } = new List<Processor>();
 
         public ProcClass(SignValue? sv = null)
         {
@@ -34,26 +34,17 @@ namespace DynamicParser
                 throw new ArgumentNullException();
             if (pc2 == null)
                 throw new ArgumentNullException();
-            CurrentProcessor = null;
             if (pc1.Type == ProcType.Error || pc2.Type == ProcType.Error)
                 throw new ArgumentException();
+            ProcessorDifferences.Clear();
             if (pc1.Type == ProcType.Sign && pc2.Type == ProcType.Sign)
                 return (pc1.Value - pc2.Value).Value;
             if (pc1.Type != ProcType.ProcList)
                 throw new ArgumentException();
             if (pc2.Type != ProcType.ProcList)
                 throw new ArgumentException();
-            double perc = double.MaxValue;
-            for (int pf = 0; pf < pc1.CurrentProcessors.Keys.Count; pf++)
-                for (int pr = 0; pr < pc2.CurrentProcessors.Keys.Count; pr++)
-                {
-                    double db = Math.Abs(pc1.CurrentProcessors.Keys.ElementAt(pf) -
-                        pc2.CurrentProcessors.Keys.ElementAt(pr));
-                    if (perc < db) continue;
-                    perc = db;
-                    CurrentProcessor = pc2.CurrentProcessors.Values.ElementAt(pr);
-                }
-            return perc;
+            
+            return 0;
         }
 
         public ProcType Type
@@ -84,9 +75,9 @@ namespace DynamicParser
         {
             get
             {
-                if (Procs.IsEmpty)
+                if (ProcPercent.IsEmpty)
                     return -1;
-                return Procs.Min().Key;
+                return ProcPercent.Min().Key;
             }
         }
     }
@@ -205,7 +196,7 @@ namespace DynamicParser
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент текущей карты равен null", nameof(curp));
-                                            tp.Procs[j] = tp.Difference(tpps, curp);
+                                            tp.ProcPercent[j] = tp.Difference(tpps, curp);
                                         }
                                 }
                                 catch (Exception ex)
@@ -244,9 +235,9 @@ namespace DynamicParser
                                             if (dct.Count <= 0)
                                                 throw new Exception();
                                             KeyValuePair<int, double> db = dct.Max();
-                                            ProcClass pc = _bitmap[x, y];
-                                            foreach (int i in from svv in dct where Math.Abs(svv.Value - db.Value) < 0.0000000000000001 select svv.Key)
-                                                pc.CurrentProcessors[i] = proc._lstProcs[i];
+                                            ProcClass pc = proc._bitmap[x, y];
+                                            foreach (int i in from svv in dct where Math.Abs(svv.Value - db.Value) < 0.0000001 select svv.Key)
+                                                pc.CurrentProcessors[i] = _lstProcs[i];
                                         }
                                         catch (Exception ex)
                                         {

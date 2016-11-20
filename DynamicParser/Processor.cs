@@ -18,33 +18,23 @@ namespace DynamicParser
 
     public sealed class ProcClass
     {
-        public ConcurrentDictionary<int, double> ProcPercent { get; } = new ConcurrentDictionary<int, double>();
         public ConcurrentDictionary<int, Processor> CurrentProcessors { get; } = new ConcurrentDictionary<int, Processor>();
         readonly SignValue? _currentSignValue;
-        public List<Processor> ProcessorDifferences { get; } = new List<Processor>();
 
         public ProcClass(SignValue? sv = null)
         {
             _currentSignValue = sv;
         }
 
-        public double Difference(ProcClass pc1, ProcClass pc2)
+        public static double Difference(ProcClass pc1, ProcClass pc2)
         {
             if (pc1 == null)
                 throw new ArgumentNullException();
             if (pc2 == null)
                 throw new ArgumentNullException();
-            if (pc1.Type == ProcType.Error || pc2.Type == ProcType.Error)
+            if (pc1.Type != ProcType.Sign || pc2.Type != ProcType.Sign)
                 throw new ArgumentException();
-            ProcessorDifferences.Clear();
-            if (pc1.Type == ProcType.Sign && pc2.Type == ProcType.Sign)
-                return (pc1.Value - pc2.Value).Value;
-            if (pc1.Type != ProcType.ProcList)
-                throw new ArgumentException();
-            if (pc2.Type != ProcType.ProcList)
-                throw new ArgumentException();
-            
-            return 0;
+            return (pc1.Value - pc2.Value).Value;
         }
 
         public ProcType Type
@@ -68,16 +58,6 @@ namespace DynamicParser
                 if (_currentSignValue == null)
                     throw new ArgumentException("Знак должен быть указан (null)", nameof(Value));
                 return _currentSignValue.Value;
-            }
-        }
-
-        public int MaxEqualIndex
-        {
-            get
-            {
-                if (ProcPercent.IsEmpty)
-                    return -1;
-                return ProcPercent.Min().Key;
             }
         }
     }
@@ -168,8 +148,9 @@ namespace DynamicParser
             return new Processor(_bitmap);
         }
 
-        public void GetEqual()
+        public Processor GetEqual()
         {
+            Processor proc = new Processor(MaxWidth, MaxHeight);
             ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
             {
                 try
@@ -178,7 +159,7 @@ namespace DynamicParser
                     {
                         try
                         {
-                            Processor proc = new Processor(MaxWidth, MaxHeight);
+                            ConcurrentDictionary<int, double> procPercent = new ConcurrentDictionary<int, double>();
                             ParallelLoopResult pr1 = Parallel.For(0, _lstProcs.Count, j =>
                             {
                                 try
@@ -189,14 +170,12 @@ namespace DynamicParser
                                     for (int y = 0; y < ps.Height; y++, y1++)
                                         for (int x = 0; x < ps.Width; x++, x1++)
                                         {
-                                            ProcClass tp = proc._bitmap[x, y], tpps = ps._bitmap[x, y], curp = _bitmap[x1, y1];
-                                            if (tp == null)
-                                                throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяемой карты равен null", nameof(tp));
+                                            ProcClass tpps = ps._bitmap[x, y], curp = _bitmap[x1, y1];
                                             if (tpps == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент текущей карты равен null", nameof(curp));
-                                            tp.ProcPercent[j] = tp.Difference(tpps, curp);
+                                            procPercent[j] = ProcClass.Difference(tpps, curp);//Ошибка: координаты не указаны
                                         }
                                 }
                                 catch (Exception ex)
@@ -219,10 +198,10 @@ namespace DynamicParser
                                             {
                                                 if (proc.Width - x < _lstProcs[k].Width || proc.Height - y < _lstProcs[k].Height)
                                                     continue;
-                                                for (int y2 = y, y3 = 0, yp = y2 + proc.Height; y2 < yp; y2++, y3++)
-                                                    for (int x2 = x, x3 = 0, xp = x2 + proc.Width; x2 < xp; x2++, x3++)
+                                                for (int y2 = y, yp = y2 + proc.Height; y2 < yp; y2++)
+                                                    for (int x2 = x, xp = x2 + proc.Width; x2 < xp; x2++)
                                                     {
-                                                        int index = proc._bitmap[x3, y3].MaxEqualIndex;
+                                                        int index = procPercent.Min().Key;
                                                         if (index < 0)
                                                             continue;
                                                         if (!dct.ContainsKey(index))
@@ -270,6 +249,7 @@ namespace DynamicParser
             });
             if (!pty.IsCompleted)
                 throw new Exception("Ошибка при выполнении цикла обработки изображения (общий)");
+            return proc;
         }
     }
 }

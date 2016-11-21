@@ -8,57 +8,25 @@ using DynamicProcessor;
 
 namespace DynamicParser
 {
-    public enum ProcType
-    {
-        None,
-        ProcList,
-        Sign,
-        Error
-    }
-
     public sealed class ProcClass
     {
         public ConcurrentDictionary<int, Processor> CurrentProcessors { get; } = new ConcurrentDictionary<int, Processor>();
-        readonly SignValue? _currentSignValue;
+        public SignValue? CurrentSignValue { get; }
 
         public ProcClass(SignValue? sv = null)
         {
-            _currentSignValue = sv;
+            CurrentSignValue = sv;
         }
 
-        public static double Difference(ProcClass pc1, ProcClass pc2)
+        public static double Difference(ProcClass pc1, ProcClass pc2)//добавить оператор -
         {
             if (pc1 == null)
                 throw new ArgumentNullException();
             if (pc2 == null)
                 throw new ArgumentNullException();
-            if (pc1.Type != ProcType.Sign || pc2.Type != ProcType.Sign)
+            if (pc1.CurrentSignValue == null || pc2.CurrentSignValue == null)
                 throw new ArgumentException();
-            return (pc1.Value - pc2.Value).Value;
-        }
-
-        public ProcType Type
-        {
-            get
-            {
-                if (CurrentProcessors.Count > 0 && _currentSignValue != null)
-                    return ProcType.Error;
-                if (_currentSignValue != null)
-                    return ProcType.Sign;
-                return CurrentProcessors.Count > 0 ? ProcType.ProcList : ProcType.None;
-            }
-        }
-
-        public SignValue Value
-        {
-            get
-            {
-                if (Type != ProcType.Sign)
-                    throw new ArgumentException($"Знак должен быть указан ({Type})", nameof(Value));
-                if (_currentSignValue == null)
-                    throw new ArgumentException("Знак должен быть указан (null)", nameof(Value));
-                return _currentSignValue.Value;
-            }
+            return (pc1.CurrentSignValue.Value - pc2.CurrentSignValue.Value).Value;
         }
     }
 
@@ -148,6 +116,15 @@ namespace DynamicParser
             return new Processor(_bitmap);
         }
 
+        static int GetMinIndex(List<double[,]> db, int x, int y)
+        {
+            if(x<0 || y < 0)
+                throw new ArgumentException();
+            if (db == null)
+                throw new ArgumentNullException();
+
+        }
+
         public Processor GetEqual()
         {
             Processor proc = new Processor(MaxWidth, MaxHeight);
@@ -159,24 +136,26 @@ namespace DynamicParser
                     {
                         try
                         {
-                            ConcurrentDictionary<int, double> procPercent = new ConcurrentDictionary<int, double>();
+                            List<double[,]> procPercent = new List<double[,]>();
                             ParallelLoopResult pr1 = Parallel.For(0, _lstProcs.Count, j =>
                             {
                                 try
                                 {
                                     Processor ps = _lstProcs[j];
+                                    double[,] pc = new double[ps.Width, ps.Height];
                                     if (ps.Width < Width - x1 || ps.Height < Height - y1)
                                         return;
-                                    for (int y = 0; y < ps.Height; y++, y1++)
-                                        for (int x = 0; x < ps.Width; x++, x1++)
+                                    for (int y = 0; y < ps.Height;)
+                                        for (int x = 0; x < ps.Width;)
                                         {
-                                            ProcClass tpps = ps._bitmap[x, y], curp = _bitmap[x1, y1];
+                                            ProcClass tpps = ps._bitmap[x++, y++], curp = _bitmap[x1++, y1++];
                                             if (tpps == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент текущей карты равен null", nameof(curp));
-                                            procPercent[j] = ProcClass.Difference(tpps, curp);//Ошибка: координаты не указаны
+                                            pc[x, y] = ProcClass.Difference(tpps, curp);
                                         }
+                                    procPercent[j] = pc;
                                 }
                                 catch (Exception ex)
                                 {
@@ -201,7 +180,7 @@ namespace DynamicParser
                                                 for (int y2 = y, yp = y2 + proc.Height; y2 < yp; y2++)
                                                     for (int x2 = x, xp = x2 + proc.Width; x2 < xp; x2++)
                                                     {
-                                                        int index = procPercent.Min().Key;
+                                                        int index = GetMinIndex(procPercent[k],x2,y2);
                                                         if (index < 0)
                                                             continue;
                                                         if (!dct.ContainsKey(index))

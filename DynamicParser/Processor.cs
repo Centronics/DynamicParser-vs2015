@@ -116,13 +116,43 @@ namespace DynamicParser
             return new Processor(_bitmap);
         }
 
-        static int GetMinIndex(List<double[,]> db, int x, int y)
+        static bool GetMinIndex(IList<double[,]> db, int x, int y, int number)
         {
-            if(x<0 || y < 0)
+            if (x < 0 || y < 0 || number < 0)
                 throw new ArgumentException();
             if (db == null)
                 throw new ArgumentNullException();
+            if (db.Count <= 0)
+                throw new ArgumentException();
+            double dbl = double.MaxValue;
+            int n = 0;
+            List<int> lst = new List<int>();
+            for (int k = 0; k < db.Count; k++)
+            {
+                double[,] mas = db[k];
+                if (x >= mas.GetLength(0) || y >= mas.GetLength(1))
+                    continue;
+                if (dbl < mas[x, y]) continue;
+                if (Math.Abs(dbl - mas[x, y]) <= 0.0001)
+                    lst.Add(k);
+                dbl = mas[x, y];
+                n = k;
+            }
+            if (lst.Contains(number))
+                return true;
+            return n == number;
+        }
 
+        static IEnumerable<int> GetMaxIndex(IList<double> lst)
+        {
+            if (lst == null)
+                throw new ArgumentNullException();
+            if (lst.Count <= 0)
+                yield break;
+            double db = lst.Max();
+            for (int k = 0; k < lst.Count; k++)
+                if (Math.Abs(lst[k] - db) < 0.00000001)
+                    yield return k;
         }
 
         public Processor GetEqual()
@@ -172,29 +202,24 @@ namespace DynamicParser
                                     {
                                         try
                                         {
-                                            Dictionary<int, double> dct = new Dictionary<int, double>();
+                                            if (_lstProcs.Count <= 0)
+                                                throw new Exception();
+                                            double[] lst = new double[_lstProcs.Count];
                                             for (int k = 0; k < _lstProcs.Count; k++)
                                             {
                                                 if (proc.Width - x < _lstProcs[k].Width || proc.Height - y < _lstProcs[k].Height)
                                                     continue;
-                                                for (int y2 = y, yp = y2 + proc.Height; y2 < yp; y2++)
-                                                    for (int x2 = x, xp = x2 + proc.Width; x2 < xp; x2++)
+                                                for (int y2 = y, yp = y + proc.Height; y2 < yp; y2++)
+                                                    for (int x2 = x, xp = x + proc.Width; x2 < xp; x2++)
                                                     {
-                                                        int index = GetMinIndex(procPercent[k],x2,y2);
-                                                        if (index < 0)
+                                                        if (!GetMinIndex(procPercent, x2, y2, k))
                                                             continue;
-                                                        if (!dct.ContainsKey(index))
-                                                            dct[index] = 1;
-                                                        else
-                                                            dct[index]++;
+                                                        lst[k]++;
                                                     }
-                                                dct[k] = dct[k] / Convert.ToDouble(_lstProcs[k].Length);
+                                                lst[k] = lst[k] / Convert.ToDouble(_lstProcs[k].Length);
                                             }
-                                            if (dct.Count <= 0)
-                                                throw new Exception();
-                                            KeyValuePair<int, double> db = dct.Max();
                                             ProcClass pc = proc._bitmap[x, y];
-                                            foreach (int i in from svv in dct where Math.Abs(svv.Value - db.Value) < 0.0000001 select svv.Key)
+                                            foreach (int i in GetMaxIndex(lst))
                                                 pc.CurrentProcessors[i] = _lstProcs[i];
                                         }
                                         catch (Exception ex)

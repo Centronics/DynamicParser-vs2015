@@ -18,7 +18,7 @@ namespace DynamicParser
             CurrentSignValue = sv;
         }
 
-        public static double Difference(ProcClass pc1, ProcClass pc2)//добавить оператор -
+        public static int operator -(ProcClass pc1, ProcClass pc2)
         {
             if (pc1 == null)
                 throw new ArgumentNullException();
@@ -183,7 +183,7 @@ namespace DynamicParser
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент текущей карты равен null", nameof(curp));
-                                            pc[x, y] = ProcClass.Difference(tpps, curp);
+                                            pc[x, y] = tpps - curp;
                                         }
                                     procPercent[j] = pc;
                                 }

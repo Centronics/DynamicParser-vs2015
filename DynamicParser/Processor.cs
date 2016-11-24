@@ -243,7 +243,7 @@ namespace DynamicParser
                         }
                     });
                     if (!ptx.IsCompleted)
-                        throw new Exception("Ошибка при выполнении цикла обработки изображения (общий)");
+                        throw new Exception($"Ошибка при выполнении цикла обработки изображения ({nameof(ptx)})");
                 }
                 catch (Exception ex)
                 {
@@ -251,7 +251,7 @@ namespace DynamicParser
                 }
             });
             if (!pty.IsCompleted)
-                throw new Exception("Ошибка при выполнении цикла обработки изображения (общий)");
+                throw new Exception($"Ошибка при выполнении цикла обработки изображения ({nameof(pty)})");
             return proc;
         }
     }

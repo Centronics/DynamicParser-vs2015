@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Concurrent;
 using DynamicProcessor;
 
 namespace DynamicParser
@@ -10,7 +11,7 @@ namespace DynamicParser
     public sealed class ProcClass
     {
         public List<Processor> CurrentProcessors { get; } = new List<Processor>();
-        public SignValue? CurrentSignValue { get; }
+        public SignValue? CurrentSignValue { get; set; }
 
         public ProcClass(SignValue? sv = null)
         {
@@ -115,7 +116,7 @@ namespace DynamicParser
             return new Processor(_bitmap);
         }
 
-        static bool GetMinIndex(IList<double[,]> db, int x, int y, int number)
+        static bool GetMinIndex(IDictionary<int, double[,]> db, int x, int y, int number)
         {
             if (x < 0 || y < 0 || number < 0)
                 throw new ArgumentException();
@@ -126,16 +127,16 @@ namespace DynamicParser
             double dbl = double.MaxValue;
             int n = 0;
             List<int> lst = new List<int>();
-            for (int k = 0; k < db.Count; k++)
+            foreach (int key in db.Keys)
             {
-                double[,] mas = db[k];
+                double[,] mas = db[key];
                 if (x >= mas.GetLength(0) || y >= mas.GetLength(1))
                     continue;
                 if (dbl < mas[x, y]) continue;
                 if (Math.Abs(dbl - mas[x, y]) <= 0.0001)
-                    lst.Add(k);
+                    lst.Add(key);
                 dbl = mas[x, y];
-                n = k;
+                n = key;
             }
             if (lst.Contains(number))
                 return true;
@@ -165,7 +166,7 @@ namespace DynamicParser
                     {
                         try
                         {
-                            List<double[,]> procPercent = new List<double[,]>();
+                            ConcurrentDictionary<int, double[,]> procPercent = new ConcurrentDictionary<int, double[,]>();
                             ParallelLoopResult pr1 = Parallel.For(0, _lstProcs.Count, j =>
                             {
                                 try
@@ -174,10 +175,10 @@ namespace DynamicParser
                                     double[,] pc = new double[ps.Width, ps.Height];
                                     if (ps.Width < Width - x1 || ps.Height < Height - y1)
                                         return;
-                                    for (int y = 0; y < ps.Height;)
-                                        for (int x = 0; x < ps.Width;)
+                                    for (int y = 0, yy = y1; y < ps.Height;)
+                                        for (int x = 0, xx = x1; x < ps.Width;)
                                         {
-                                            ProcClass tpps = ps._bitmap[x++, y++], curp = _bitmap[x1++, y1++];
+                                            ProcClass tpps = ps._bitmap[x++, y++], curp = _bitmap[xx++, yy++];
                                             if (tpps == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
@@ -193,11 +194,12 @@ namespace DynamicParser
                             });
                             if (!pr1.IsCompleted)
                                 throw new Exception($"Ошибка при выполнении цикла обработки изображений ({nameof(pr1)})");
-                            ParallelLoopResult pr2 = Parallel.For(0, proc.Height, y =>
+                            Processor pr = new Processor(MaxWidth, MaxHeight);
+                            ParallelLoopResult pr2 = Parallel.For(0, MaxHeight, y =>
                             {
                                 try
                                 {
-                                    ParallelLoopResult pr3 = Parallel.For(0, proc.Width, x =>
+                                    ParallelLoopResult pr3 = Parallel.For(0, MaxWidth, x =>
                                     {
                                         try
                                         {
@@ -206,18 +208,16 @@ namespace DynamicParser
                                             double[] lst = new double[_lstProcs.Count];
                                             for (int k = 0; k < _lstProcs.Count; k++)
                                             {
-                                                if (proc.Width - x < _lstProcs[k].Width || proc.Height - y < _lstProcs[k].Height)
+                                                if (pr.Width - x < _lstProcs[k].Width || pr.Height - y < _lstProcs[k].Height)
                                                     continue;
-                                                for (int y2 = y, yp = y + proc.Height; y2 < yp; y2++)
-                                                    for (int x2 = x, xp = x + proc.Width; x2 < xp; x2++)
-                                                    {
-                                                        if (!GetMinIndex(procPercent, x2, y2, k))
-                                                            continue;
-                                                        lst[k]++;
-                                                    }
+                                                for (int y2 = y, yp = y + _lstProcs[k].Height; y2 < yp; y2++)
+                                                    for (int x2 = x, xp = x + _lstProcs[k].Width; x2 < xp; x2++)
+                                                        if (GetMinIndex(procPercent, x2, y2, k))
+                                                            lst[k]++;
                                                 lst[k] = lst[k] / Convert.ToDouble(_lstProcs[k].Length);
                                             }
-                                            ProcClass pc = proc._bitmap[x, y];
+                                            ProcClass pc = pr._bitmap[x, y];
+                                            pc.CurrentSignValue = _bitmap[x1++, y1++].CurrentSignValue;
                                             foreach (int i in GetMaxIndex(lst))
                                                 pc.CurrentProcessors.Add(_lstProcs[i]);
                                         }
@@ -236,6 +236,7 @@ namespace DynamicParser
                             });
                             if (!pr2.IsCompleted)
                                 throw new Exception($"Ошибка при выполнении цикла обработки изображений ({nameof(pr2)})");
+                            proc._bitmap[x1, y1].CurrentProcessors.Add(pr);
                         }
                         catch (Exception ex)
                         {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
 using System.Linq;
 using DynamicProcessor;
 
@@ -10,7 +9,7 @@ namespace DynamicParser
 {
     public sealed class ProcClass
     {
-        public ConcurrentDictionary<int, Processor> CurrentProcessors { get; } = new ConcurrentDictionary<int, Processor>();
+        public List<Processor> CurrentProcessors { get; } = new List<Processor>();
         public SignValue? CurrentSignValue { get; }
 
         public ProcClass(SignValue? sv = null)
@@ -220,7 +219,7 @@ namespace DynamicParser
                                             }
                                             ProcClass pc = proc._bitmap[x, y];
                                             foreach (int i in GetMaxIndex(lst))
-                                                pc.CurrentProcessors[i] = _lstProcs[i];
+                                                pc.CurrentProcessors.Add(_lstProcs[i]);
                                         }
                                         catch (Exception ex)
                                         {

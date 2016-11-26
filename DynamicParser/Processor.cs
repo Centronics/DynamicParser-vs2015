@@ -10,7 +10,7 @@ namespace DynamicParser
 {
     public sealed class ProcClass
     {
-        public List<Processor> CurrentProcessors { get; } = new List<Processor>();
+        public ConcurrentBag<Processor> Processors { get; } = new ConcurrentBag<Processor>();
         public SignValue? CurrentSignValue { get; set; }
 
         public ProcClass(SignValue? sv = null)
@@ -35,55 +35,68 @@ namespace DynamicParser
         readonly ProcClass[,] _bitmap;
         readonly List<Processor> _lstProcs = new List<Processor>();
 
+        public static double DiffEqual { get; } = 0.0001;
+
+        public object Tag { get; }
+
         public int Width => _bitmap.GetLength(0);
 
         public int Height => _bitmap.GetLength(1);
 
         public int Length => Width * Height;
 
-        public int MaxWidth => _lstProcs.Select(pr => pr.Width).Concat(new[] { 0 }).Max();
-
-        public int MaxHeight => _lstProcs.Select(pr => pr.Height).Concat(new[] { 0 }).Max();
-
-        public Processor GetMaxProcessor => new Processor(MaxWidth, MaxHeight);
-
         public event Action<string> LogEvent;
 
-        public Processor(ProcClass[,] lst)
+        public int ProcessorCount => _lstProcs.Count;
+
+        public Processor this[int index] => _lstProcs[index];
+
+        public ProcClass this[int x, int y] => _bitmap[x, y];
+
+        public Processor(ProcClass[,] lst, object tag)
         {
             if (lst == null)
                 throw new ArgumentNullException();
             if (lst.Length <= 0)
                 throw new ArgumentException();
+            if (tag == null)
+                throw new ArgumentNullException();
             ProcClass[,] list = new ProcClass[lst.GetLength(0), lst.GetLength(1)];
             for (int y = 0, ly = lst.GetLength(1); y < ly; y++)
                 for (int x = 0, lx = lst.GetLength(0); x < lx; x++)
                     list[x, y] = lst[x, y];
             _bitmap = list;
+            Tag = tag;
         }
 
-        public Processor(Bitmap btm)
+        public Processor(Bitmap btm, object tag)
         {
             if (btm == null)
                 throw new ArgumentNullException();
             if (btm.Width <= 0 || btm.Height <= 0)
                 throw new ArgumentException();
+            if (tag == null)
+                throw new ArgumentNullException();
             _bitmap = new ProcClass[btm.Width, btm.Height];
             for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
                     _bitmap[x, y] = new ProcClass(new SignValue(btm.GetPixel(x, y)));
+            Tag = tag;
         }
 
-        public Processor(int mx, int my)
+        public Processor(int mx, int my, object tag)
         {
             if (mx <= 0)
-                throw new ArgumentException($"{nameof(Processor)}: mx < 0: ({mx})", nameof(mx));
+                throw new ArgumentException($"{nameof(Processor)}: mx <= 0: ({mx})", nameof(mx));
             if (my <= 0)
-                throw new ArgumentException($"{nameof(Processor)}: my < 0: ({my})", nameof(my));
+                throw new ArgumentException($"{nameof(Processor)}: my <= 0: ({my})", nameof(my));
+            if (tag == null)
+                throw new ArgumentNullException();
             _bitmap = new ProcClass[mx, my];
             for (int y = 0; y < my; y++)
                 for (int x = 0; x < mx; x++)
                     _bitmap[x, y] = new ProcClass();
+            Tag = tag;
         }
 
         void WriteLog(string message)
@@ -104,19 +117,19 @@ namespace DynamicParser
                 throw new ArgumentNullException();
             if (proc.Length <= 0)
                 throw new ArgumentException();
-            if (proc.Width > Width)
+            if (proc.Width != Width)
                 throw new ArgumentException();
-            if (proc.Height > Height)
+            if (proc.Height != Height)
                 throw new ArgumentException();
             _lstProcs.Add(proc);
         }
 
         public object Clone()
         {
-            return new Processor(_bitmap);
+            return new Processor(_bitmap, Tag);
         }
 
-        static bool GetMinIndex(IDictionary<int, double[,]> db, int x, int y, int number)
+        static bool GetMinIndex(IDictionary<int, int[,]> db, int x, int y, int number)
         {
             if (x < 0 || y < 0 || number < 0)
                 throw new ArgumentException();
@@ -129,11 +142,11 @@ namespace DynamicParser
             List<int> lst = new List<int>();
             foreach (int key in db.Keys)
             {
-                double[,] mas = db[key];
+                int[,] mas = db[key];
                 if (x >= mas.GetLength(0) || y >= mas.GetLength(1))
                     continue;
                 if (dbl < mas[x, y]) continue;
-                if (Math.Abs(dbl - mas[x, y]) <= 0.0001)
+                if (Math.Abs(dbl - mas[x, y]) <= DiffEqual)
                     lst.Add(key);
                 dbl = mas[x, y];
                 n = key;
@@ -151,13 +164,22 @@ namespace DynamicParser
                 yield break;
             double db = lst.Max();
             for (int k = 0; k < lst.Count; k++)
-                if (Math.Abs(lst[k] - db) < 0.00000001)
+                if (Math.Abs(lst[k] - db) < DiffEqual)
                     yield return k;
         }
 
-        public Processor GetEqual()
+        public Processor GetEqual(Processor prc)
         {
-            Processor proc = new Processor(MaxWidth, MaxHeight);
+            if (prc == null)
+                throw new ArgumentNullException();
+            if (prc.Width > Width || prc.Height > Height)
+                throw new ArgumentException();
+            if (prc.ProcessorCount <= 0)
+                throw new ArgumentException();
+            if (ProcessorCount <= 0)
+                throw new Exception();
+            WriteLog("Обработка начата");
+            Processor proc = new Processor(Width, Height, Tag);
             ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
             {
                 try
@@ -166,19 +188,19 @@ namespace DynamicParser
                     {
                         try
                         {
-                            ConcurrentDictionary<int, double[,]> procPercent = new ConcurrentDictionary<int, double[,]>();
-                            ParallelLoopResult pr1 = Parallel.For(0, _lstProcs.Count, j =>
+                            ConcurrentDictionary<int, int[,]> procPercent = new ConcurrentDictionary<int, int[,]>();
+                            ParallelLoopResult pr1 = Parallel.For(0, ProcessorCount, j =>
                             {
                                 try
                                 {
-                                    Processor ps = _lstProcs[j];
-                                    double[,] pc = new double[ps.Width, ps.Height];
+                                    Processor ps = prc[j];
+                                    int[,] pc = new int[ps.Width, ps.Height];
                                     if (ps.Width < Width - x1 || ps.Height < Height - y1)
                                         return;
-                                    for (int y = 0, yy = y1; y < ps.Height;)
-                                        for (int x = 0, xx = x1; x < ps.Width;)
+                                    for (int y = 0, yy = y1; y < prc.Height;)
+                                        for (int x = 0, xx = x1; x < prc.Width;)
                                         {
-                                            ProcClass tpps = ps._bitmap[x++, y++], curp = _bitmap[xx++, yy++];
+                                            ProcClass tpps = ps[x++, y++], curp = this[xx++, yy++];
                                             if (tpps == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
@@ -194,32 +216,28 @@ namespace DynamicParser
                             });
                             if (!pr1.IsCompleted)
                                 throw new Exception($"Ошибка при выполнении цикла обработки изображений ({nameof(pr1)})");
-                            Processor pr = new Processor(MaxWidth, MaxHeight);
-                            ParallelLoopResult pr2 = Parallel.For(0, MaxHeight, y =>
+                            Processor pr = new Processor(Width, Height, Tag);
+                            ParallelLoopResult pr2 = Parallel.For(0, Height - prc.Height, y =>
                             {
                                 try
                                 {
-                                    ParallelLoopResult pr3 = Parallel.For(0, MaxWidth, x =>
+                                    ParallelLoopResult pr3 = Parallel.For(0, Width - prc.Width, x =>
                                     {
                                         try
                                         {
-                                            if (_lstProcs.Count <= 0)
-                                                throw new Exception();
-                                            double[] lst = new double[_lstProcs.Count];
-                                            for (int k = 0; k < _lstProcs.Count; k++)
+                                            double[] mas = new double[ProcessorCount];
+                                            for (int k = 0; k < ProcessorCount; k++)
                                             {
-                                                if (pr.Width - x < _lstProcs[k].Width || pr.Height - y < _lstProcs[k].Height)
-                                                    continue;
-                                                for (int y2 = y, yp = y + _lstProcs[k].Height; y2 < yp; y2++)
-                                                    for (int x2 = x, xp = x + _lstProcs[k].Width; x2 < xp; x2++)
+                                                for (int y2 = y, yp = y + prc[k].Height; y2 < yp; y2++)
+                                                    for (int x2 = x, xp = x + prc[k].Width; x2 < xp; x2++)
                                                         if (GetMinIndex(procPercent, x2, y2, k))
-                                                            lst[k]++;
-                                                lst[k] = lst[k] / Convert.ToDouble(_lstProcs[k].Length);
+                                                            mas[k]++;
+                                                mas[k] /= prc[k].Length;
                                             }
-                                            ProcClass pc = pr._bitmap[x, y];
-                                            pc.CurrentSignValue = _bitmap[x1++, y1++].CurrentSignValue;
-                                            foreach (int i in GetMaxIndex(lst))
-                                                pc.CurrentProcessors.Add(_lstProcs[i]);
+                                            ProcClass pc = pr[x, y];
+                                            pc.CurrentSignValue = this[x1 + x, y1 + y].CurrentSignValue;
+                                            foreach (int i in GetMaxIndex(mas))
+                                                pc.Processors.Add(prc[i]);
                                         }
                                         catch (Exception ex)
                                         {
@@ -236,7 +254,7 @@ namespace DynamicParser
                             });
                             if (!pr2.IsCompleted)
                                 throw new Exception($"Ошибка при выполнении цикла обработки изображений ({nameof(pr2)})");
-                            proc._bitmap[x1, y1].CurrentProcessors.Add(pr);
+                            proc[x1, y1].Processors.Add(pr);
                         }
                         catch (Exception ex)
                         {
@@ -253,6 +271,7 @@ namespace DynamicParser
             });
             if (!pty.IsCompleted)
                 throw new Exception($"Ошибка при выполнении цикла обработки изображения ({nameof(pty)})");
+            WriteLog("Обработка успешно завершена");
             return proc;
         }
     }

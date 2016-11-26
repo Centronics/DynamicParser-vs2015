@@ -174,6 +174,8 @@ namespace DynamicParser
                 throw new ArgumentNullException();
             if (prc.Width > Width || prc.Height > Height)
                 throw new ArgumentException();
+            if (prc.Length <= 0)
+                throw new ArgumentException();
             if (prc.ProcessorCount <= 0)
                 throw new ArgumentException();
             if (ProcessorCount <= 0)

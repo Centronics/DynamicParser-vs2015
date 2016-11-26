@@ -99,6 +99,34 @@ namespace DynamicParser
             Tag = tag;
         }
 
+        public Processor(object tag, Processor first, params Processor[] processors)
+        {
+            if (processors == null)
+                return;
+            if (processors.Length <= 0)
+                return;
+            if (first == null)
+                throw new ArgumentNullException();
+            if (first.Length <= 0)
+                throw new ArgumentException();
+            if (tag == null)
+                throw new ArgumentNullException();
+            int mx = first.Width, my = first.Height;
+            _bitmap = new ProcClass[mx, my];
+            for (int y = 0; y < my; y++)
+                for (int x = 0; x < mx; x++)
+                    _bitmap[x, y] = new ProcClass();
+            Tag = tag;
+            foreach (Processor proc in processors)
+            {
+                if (proc == null)
+                    continue;
+                if (proc.Length <= 0)
+                    continue;
+                Add(proc);
+            }
+        }
+
         void WriteLog(string message)
         {
             try

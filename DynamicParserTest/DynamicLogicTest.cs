@@ -20,8 +20,8 @@ namespace DynamicParserTest
             Processor proc2 = new Processor(btm2, 2);
             Processor proc3 = new Processor(btm3, 3);
 
-            Processor matr = new Processor("Хранитель", proc1, proc2, proc3);
-            Processor pr = proc.GetEqual(matr);
+            ProcessorContainer pc = new ProcessorContainer(proc1, proc2, proc3);
+            Processor pr = proc.GetEqual(pc);
 
         }
     }

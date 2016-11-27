@@ -8,7 +8,65 @@ using DynamicProcessor;
 
 namespace DynamicParser
 {
-    public sealed class ProcClass
+    public sealed class ProcessorContainer
+    {
+        readonly List<Processor> _lstProcs = new List<Processor>();
+
+        public Processor this[int index] => _lstProcs[index];
+
+        public int Count => _lstProcs.Count;
+
+        public int Width { get; }
+
+        public int Height { get; }
+
+        public ProcessorContainer(Processor first, params Processor[] processors)
+        {
+            if (first == null)
+                throw new ArgumentNullException();
+            if (first.Length <= 0)
+                throw new ArgumentException();
+            if (!InOneSize(first, processors))
+                throw new ArgumentException();
+            _lstProcs.Add(first);
+            Width = first.Width;
+            Height = first.Height;
+            if (processors == null)
+                return;
+            if (processors.Length <= 0)
+                return;
+            foreach (Processor proc in processors)
+            {
+                if (proc == null)
+                    continue;
+                if (proc.Length <= 0)
+                    continue;
+                _lstProcs.Add(proc);
+            }
+        }
+
+        public void Add(Processor proc)
+        {
+            if (proc == null)
+                throw new ArgumentNullException();
+            if (proc.Length <= 0)
+                throw new ArgumentException();
+            if (proc.Width != Width)
+                throw new ArgumentException();
+            if (proc.Height != Height)
+                throw new ArgumentException();
+            _lstProcs.Add(proc);
+        }
+
+        public static bool InOneSize(Processor proc, Processor[] processors)
+        {
+            if (proc == null)
+                return false;
+            return processors != null && processors.All(pr => pr?.Width == proc.Width && pr.Height == proc.Height);
+        }
+    }
+
+    public sealed class ProcClass : ICloneable
     {
         public ConcurrentBag<Processor> Processors { get; } = new ConcurrentBag<Processor>();
         public SignValue? CurrentSignValue { get; set; }
@@ -28,14 +86,21 @@ namespace DynamicParser
                 throw new ArgumentException();
             return (pc1.CurrentSignValue.Value - pc2.CurrentSignValue.Value).Value;
         }
+
+        public object Clone()
+        {
+            ProcClass pc = new ProcClass(CurrentSignValue);
+            foreach (Processor pr in Processors)
+                pc.Processors.Add((Processor)pr.Clone());
+            return pc;
+        }
     }
 
     public sealed class Processor : ICloneable
     {
         readonly ProcClass[,] _bitmap;
-        readonly List<Processor> _lstProcs = new List<Processor>();
 
-        public static double DiffEqual { get; } = 0.0001;
+        const double DiffEqual = 0.01;
 
         public object Tag { get; }
 
@@ -46,10 +111,6 @@ namespace DynamicParser
         public int Length => Width * Height;
 
         public event Action<string> LogEvent;
-
-        public int ProcessorCount => _lstProcs.Count;
-
-        public Processor this[int index] => _lstProcs[index];
 
         public ProcClass this[int x, int y] => _bitmap[x, y];
 
@@ -64,7 +125,7 @@ namespace DynamicParser
             ProcClass[,] list = new ProcClass[lst.GetLength(0), lst.GetLength(1)];
             for (int y = 0, ly = lst.GetLength(1); y < ly; y++)
                 for (int x = 0, lx = lst.GetLength(0); x < lx; x++)
-                    list[x, y] = lst[x, y];
+                    list[x, y] = (ProcClass)lst[x, y].Clone();
             _bitmap = list;
             Tag = tag;
         }
@@ -99,34 +160,6 @@ namespace DynamicParser
             Tag = tag;
         }
 
-        public Processor(object tag, Processor first, params Processor[] processors)
-        {
-            if (processors == null)
-                return;
-            if (processors.Length <= 0)
-                return;
-            if (first == null)
-                throw new ArgumentNullException();
-            if (first.Length <= 0)
-                throw new ArgumentException();
-            if (tag == null)
-                throw new ArgumentNullException();
-            int mx = first.Width, my = first.Height;
-            _bitmap = new ProcClass[mx, my];
-            for (int y = 0; y < my; y++)
-                for (int x = 0; x < mx; x++)
-                    _bitmap[x, y] = new ProcClass();
-            Tag = tag;
-            foreach (Processor proc in processors)
-            {
-                if (proc == null)
-                    continue;
-                if (proc.Length <= 0)
-                    continue;
-                Add(proc);
-            }
-        }
-
         void WriteLog(string message)
         {
             try
@@ -137,19 +170,6 @@ namespace DynamicParser
             {
                 // ignored
             }
-        }
-
-        public void Add(Processor proc)
-        {
-            if (proc == null)
-                throw new ArgumentNullException();
-            if (proc.Length <= 0)
-                throw new ArgumentException();
-            if (proc.Width != Width)
-                throw new ArgumentException();
-            if (proc.Height != Height)
-                throw new ArgumentException();
-            _lstProcs.Add(proc);
         }
 
         public object Clone()
@@ -165,7 +185,7 @@ namespace DynamicParser
                 throw new ArgumentNullException();
             if (db.Count <= 0)
                 throw new ArgumentException();
-            double dbl = double.MaxValue;
+            int ind = int.MaxValue;
             int n = 0;
             List<int> lst = new List<int>();
             foreach (int key in db.Keys)
@@ -173,10 +193,10 @@ namespace DynamicParser
                 int[,] mas = db[key];
                 if (x >= mas.GetLength(0) || y >= mas.GetLength(1))
                     continue;
-                if (dbl < mas[x, y]) continue;
-                if (Math.Abs(dbl - mas[x, y]) <= DiffEqual)
+                if (ind < mas[x, y]) continue;
+                if (ind == mas[x, y])
                     lst.Add(key);
-                dbl = mas[x, y];
+                ind = mas[x, y];
                 n = key;
             }
             if (lst.Contains(number))
@@ -196,18 +216,14 @@ namespace DynamicParser
                     yield return k;
         }
 
-        public Processor GetEqual(Processor prc)
+        public Processor GetEqual(ProcessorContainer prc)
         {
             if (prc == null)
                 throw new ArgumentNullException();
             if (prc.Width > Width || prc.Height > Height)
                 throw new ArgumentException();
-            if (prc.Length <= 0)
+            if (prc.Count <= 0)
                 throw new ArgumentException();
-            if (prc.ProcessorCount <= 0)
-                throw new ArgumentException();
-            if (ProcessorCount <= 0)
-                throw new Exception();
             WriteLog("Обработка начата");
             Processor proc = new Processor(Width, Height, Tag);
             ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
@@ -219,7 +235,7 @@ namespace DynamicParser
                         try
                         {
                             ConcurrentDictionary<int, int[,]> procPercent = new ConcurrentDictionary<int, int[,]>();
-                            ParallelLoopResult pr1 = Parallel.For(0, ProcessorCount, j =>
+                            ParallelLoopResult pr1 = Parallel.For(0, prc.Count, j =>
                             {
                                 try
                                 {
@@ -255,8 +271,8 @@ namespace DynamicParser
                                     {
                                         try
                                         {
-                                            double[] mas = new double[ProcessorCount];
-                                            for (int k = 0; k < ProcessorCount; k++)
+                                            double[] mas = new double[prc.Count];
+                                            for (int k = 0; k < prc.Count; k++)
                                             {
                                                 for (int y2 = y, yp = y + prc[k].Height; y2 < yp; y2++)
                                                     for (int x2 = x, xp = x + prc[k].Width; x2 < xp; x2++)

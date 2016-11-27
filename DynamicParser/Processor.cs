@@ -70,6 +70,9 @@ namespace DynamicParser
     {
         public ConcurrentBag<Processor> Processors { get; } = new ConcurrentBag<Processor>();
         public SignValue? CurrentSignValue { get; set; }
+        public int? X { get; set; }
+        public int? Y { get; set; }
+        public object Tag { get; set; }
 
         public ProcClass(SignValue? sv = null)
         {
@@ -94,13 +97,20 @@ namespace DynamicParser
                 pc.Processors.Add((Processor)pr.Clone());
             return pc;
         }
+
+        public bool ContainsTag(object tag)
+        {
+            if (tag == null)
+                throw new ArgumentNullException();
+            return Processors.Where(pr => pr != null).Any(pr => pr.Tag == tag);
+        }
     }
 
     public sealed class Processor : ICloneable
     {
-        readonly ProcClass[,] _bitmap;
-
         const double DiffEqual = 0.01;
+
+        readonly ProcClass[,] _bitmap;
 
         public object Tag { get; }
 
@@ -109,6 +119,10 @@ namespace DynamicParser
         public int Height => _bitmap.GetLength(1);
 
         public int Length => Width * Height;
+
+        public int CountAssigned => _bitmap.Cast<ProcClass>().Count(pc => pc?.X != null && pc.Y != null);
+
+        public IEnumerable<ProcClass> AssignedAttributes => _bitmap.Cast<ProcClass>().Where(pc => pc?.X != null && pc.Y != null);
 
         public event Action<string> LogEvent;
 
@@ -164,7 +178,7 @@ namespace DynamicParser
         {
             try
             {
-                LogEvent?.Invoke($@"{DateTime.Now}: {message}");
+                LogEvent?.Invoke($@"{DateTime.Now}: ID:({Tag}): {message}");
             }
             catch
             {
@@ -319,6 +333,24 @@ namespace DynamicParser
                 throw new Exception($"Ошибка при выполнении цикла обработки изображения ({nameof(pty)})");
             WriteLog("Обработка успешно завершена");
             return proc;
+        }
+
+        public double GetEqual(Processor proc)
+        {
+            if (proc == null)
+                throw new ArgumentNullException();
+            if (proc.Length <= 0)
+                throw new ArgumentException();
+            if (proc.Width > Width)
+                throw new ArgumentException();
+            if (proc.Height > Height)
+                throw new ArgumentException();
+            double count = 0;
+            foreach (ProcClass pc in AssignedAttributes)
+                if (pc.X != null && pc.Y != null)
+                    if (this[pc.X.Value, pc.Y.Value].Tag == pc.Tag)
+                        count++;
+            return count / proc.CountAssigned;
         }
     }
 }

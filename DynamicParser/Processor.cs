@@ -71,7 +71,7 @@ namespace DynamicParser
     {
         public Rectangle Rect { get; set; }
         public Type ObjectType { get; set; }
-        public ConcurrentBag<Processor> LstProc { get; } = new ConcurrentBag<Processor>();
+        public ConcurrentBag<ProcClass> LstProc { get; } = new ConcurrentBag<ProcClass>();
     }
 
     public sealed class ProcClass : ICloneable
@@ -192,15 +192,25 @@ namespace DynamicParser
                     try
                     {
                         double perc = -1;
-                        ProcClass prc = null;
+                        List<ProcClass> prc = new List<ProcClass>();
                         for (int y = rs.Rect.Y; y < rs.Rect.Bottom; y++)
                             for (int x = rs.Rect.X; x < rs.Rect.Right; x++)
                             {
-                                //_bitmap[x, y]
+                                ProcClass pc = _bitmap[x, y];
+                                double db = pc.Percent;
+                                if (perc < 0)
+                                {
+                                    perc = db;
+                                    prc.Add(pc);
+                                    continue;
+                                }
+                                if (Math.Abs(perc - db) > DiffEqual)
+                                    continue;
+                                perc = db;
+                                prc.Add(pc);
                             }
-                        if (prc != null)
-                            foreach (Processor pr in prc.Processors)
-                                rs.LstProc.Add(pr);
+                        foreach (ProcClass pr in prc)
+                            rs.LstProc.Add(pr);
                     }
                     catch (Exception ex)
                     {
@@ -276,15 +286,14 @@ namespace DynamicParser
             return n == number;
         }
 
-        static IEnumerable<int> GetMaxIndex(IList<double> lst)
+        static IEnumerable<int> GetMaxIndex(IList<double> lst, double perc)
         {
             if (lst == null)
                 throw new ArgumentNullException();
             if (lst.Count <= 0)
                 yield break;
-            double db = lst.Max();
             for (int k = 0; k < lst.Count; k++)
-                if (Math.Abs(lst[k] - db) < DiffEqual)
+                if (Math.Abs(lst[k] - perc) < DiffEqual)
                     yield return k;
         }
 
@@ -354,7 +363,9 @@ namespace DynamicParser
                                             }
                                             ProcClass pc = pr[x, y];
                                             pc.CurrentSignValue = this[x1 + x, y1 + y].CurrentSignValue;
-                                            foreach (int i in GetMaxIndex(mas))
+                                            double db = mas.Max();
+                                            pc.Percent = db;
+                                            foreach (int i in GetMaxIndex(mas, db))
                                                 pc.Processors.Add(prc[i]);
                                         }
                                         catch (Exception ex)

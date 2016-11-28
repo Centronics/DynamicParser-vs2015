@@ -16,13 +16,13 @@ namespace DynamicParserTest
             Bitmap btm3 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img3.bmp");
 
             Processor proc = new Processor(btm, "Основной");//Необходимо "заполнение" процессора информацией о расположении предполагаемых данных
-            Processor proc1 = new Processor(btm1, 1);
-            Processor proc2 = new Processor(btm2, 2);
-            Processor proc3 = new Processor(btm3, 3);
+            Processor proc1 = new Processor(btm1, 'A');
+            Processor proc2 = new Processor(btm2, 'L');
+            Processor proc3 = new Processor(btm3, 'A');
 
             ProcessorContainer pc = new ProcessorContainer(proc1, proc2, proc3);
             Processor pr = proc.GetEqual(pc);
-            double perc = pr.GetEqual(proc);
+            //double perc = pr.GetEqual(proc);
         }
     }
 }

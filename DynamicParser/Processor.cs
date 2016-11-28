@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Concurrent;
+using System.Threading;
 using DynamicProcessor;
 
 namespace DynamicParser
@@ -66,12 +67,19 @@ namespace DynamicParser
         }
     }
 
+    public class RectSign
+    {
+        public Rectangle Rect { get; set; }
+        public Type ObjectType { get; set; }
+        public ConcurrentBag<Processor> LstProc { get; } = new ConcurrentBag<Processor>();
+    }
+
     public sealed class ProcClass : ICloneable
     {
         public ConcurrentBag<Processor> Processors { get; } = new ConcurrentBag<Processor>();
+        public double Percent { get; set; }
         public SignValue? CurrentSignValue { get; set; }
-        public int? X { get; set; }
-        public int? Y { get; set; }
+        public ConcurrentBag<RectSign> Map { get; } = new ConcurrentBag<RectSign>();
         public object Tag { get; set; }
 
         public ProcClass(SignValue? sv = null)
@@ -120,13 +128,11 @@ namespace DynamicParser
 
         public int Length => Width * Height;
 
-        public int CountAssigned => _bitmap.Cast<ProcClass>().Count(pc => pc?.X != null && pc.Y != null);
-
-        public IEnumerable<ProcClass> AssignedAttributes => _bitmap.Cast<ProcClass>().Where(pc => pc?.X != null && pc.Y != null);
-
         public event Action<string> LogEvent;
 
         public ProcClass this[int x, int y] => _bitmap[x, y];
+
+        public IEnumerable<RectSign> Mapping => from ProcClass pc in _bitmap where pc?.Map.Count > 0 from rc in pc.Map select rc;
 
         public Processor(ProcClass[,] lst, object tag)
         {
@@ -174,11 +180,63 @@ namespace DynamicParser
             Tag = tag;
         }
 
+        public Processor GetEqual()
+        {
+            Processor proc = new Processor(Width, Height, Tag);
+            List<Thread> thrs = new List<Thread>();
+            foreach (RectSign map in Mapping)
+            {
+                RectSign rs = map;
+                Thread thr = new Thread(() =>
+                {
+                    try
+                    {
+                        double perc = -1;
+                        ProcClass prc = null;
+                        for (int y = rs.Rect.Y; y < rs.Rect.Bottom; y++)
+                            for (int x = rs.Rect.X; x < rs.Rect.Right; x++)
+                            {
+                                //_bitmap[x, y]
+                            }
+                        if (prc != null)
+                            foreach (Processor pr in prc.Processors)
+                                rs.LstProc.Add(pr);
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteLog(ex.Message);
+                    }
+                })
+                {
+                    IsBackground = true,
+                    Name = nameof(GetEqual),
+                    Priority = ThreadPriority.AboveNormal
+                };
+                thr.Start();
+                thrs.Add(thr);
+            }
+            foreach (Thread t in thrs)
+                t.Join();
+            return proc;
+        }
+
         void WriteLog(string message)
         {
             try
             {
-                LogEvent?.Invoke($@"{DateTime.Now}: ID:({Tag}): {message}");
+                if (LogEvent == null)
+                    return;
+                foreach (Delegate del in LogEvent.GetInvocationList())
+                {
+                    try
+                    {
+                        ((Action<string>)del).Invoke($@"{DateTime.Now}: ID:({Tag}): {message}");
+                    }
+                    catch
+                    {
+                        //ignored
+                    }
+                }
             }
             catch
             {
@@ -275,7 +333,7 @@ namespace DynamicParser
                                 }
                             });
                             if (!pr1.IsCompleted)
-                                throw new Exception($"Ошибка при выполнении цикла обработки изображений ({nameof(pr1)})");
+                                throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr1)})");
                             Processor pr = new Processor(Width, Height, Tag);
                             ParallelLoopResult pr2 = Parallel.For(0, Height - prc.Height, y =>
                             {
@@ -305,7 +363,7 @@ namespace DynamicParser
                                         }
                                     });
                                     if (!pr3.IsCompleted)
-                                        throw new Exception($"Ошибка при выполнении цикла обработки изображений ({nameof(pr3)})");
+                                        throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr3)})");
                                 }
                                 catch (Exception ex)
                                 {
@@ -313,7 +371,7 @@ namespace DynamicParser
                                 }
                             });
                             if (!pr2.IsCompleted)
-                                throw new Exception($"Ошибка при выполнении цикла обработки изображений ({nameof(pr2)})");
+                                throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr2)})");
                             proc[x1, y1].Processors.Add(pr);
                         }
                         catch (Exception ex)
@@ -322,7 +380,7 @@ namespace DynamicParser
                         }
                     });
                     if (!ptx.IsCompleted)
-                        throw new Exception($"Ошибка при выполнении цикла обработки изображения ({nameof(ptx)})");
+                        throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(ptx)})");
                 }
                 catch (Exception ex)
                 {
@@ -330,27 +388,9 @@ namespace DynamicParser
                 }
             });
             if (!pty.IsCompleted)
-                throw new Exception($"Ошибка при выполнении цикла обработки изображения ({nameof(pty)})");
+                throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pty)})");
             WriteLog("Обработка успешно завершена");
             return proc;
-        }
-
-        public double GetEqual(Processor proc)
-        {
-            if (proc == null)
-                throw new ArgumentNullException();
-            if (proc.Length <= 0)
-                throw new ArgumentException();
-            if (proc.Width > Width)
-                throw new ArgumentException();
-            if (proc.Height > Height)
-                throw new ArgumentException();
-            double count = 0;
-            foreach (ProcClass pc in AssignedAttributes)
-                if (pc.X != null && pc.Y != null)
-                    if (this[pc.X.Value, pc.Y.Value].Tag == pc.Tag)
-                        count++;
-            return count / proc.CountAssigned;
         }
     }
 }

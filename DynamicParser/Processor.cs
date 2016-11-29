@@ -269,7 +269,7 @@ namespace DynamicParser
             if (db.Count <= 0)
                 throw new ArgumentException();
             int ind = int.MaxValue;
-            int n = 0;
+            int n = -1;
             List<int> lst = new List<int>();
             foreach (int key in db.Keys)
             {
@@ -284,6 +284,8 @@ namespace DynamicParser
             }
             if (lst.Contains(number))
                 return true;
+            if (n < 0)
+                return false;
             return n == number;
         }
 
@@ -328,10 +330,10 @@ namespace DynamicParser
                                     int[,] pc = new int[ps.Width, ps.Height];
                                     if (ps.Width > Width - x1 || ps.Height > Height - y1)
                                         continue;//return;
-                                    for (int y = 0, yy = y1; y < prc.Height;)
-                                        for (int x = 0, xx = x1; x < prc.Width;)
+                                    for (int y = 0, yy = y1; y < prc.Height;y++,yy++)
+                                        for (int x = 0, xx = x1; x < prc.Width;x++,xx++)
                                         {
-                                            ProcClass tpps = ps[x++, y++], curp = this[xx++, yy++];
+                                            ProcClass tpps = ps[x, y], curp = this[xx, yy];
                                             if (tpps == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)

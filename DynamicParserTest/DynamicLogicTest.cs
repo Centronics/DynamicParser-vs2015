@@ -11,10 +11,18 @@ namespace DynamicParserTest
         [TestMethod]
         public void ParserTest()
         {
-            Bitmap btm = new Bitmap(@"D:\разработки\Примеры\Пример1\ImgMain.bmp");
-            Bitmap btm1 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img1.bmp");
-            Bitmap btm2 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img2.bmp");
-            Bitmap btm3 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img3.bmp");
+            Bitmap btm = new Bitmap(2, 2); //new Bitmap(@"D:\разработки\Примеры\Пример1\ImgMain.bmp");
+            Bitmap btm1 = new Bitmap(1, 1);//(@"D:\разработки\Примеры\Пример1\Img1.bmp");
+            Bitmap btm2 = new Bitmap(1, 1); //(@"D:\разработки\Примеры\Пример1\Img2.bmp");
+            Bitmap btm3 = new Bitmap(1, 1); //(@"D:\разработки\Примеры\Пример1\Img3.bmp");
+
+            btm.SetPixel(0, 0, Color.Green);
+            btm.SetPixel(0, 1, Color.Yellow);
+            btm.SetPixel(1, 0, Color.Violet);
+            btm.SetPixel(1, 1, Color.Red);
+            btm1.SetPixel(0, 0, Color.Red);
+            btm2.SetPixel(0, 0, Color.Yellow);
+            btm3.SetPixel(0, 0, Color.Gray);
 
             Processor proc = new Processor(btm, "Основной");
             Processor proc1 = new Processor(btm1, 'A');

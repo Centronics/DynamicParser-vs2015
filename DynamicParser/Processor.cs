@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Threading.Tasks;
+//using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -70,8 +70,7 @@ namespace DynamicParser
     public class RectSign
     {
         public Rectangle Rect { get; set; }
-        public Type ObjectType { get; set; }
-        public ConcurrentBag<ProcClass> LstProc { get; } = new ConcurrentBag<ProcClass>();
+        public List<ProcClass> LstProc { get; } = new List<ProcClass>();
     }
 
     public sealed class ProcClass : ICloneable
@@ -186,11 +185,13 @@ namespace DynamicParser
             List<Thread> thrs = new List<Thread>();
             foreach (RectSign map in Mapping)
             {
-                RectSign rs = map;
-                Thread thr = new Thread(() =>
+                Thread thr = new Thread(o =>
                 {
                     try
                     {
+                        if (o == null)
+                            throw new Exception("o == null");
+                        RectSign rs = (RectSign)o;
                         double perc = -1;
                         List<ProcClass> prc = new List<ProcClass>();
                         for (int y = rs.Rect.Y; y < rs.Rect.Bottom; y++)
@@ -222,7 +223,7 @@ namespace DynamicParser
                     Name = nameof(GetEqual),
                     Priority = ThreadPriority.AboveNormal
                 };
-                thr.Start();
+                thr.Start(map);
                 thrs.Add(thr);
             }
             foreach (Thread t in thrs)
@@ -307,23 +308,26 @@ namespace DynamicParser
                 throw new ArgumentException();
             WriteLog("Обработка начата");
             Processor proc = new Processor(Width, Height, Tag);
-            ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
+            //ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
+            for(int y1=0;y1<Height;y1++)
             {
                 try
                 {
-                    ParallelLoopResult ptx = Parallel.For(0, Width, x1 =>
+                    //ParallelLoopResult ptx = Parallel.For(0, Width, x1 =>
+                    for(int x1=0; x1 < Width;x1++)
                     {
                         try
                         {
                             ConcurrentDictionary<int, int[,]> procPercent = new ConcurrentDictionary<int, int[,]>();
-                            ParallelLoopResult pr1 = Parallel.For(0, prc.Count, j =>
+                            //ParallelLoopResult pr1 = Parallel.For(0, prc.Count, j =>
+                            for(int j=0; j < prc.Count;j++)
                             {
                                 try
                                 {
                                     Processor ps = prc[j];
                                     int[,] pc = new int[ps.Width, ps.Height];
-                                    if (ps.Width < Width - x1 || ps.Height < Height - y1)
-                                        return;
+                                    if (ps.Width > Width - x1 || ps.Height > Height - y1)
+                                        continue;//return;
                                     for (int y = 0, yy = y1; y < prc.Height;)
                                         for (int x = 0, xx = x1; x < prc.Width;)
                                         {
@@ -340,15 +344,17 @@ namespace DynamicParser
                                 {
                                     WriteLog(ex.Message);
                                 }
-                            });
-                            if (!pr1.IsCompleted)
-                                throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr1)})");
+                            }//);
+                            //if (!pr1.IsCompleted)
+                             //   throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr1)})");
                             Processor pr = new Processor(Width, Height, Tag);
-                            ParallelLoopResult pr2 = Parallel.For(0, Height - prc.Height, y =>
+                            //ParallelLoopResult pr2 = Parallel.For(0, Height - prc.Height, y =>
+                            for(int y=0;y < Height - prc.Height;y++)
                             {
                                 try
                                 {
-                                    ParallelLoopResult pr3 = Parallel.For(0, Width - prc.Width, x =>
+                                    //ParallelLoopResult pr3 = Parallel.For(0, Width - prc.Width, x =>
+                                    for(int x=0;x < Width - prc.Width;x++)
                                     {
                                         try
                                         {
@@ -372,34 +378,34 @@ namespace DynamicParser
                                         {
                                             WriteLog(ex.Message);
                                         }
-                                    });
-                                    if (!pr3.IsCompleted)
-                                        throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr3)})");
+                                    }//);
+                                   // if (!pr3.IsCompleted)
+                                   //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr3)})");
                                 }
                                 catch (Exception ex)
                                 {
                                     WriteLog(ex.Message);
                                 }
-                            });
-                            if (!pr2.IsCompleted)
-                                throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr2)})");
+                            }//);
+                           // if (!pr2.IsCompleted)
+                           //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr2)})");
                             proc[x1, y1].Processors.Add(pr);
                         }
                         catch (Exception ex)
                         {
                             WriteLog(ex.Message);
                         }
-                    });
-                    if (!ptx.IsCompleted)
-                        throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(ptx)})");
+                    }//);
+                    //if (!ptx.IsCompleted)
+                     //   throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(ptx)})");
                 }
                 catch (Exception ex)
                 {
                     WriteLog(ex.Message);
                 }
-            });
-            if (!pty.IsCompleted)
-                throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pty)})");
+            }//);
+           // if (!pty.IsCompleted)
+           //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pty)})");
             WriteLog("Обработка успешно завершена");
             return proc;
         }

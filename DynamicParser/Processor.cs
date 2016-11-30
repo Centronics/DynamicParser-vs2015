@@ -209,6 +209,7 @@ namespace DynamicParser
                                     continue;
                                 perc = db;
                                 prc.Add(pc);
+                                proc._bitmap[x, y].Map.Add(rs);
                             }
                         foreach (ProcClass pr in prc)
                             rs.LstProc.Add(pr);
@@ -268,25 +269,15 @@ namespace DynamicParser
                 throw new ArgumentNullException();
             if (db.Count <= 0)
                 throw new ArgumentException();
-            int ind = int.MaxValue;
-            int n = -1;
-            List<int> lst = new List<int>();
+            int ind = int.MaxValue, n = -1;
             foreach (int key in db.Keys)
             {
                 int[,] mas = db[key];
-                if (x >= mas.GetLength(0) || y >= mas.GetLength(1))
-                    continue;
                 if (ind < mas[x, y]) continue;
-                if (ind == mas[x, y])
-                    lst.Add(key);
                 ind = mas[x, y];
                 n = key;
             }
-            if (lst.Contains(number))
-                return true;
-            if (n < 0)
-                return false;
-            return n == number;
+            return n >= 0 && db.Keys.Where(key => ind == db[key][x, y]).ToList().Contains(number);
         }
 
         static IEnumerable<int> GetMaxIndex(IList<double> lst, double perc)
@@ -311,18 +302,18 @@ namespace DynamicParser
             WriteLog("Обработка начата");
             Processor proc = new Processor(Width, Height, Tag);
             //ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
-            for(int y1=0;y1<Height;y1++)
+            for (int y1 = 0; y1 < Height; y1++)
             {
                 try
                 {
                     //ParallelLoopResult ptx = Parallel.For(0, Width, x1 =>
-                    for(int x1=0; x1 < Width;x1++)
+                    for (int x1 = 0; x1 < Width; x1++)
                     {
                         try
                         {
                             ConcurrentDictionary<int, int[,]> procPercent = new ConcurrentDictionary<int, int[,]>();
                             //ParallelLoopResult pr1 = Parallel.For(0, prc.Count, j =>
-                            for(int j=0; j < prc.Count;j++)
+                            for (int j = 0; j < prc.Count; j++)
                             {
                                 try
                                 {
@@ -330,8 +321,8 @@ namespace DynamicParser
                                     int[,] pc = new int[ps.Width, ps.Height];
                                     if (ps.Width > Width - x1 || ps.Height > Height - y1)
                                         continue;//return;
-                                    for (int y = 0, yy = y1; y < prc.Height;y++,yy++)
-                                        for (int x = 0, xx = x1; x < prc.Width;x++,xx++)
+                                    for (int y = 0, yy = y1; y < prc.Height; y++, yy++)
+                                        for (int x = 0, xx = x1; x < prc.Width; x++, xx++)
                                         {
                                             ProcClass tpps = ps[x, y], curp = this[xx, yy];
                                             if (tpps == null)
@@ -347,16 +338,16 @@ namespace DynamicParser
                                     WriteLog(ex.Message);
                                 }
                             }//);
-                            //if (!pr1.IsCompleted)
+                             //if (!pr1.IsCompleted)
                              //   throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr1)})");
                             Processor pr = new Processor(Width, Height, Tag);
                             //ParallelLoopResult pr2 = Parallel.For(0, Height - prc.Height, y =>
-                            for(int y=0;y < Height - prc.Height;y++)
+                            for (int y = 0; y <= Height - prc.Height; y++)
                             {
                                 try
                                 {
                                     //ParallelLoopResult pr3 = Parallel.For(0, Width - prc.Width, x =>
-                                    for(int x=0;x < Width - prc.Width;x++)
+                                    for (int x = 0; x <= Width - prc.Width; x++)
                                     {
                                         try
                                         {
@@ -381,16 +372,16 @@ namespace DynamicParser
                                             WriteLog(ex.Message);
                                         }
                                     }//);
-                                   // if (!pr3.IsCompleted)
-                                   //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr3)})");
+                                     // if (!pr3.IsCompleted)
+                                     //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr3)})");
                                 }
                                 catch (Exception ex)
                                 {
                                     WriteLog(ex.Message);
                                 }
                             }//);
-                           // if (!pr2.IsCompleted)
-                           //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr2)})");
+                             // if (!pr2.IsCompleted)
+                             //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr2)})");
                             proc[x1, y1].Processors.Add(pr);
                         }
                         catch (Exception ex)
@@ -398,7 +389,7 @@ namespace DynamicParser
                             WriteLog(ex.Message);
                         }
                     }//);
-                    //if (!ptx.IsCompleted)
+                     //if (!ptx.IsCompleted)
                      //   throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(ptx)})");
                 }
                 catch (Exception ex)
@@ -406,8 +397,8 @@ namespace DynamicParser
                     WriteLog(ex.Message);
                 }
             }//);
-           // if (!pty.IsCompleted)
-           //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pty)})");
+             // if (!pty.IsCompleted)
+             //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pty)})");
             WriteLog("Обработка успешно завершена");
             return proc;
         }

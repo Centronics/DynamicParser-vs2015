@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DynamicParser;
+using Region = DynamicParser.Region;
 
 namespace DynamicParserTest
 {
@@ -18,20 +18,19 @@ namespace DynamicParserTest
 
             btm.SetPixel(0, 0, Color.Black);
             btm1.SetPixel(0, 0, Color.Red);
-            btm2.SetPixel(0, 0, Color.Yellow);
+            btm2.SetPixel(0, 0, Color.Gray);
             btm3.SetPixel(0, 0, Color.Gray);
 
-            Processor proc = new Processor(btm, "Основной");
-            Processor proc1 = new Processor(btm1, 'A');
-            Processor proc2 = new Processor(btm2, 'L');
-            Processor proc3 = new Processor(btm3, 'A');
+            Processor proc = new Processor(btm, "Main");
+            Processor proc1 = new Processor(btm1, "Black");
+            Processor proc2 = new Processor(btm2, "Gray");
+            Processor proc3 = new Processor(btm3, "Gray");
 
             ProcessorContainer pc = new ProcessorContainer(proc1, proc2, proc3);
-            Processor pr = proc.GetEqual(pc);
-            pr[0, 0].Map.Add(new RectSign { Rect = new Rectangle { Width = 1, Height = 1 } });
-            //pr[44, 2].Map.Add(new RectSign { Rect = rect });
-            Processor prc = pr.GetEqual();
-            List<RectSign> lst = new List<RectSign>(prc.Mapping);
+            SearchResults pr = proc.GetEqual(pc);
+            Region region = new Region(pc.Width, pc.Height);
+            region.Add(new Rectangle(0, 0, 1, 1));
+            pr.FindRegion(region);
         }
     }
 }

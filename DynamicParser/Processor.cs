@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-//using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Concurrent;
-using System.Threading;
 using DynamicProcessor;
 
 namespace DynamicParser
@@ -67,57 +65,120 @@ namespace DynamicParser
         }
     }
 
-    public class RectSign
+    public struct ProcPerc
     {
-        public Rectangle Rect { get; set; }
-        public List<ProcClass> LstProc { get; } = new List<ProcClass>();
+        public double Percent;
+        public Processor[] Procs;
     }
 
-    public sealed class ProcClass : ICloneable
+    public struct Reg
     {
-        public ConcurrentBag<Processor> Processors { get; } = new ConcurrentBag<Processor>();
-        public double Percent { get; set; }
-        public SignValue? CurrentSignValue { get; set; }
-        public ConcurrentBag<RectSign> Map { get; } = new ConcurrentBag<RectSign>();
-        public object Tag { get; set; }
-
-        public ProcClass(SignValue? sv = null)
-        {
-            CurrentSignValue = sv;
-        }
-
-        public static int operator -(ProcClass pc1, ProcClass pc2)
-        {
-            if (pc1 == null)
-                throw new ArgumentNullException();
-            if (pc2 == null)
-                throw new ArgumentNullException();
-            if (pc1.CurrentSignValue == null || pc2.CurrentSignValue == null)
-                throw new ArgumentException();
-            return (pc1.CurrentSignValue.Value - pc2.CurrentSignValue.Value).Value;
-        }
-
-        public object Clone()
-        {
-            ProcClass pc = new ProcClass(CurrentSignValue);
-            foreach (Processor pr in Processors)
-                pc.Processors.Add((Processor)pr.Clone());
-            return pc;
-        }
-
-        public bool ContainsTag(object tag)
-        {
-            if (tag == null)
-                throw new ArgumentNullException();
-            return Processors.Where(pr => pr != null).Any(pr => pr.Tag == tag);
-        }
+        public Point Position;
+        public Processor[] Procs;
     }
 
-    public sealed class Processor : ICloneable
+    public sealed class SearchResults
     {
         const double DiffEqual = 0.01;
 
-        readonly ProcClass[,] _bitmap;
+        readonly ProcPerc[,] _coords;
+
+        public int Width => _coords.GetLength(0);
+
+        public int Height => _coords.GetLength(1);
+
+        public SearchResults(int mx, int my)
+        {
+            if (mx <= 0)
+                throw new ArgumentException();
+            if (my <= 0)
+                throw new ArgumentException();
+            _coords = new ProcPerc[mx, my];
+        }
+
+        public ProcPerc this[int x, int y]
+        {
+            get { return _coords[x, y]; }
+            set { _coords[x, y] = value; }
+        }
+
+        List<Reg> Find(Rectangle rect)
+        {
+            if (rect.Width > Width)
+                throw new ArgumentException();
+            if (rect.Height > Height)
+                throw new ArgumentException();
+            double max = -1.0;
+            for (int y = rect.Y; y < rect.Bottom; y++)
+                for (int x = rect.X; x < rect.Right; x++)
+                {
+                    if (max < _coords[x, y].Percent)
+                        max = _coords[x, y].Percent;
+                    if (max >= 1.0)
+                        goto exit;
+                }
+            exit: List<Reg> procs = new List<Reg>();
+            for (int y = rect.Y; y < rect.Bottom; y++)
+                for (int x = rect.X; x < rect.Right; x++)
+                {
+                    ProcPerc pp = _coords[x, y];
+                    if (Math.Abs(pp.Percent - max) <= DiffEqual)
+                        procs.Add(new Reg { Position = new Point(x, y), Procs = pp.Procs });
+                }
+            return procs;
+        }
+
+        public void FindRegion(Region region)
+        {
+            if (region == null)
+                throw new ArgumentNullException();
+            for (int y = 0; y < region.Height; y++)
+                for (int x = 0; x < region.Width; x++)
+                {
+                    Registered reg = region[x, y];
+                    if (reg == null)
+                        continue;
+                    reg.Register = Find(reg.Region);
+                }
+        }
+    }
+
+    public sealed class Registered
+    {
+        public Rectangle Region;
+        public List<Reg> Register;
+    }
+
+    public sealed class Region
+    {
+        readonly Registered[,] _rects;
+
+        public Registered this[int x, int y] => _rects[x, y];
+
+        public int Width => _rects.GetLength(0);
+
+        public int Height => _rects.GetLength(1);
+
+        public Region(int mx, int my)
+        {
+            if (mx <= 0)
+                throw new ArgumentException();
+            if (my <= 0)
+                throw new ArgumentException();
+            _rects = new Registered[mx, my];
+        }
+
+        public void Add(Rectangle rect)
+        {
+            _rects[rect.X, rect.Y] = new Registered { Region = rect };
+        }
+    }
+
+    public sealed class Processor
+    {
+        const double DiffEqual = 0.01;
+
+        readonly SignValue[,] _bitmap;
 
         public object Tag { get; }
 
@@ -129,25 +190,7 @@ namespace DynamicParser
 
         public event Action<string> LogEvent;
 
-        public ProcClass this[int x, int y] => _bitmap[x, y];
-
-        public IEnumerable<RectSign> Mapping => from ProcClass pc in _bitmap where pc?.Map.Count > 0 from rc in pc.Map select rc;
-
-        public Processor(ProcClass[,] lst, object tag)
-        {
-            if (lst == null)
-                throw new ArgumentNullException();
-            if (lst.Length <= 0)
-                throw new ArgumentException();
-            if (tag == null)
-                throw new ArgumentNullException();
-            ProcClass[,] list = new ProcClass[lst.GetLength(0), lst.GetLength(1)];
-            for (int y = 0, ly = lst.GetLength(1); y < ly; y++)
-                for (int x = 0, lx = lst.GetLength(0); x < lx; x++)
-                    list[x, y] = (ProcClass)lst[x, y].Clone();
-            _bitmap = list;
-            Tag = tag;
-        }
+        public SignValue this[int x, int y] => _bitmap[x, y];
 
         public Processor(Bitmap btm, object tag)
         {
@@ -157,79 +200,11 @@ namespace DynamicParser
                 throw new ArgumentException();
             if (tag == null)
                 throw new ArgumentNullException();
-            _bitmap = new ProcClass[btm.Width, btm.Height];
+            _bitmap = new SignValue[btm.Width, btm.Height];
             for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
-                    _bitmap[x, y] = new ProcClass(new SignValue(btm.GetPixel(x, y)));
+                    _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
             Tag = tag;
-        }
-
-        public Processor(int mx, int my, object tag)
-        {
-            if (mx <= 0)
-                throw new ArgumentException($"{nameof(Processor)}: mx <= 0: ({mx})", nameof(mx));
-            if (my <= 0)
-                throw new ArgumentException($"{nameof(Processor)}: my <= 0: ({my})", nameof(my));
-            if (tag == null)
-                throw new ArgumentNullException();
-            _bitmap = new ProcClass[mx, my];
-            for (int y = 0; y < my; y++)
-                for (int x = 0; x < mx; x++)
-                    _bitmap[x, y] = new ProcClass();
-            Tag = tag;
-        }
-
-        public Processor GetEqual()
-        {
-            Processor proc = new Processor(Width, Height, Tag);
-            List<Thread> thrs = new List<Thread>();
-            foreach (RectSign map in Mapping)
-            {
-                Thread thr = new Thread(o =>
-                {
-                    try
-                    {
-                        if (o == null)
-                            throw new Exception("o == null");
-                        RectSign rs = (RectSign)o;
-                        double perc = -1;
-                        List<ProcClass> prc = new List<ProcClass>();
-                        for (int y = rs.Rect.Y; y < rs.Rect.Bottom; y++)
-                            for (int x = rs.Rect.X; x < rs.Rect.Right; x++)
-                            {
-                                ProcClass pc = _bitmap[x, y];
-                                double db = pc.Percent;
-                                if (perc < 0)
-                                {
-                                    perc = db;
-                                    prc.Add(pc);
-                                    continue;
-                                }
-                                if (Math.Abs(perc - db) > DiffEqual)
-                                    continue;
-                                perc = db;
-                                prc.Add(pc);
-                                proc._bitmap[x, y].Map.Add(rs);
-                            }
-                        foreach (ProcClass pr in prc)
-                            rs.LstProc.Add(pr);
-                    }
-                    catch (Exception ex)
-                    {
-                        WriteLog(ex.Message);
-                    }
-                })
-                {
-                    IsBackground = true,
-                    Name = nameof(GetEqual),
-                    Priority = ThreadPriority.AboveNormal
-                };
-                thr.Start(map);
-                thrs.Add(thr);
-            }
-            foreach (Thread t in thrs)
-                t.Join();
-            return proc;
         }
 
         void WriteLog(string message)
@@ -256,12 +231,7 @@ namespace DynamicParser
             }
         }
 
-        public object Clone()
-        {
-            return new Processor(_bitmap, Tag);
-        }
-
-        static bool GetMinIndex(IDictionary<int, int[,]> db, int x, int y, int number)
+        static bool GetMinIndex(IDictionary<int, SignValue[,]> db, int x, int y, int number)
         {
             if (x < 0 || y < 0 || number < 0)
                 throw new ArgumentException();
@@ -269,10 +239,11 @@ namespace DynamicParser
                 throw new ArgumentNullException();
             if (db.Count <= 0)
                 throw new ArgumentException();
-            int ind = int.MaxValue, n = -1;
+            SignValue ind = SignValue.MaxValue;
+            int n = -1;
             foreach (int key in db.Keys)
             {
-                int[,] mas = db[key];
+                SignValue[,] mas = db[key];
                 if (ind < mas[x, y]) continue;
                 ind = mas[x, y];
                 n = key;
@@ -291,7 +262,7 @@ namespace DynamicParser
                     yield return k;
         }
 
-        public Processor GetEqual(ProcessorContainer prc)
+        public SearchResults GetEqual(ProcessorContainer prc)
         {
             if (prc == null)
                 throw new ArgumentNullException();
@@ -300,7 +271,7 @@ namespace DynamicParser
             if (prc.Count <= 0)
                 throw new ArgumentException();
             WriteLog("Обработка начата");
-            Processor proc = new Processor(Width, Height, Tag);
+            SearchResults sr = new SearchResults(prc.Width, prc.Height);
             //ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
             for (int y1 = 0; y1 < Height; y1++)
             {
@@ -311,20 +282,20 @@ namespace DynamicParser
                     {
                         try
                         {
-                            ConcurrentDictionary<int, int[,]> procPercent = new ConcurrentDictionary<int, int[,]>();
+                            ConcurrentDictionary<int, SignValue[,]> procPercent = new ConcurrentDictionary<int, SignValue[,]>();
                             //ParallelLoopResult pr1 = Parallel.For(0, prc.Count, j =>
                             for (int j = 0; j < prc.Count; j++)
                             {
                                 try
                                 {
                                     Processor ps = prc[j];
-                                    int[,] pc = new int[ps.Width, ps.Height];
+                                    SignValue[,] pc = new SignValue[ps.Width, ps.Height];
                                     if (ps.Width > Width - x1 || ps.Height > Height - y1)
                                         continue;//return;
                                     for (int y = 0, yy = y1; y < prc.Height; y++, yy++)
                                         for (int x = 0, xx = x1; x < prc.Width; x++, xx++)
                                         {
-                                            ProcClass tpps = ps[x, y], curp = this[xx, yy];
+                                            SignValue tpps = ps[x, y], curp = this[xx, yy];
                                             if (tpps == null)
                                                 throw new ArgumentException($"{nameof(GetEqual)}: Элемент проверяющей карты равен null", nameof(tpps));
                                             if (curp == null)
@@ -340,7 +311,7 @@ namespace DynamicParser
                             }//);
                              //if (!pr1.IsCompleted)
                              //   throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr1)})");
-                            Processor pr = new Processor(Width, Height, Tag);
+
                             //ParallelLoopResult pr2 = Parallel.For(0, Height - prc.Height, y =>
                             for (int y = 0; y <= Height - prc.Height; y++)
                             {
@@ -360,12 +331,12 @@ namespace DynamicParser
                                                             mas[k]++;
                                                 mas[k] /= prc[k].Length;
                                             }
-                                            ProcClass pc = pr[x, y];
-                                            pc.CurrentSignValue = this[x1 + x, y1 + y].CurrentSignValue;
                                             double db = mas.Max();
-                                            pc.Percent = db;
-                                            foreach (int i in GetMaxIndex(mas, db))
-                                                pc.Processors.Add(prc[i]);
+                                            sr[x1, y1] = new ProcPerc
+                                            {
+                                                Procs = GetMaxIndex(mas, db).Select(i => prc[i]).ToArray(),
+                                                Percent = db
+                                            };
                                         }
                                         catch (Exception ex)
                                         {
@@ -382,7 +353,6 @@ namespace DynamicParser
                             }//);
                              // if (!pr2.IsCompleted)
                              //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pr2)})");
-                            proc[x1, y1].Processors.Add(pr);
                         }
                         catch (Exception ex)
                         {
@@ -400,7 +370,7 @@ namespace DynamicParser
              // if (!pty.IsCompleted)
              //     throw new Exception($"Ошибка при выполнении цикла обработки карт ({nameof(pty)})");
             WriteLog("Обработка успешно завершена");
-            return proc;
+            return sr;
         }
     }
 }

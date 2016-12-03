@@ -71,6 +71,14 @@ namespace DynamicParser
         {
             if (region == null)
                 throw new ArgumentNullException();
+            if (region.Width <= 0)
+                throw new ArgumentException();
+            if (region.Height <= 0)
+                throw new ArgumentException();
+            if (region.Width > Width)
+                throw new ArgumentException();
+            if (region.Height > Height)
+                throw new ArgumentException();
             for (int y = 0; y < region.Height; y++)
                 for (int x = 0; x < region.Width; x++)
                 {

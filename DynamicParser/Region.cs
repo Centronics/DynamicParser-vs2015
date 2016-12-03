@@ -42,6 +42,10 @@ namespace DynamicParser
 
         public int Height { get; }
 
+        public int MaxRight { get; private set; }
+
+        public int MaxBottom { get; private set; }
+
         public Region(int mx, int my)
         {
             if (mx <= 0)
@@ -88,6 +92,10 @@ namespace DynamicParser
         {
             if (IsConflict(rect))
                 throw new ArgumentException($"{nameof(Add)}: Попытка вставить элемент, конфликтующий с существующими");
+            if (MaxRight < rect.Right)
+                MaxRight = rect.Right;
+            if (MaxBottom < rect.Bottom)
+                MaxBottom = rect.Bottom;
             _rects[GetIndex(rect.X, rect.Y)] = new Registered { Region = rect };
         }
     }

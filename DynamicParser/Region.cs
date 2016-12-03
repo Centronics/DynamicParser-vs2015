@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace DynamicParser
 {
@@ -8,17 +9,38 @@ namespace DynamicParser
     {
         public Rectangle Region;
         public List<Reg> Register;
+
+        public int X => Region.X;
+
+        public int Y => Region.Y;
+
+        public int Right => Region.Right;
+
+        public int Bottom => Region.Bottom;
+
+        public bool IsConflict(Rectangle rect)
+        {
+            if (rect.X >= X && rect.Right <= Right)
+                return true;
+            if (rect.Y >= Y && rect.Bottom <= Bottom)
+                return true;
+            if (rect.Right >= X && rect.Right <= Right)
+                return true;
+            if (rect.Bottom >= Y && rect.Bottom <= Bottom)
+                return true;
+            if (rect.X <= X && rect.Right >= Right)
+                return true;
+            return rect.Y <= Y && rect.Bottom >= Bottom;
+        }
     }
 
     public sealed class Region
     {
-        readonly Registered[,] _rects;
+        readonly SortedDictionary<ulong, Registered> _rects = new SortedDictionary<ulong, Registered>();
 
-        public Registered this[int x, int y] => _rects[x, y];
+        public int Width { get; }
 
-        public int Width => _rects.GetLength(0);
-
-        public int Height => _rects.GetLength(1);
+        public int Height { get; }
 
         public Region(int mx, int my)
         {
@@ -26,12 +48,47 @@ namespace DynamicParser
                 throw new ArgumentException();
             if (my <= 0)
                 throw new ArgumentException();
-            _rects = new Registered[mx, my];
+            Width = mx;
+            Height = my;
+        }
+
+        ulong GetIndex(int x, int y)
+        {
+            if (x < 0)
+                throw new ArgumentException();
+            if (y < 0)
+                throw new ArgumentException();
+            if (x >= Width)
+                throw new ArgumentException();
+            if (y >= Height)
+                throw new ArgumentException();
+            return Convert.ToUInt64(Width * y + x);
+        }
+
+        public Registered this[int x, int y]
+        {
+            get
+            {
+                Registered reg;
+                return _rects.TryGetValue(GetIndex(x, y), out reg) ? reg : null;
+            }
+        }
+
+        public bool Contains(int x, int y)
+        {
+            return _rects.ContainsKey(GetIndex(x, y));
+        }
+
+        public bool IsConflict(Rectangle rect)
+        {
+            return _rects.Values.Any(reg => reg.IsConflict(rect));
         }
 
         public void Add(Rectangle rect)
         {
-            _rects[rect.X, rect.Y] = new Registered { Region = rect };
+            if (IsConflict(rect))
+                throw new ArgumentException($"{nameof(Add)}: Попытка вставить элемент, конфликтующий с существующими");
+            _rects[GetIndex(rect.X, rect.Y)] = new Registered { Region = rect };
         }
     }
 }

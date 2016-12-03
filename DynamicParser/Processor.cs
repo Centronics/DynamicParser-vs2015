@@ -103,7 +103,7 @@ namespace DynamicParser
             if (prc.Count <= 0)
                 throw new ArgumentException();
             WriteLog("Обработка начата");
-            SearchResults sr = new SearchResults(prc.Width, prc.Height);
+            SearchResults sr = new SearchResults(Width, Height);
             //ParallelLoopResult pty = Parallel.For(0, Height, y1 =>
             for (int y1 = 0; y1 < Height; y1++)
             {

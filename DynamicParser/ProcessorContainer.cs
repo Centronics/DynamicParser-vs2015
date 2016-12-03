@@ -22,20 +22,16 @@ namespace DynamicParser
                 throw new ArgumentNullException();
             if (first.Length <= 0)
                 throw new ArgumentException();
+            if (processors == null)
+                return;
             if (!InOneSize(first, processors))
                 throw new ArgumentException();
             _lstProcs.Add(first);
             Width = first.Width;
             Height = first.Height;
-            if (processors == null)
-                return;
-            if (processors.Length <= 0)
-                return;
             foreach (Processor proc in processors)
             {
                 if (proc == null)
-                    continue;
-                if (proc.Length <= 0)
                     continue;
                 _lstProcs.Add(proc);
             }

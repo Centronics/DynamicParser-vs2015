@@ -2,178 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Collections.Concurrent;
 using DynamicProcessor;
 
 namespace DynamicParser
 {
-    public sealed class ProcessorContainer
-    {
-        readonly List<Processor> _lstProcs = new List<Processor>();
-
-        public Processor this[int index] => _lstProcs[index];
-
-        public int Count => _lstProcs.Count;
-
-        public int Width { get; }
-
-        public int Height { get; }
-
-        public ProcessorContainer(Processor first, params Processor[] processors)
-        {
-            if (first == null)
-                throw new ArgumentNullException();
-            if (first.Length <= 0)
-                throw new ArgumentException();
-            if (!InOneSize(first, processors))
-                throw new ArgumentException();
-            _lstProcs.Add(first);
-            Width = first.Width;
-            Height = first.Height;
-            if (processors == null)
-                return;
-            if (processors.Length <= 0)
-                return;
-            foreach (Processor proc in processors)
-            {
-                if (proc == null)
-                    continue;
-                if (proc.Length <= 0)
-                    continue;
-                _lstProcs.Add(proc);
-            }
-        }
-
-        public void Add(Processor proc)
-        {
-            if (proc == null)
-                throw new ArgumentNullException();
-            if (proc.Length <= 0)
-                throw new ArgumentException();
-            if (proc.Width != Width)
-                throw new ArgumentException();
-            if (proc.Height != Height)
-                throw new ArgumentException();
-            _lstProcs.Add(proc);
-        }
-
-        public static bool InOneSize(Processor proc, Processor[] processors)
-        {
-            if (proc == null)
-                return false;
-            return processors != null && processors.All(pr => pr?.Width == proc.Width && pr.Height == proc.Height);
-        }
-    }
-
-    public struct ProcPerc
-    {
-        public double Percent;
-        public Processor[] Procs;
-    }
-
-    public struct Reg
-    {
-        public Point Position;
-        public Processor[] Procs;
-    }
-
-    public sealed class SearchResults
-    {
-        const double DiffEqual = 0.01;
-
-        readonly ProcPerc[,] _coords;
-
-        public int Width => _coords.GetLength(0);
-
-        public int Height => _coords.GetLength(1);
-
-        public SearchResults(int mx, int my)
-        {
-            if (mx <= 0)
-                throw new ArgumentException();
-            if (my <= 0)
-                throw new ArgumentException();
-            _coords = new ProcPerc[mx, my];
-        }
-
-        public ProcPerc this[int x, int y]
-        {
-            get { return _coords[x, y]; }
-            set { _coords[x, y] = value; }
-        }
-
-        List<Reg> Find(Rectangle rect)
-        {
-            if (rect.Width > Width)
-                throw new ArgumentException();
-            if (rect.Height > Height)
-                throw new ArgumentException();
-            double max = -1.0;
-            for (int y = rect.Y; y < rect.Bottom; y++)
-                for (int x = rect.X; x < rect.Right; x++)
-                {
-                    if (max < _coords[x, y].Percent)
-                        max = _coords[x, y].Percent;
-                    if (max >= 1.0)
-                        goto exit;
-                }
-            exit: List<Reg> procs = new List<Reg>();
-            for (int y = rect.Y; y < rect.Bottom; y++)
-                for (int x = rect.X; x < rect.Right; x++)
-                {
-                    ProcPerc pp = _coords[x, y];
-                    if (Math.Abs(pp.Percent - max) <= DiffEqual)
-                        procs.Add(new Reg { Position = new Point(x, y), Procs = pp.Procs });
-                }
-            return procs;
-        }
-
-        public void FindRegion(Region region)
-        {
-            if (region == null)
-                throw new ArgumentNullException();
-            for (int y = 0; y < region.Height; y++)
-                for (int x = 0; x < region.Width; x++)
-                {
-                    Registered reg = region[x, y];
-                    if (reg == null)
-                        continue;
-                    reg.Register = Find(reg.Region);
-                }
-        }
-    }
-
-    public sealed class Registered
-    {
-        public Rectangle Region;
-        public List<Reg> Register;
-    }
-
-    public sealed class Region
-    {
-        readonly Registered[,] _rects;
-
-        public Registered this[int x, int y] => _rects[x, y];
-
-        public int Width => _rects.GetLength(0);
-
-        public int Height => _rects.GetLength(1);
-
-        public Region(int mx, int my)
-        {
-            if (mx <= 0)
-                throw new ArgumentException();
-            if (my <= 0)
-                throw new ArgumentException();
-            _rects = new Registered[mx, my];
-        }
-
-        public void Add(Rectangle rect)
-        {
-            _rects[rect.X, rect.Y] = new Registered { Region = rect };
-        }
-    }
-
     public sealed class Processor
     {
         const double DiffEqual = 0.01;
@@ -282,7 +114,7 @@ namespace DynamicParser
                     {
                         try
                         {
-                            ConcurrentDictionary<int, SignValue[,]> procPercent = new ConcurrentDictionary<int, SignValue[,]>();
+                            Dictionary<int, SignValue[,]> procPercent = new Dictionary<int, SignValue[,]>();
                             //ParallelLoopResult pr1 = Parallel.For(0, prc.Count, j =>
                             for (int j = 0; j < prc.Count; j++)
                             {

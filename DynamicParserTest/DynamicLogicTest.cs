@@ -16,11 +16,6 @@ namespace DynamicParserTest
             Bitmap btm2 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img2.bmp");//new Bitmap(1, 1);
             Bitmap btm3 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img3.bmp");//new Bitmap(1, 1);
 
-            //btm.SetPixel(0, 0, Color.Black);
-            //btm1.SetPixel(0, 0, Color.Red);
-            //btm2.SetPixel(0, 0, Color.Gray);
-            //btm3.SetPixel(0, 0, Color.Gray);
-
             Processor proc = new Processor(btm, "Main");
             Processor proc1 = new Processor(btm1, "A");
             Processor proc2 = new Processor(btm2, "L");

@@ -15,6 +15,7 @@ namespace DynamicParser
     {
         public Point Position;
         public Processor[] Procs;
+        public double Percent;
     }
 
     public sealed class SearchResults
@@ -65,7 +66,7 @@ namespace DynamicParser
                 {
                     ProcPerc pp = _coords[x, y];
                     if (Math.Abs(pp.Percent - max) <= DiffEqual)
-                        procs.Add(new Reg { Position = new Point(x, y), Procs = pp.Procs });
+                        procs.Add(new Reg { Position = new Point(x, y), Procs = pp.Procs, Percent = pp.Percent });
                 }
             return procs;
         }
@@ -89,15 +90,8 @@ namespace DynamicParser
                 throw new ArgumentException();
             if (!InRange(region))
                 throw new ArgumentException();
-            //for (int y = 0; y < region.Height; y++)
-            //  for (int x = 0; x < region.Width; x++)
             foreach (Registered reg in region.Elements)
-            {
-                //Registered reg = region[x, y];
-                // if (reg == null)
-                //   continue;
                 reg.Register = Find(reg.Region);
-            }
         }
     }
 }

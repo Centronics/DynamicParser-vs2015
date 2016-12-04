@@ -106,9 +106,27 @@ namespace DynamicParser
                                     SignValue[,] pc = new SignValue[ps.Width, ps.Height];
                                     if (ps.Width > Width - x1 || ps.Height > Height - y1)
                                         return;
-                                    for (int y = 0, yy = y1; y < prc.Height; y++, yy++)
-                                        for (int x = 0, xx = x1; x < prc.Width; x++, xx++)
-                                            pc[x, y] = ps[x, y] - this[xx, yy];
+                                    Parallel.For(0, prc.Height, y =>
+                                    {
+                                        try
+                                        {
+                                            Parallel.For(0, prc.Width, x =>
+                                            {
+                                                try
+                                                {
+                                                    pc[x, y] = ps[x, y] - this[x + x1, y + y1];
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    errString = ex.Message;
+                                                }
+                                            });
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            errString = ex.Message;
+                                        }
+                                    });
                                     procPercent[j] = pc;
                                 }
                                 catch (Exception ex)

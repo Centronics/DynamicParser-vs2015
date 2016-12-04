@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace DynamicParser
 {
@@ -47,6 +48,8 @@ namespace DynamicParser
                 throw new ArgumentException();
             if (rect.Height > Height)
                 throw new ArgumentException();
+            if (rect.Right >= Width || rect.Height >= Height)
+                return null;
             double max = -1.0;
             for (int y = rect.Y; y < rect.Bottom; y++)
                 for (int x = rect.X; x < rect.Right; x++)
@@ -67,6 +70,11 @@ namespace DynamicParser
             return procs;
         }
 
+        public bool InRange(Region region)
+        {
+            return region != null && region.Elements.Where(reg => reg != null).All(reg => reg.Right < Width && reg.Bottom < Height);
+        }
+
         public void FindRegion(Region region)
         {
             if (region == null)
@@ -79,14 +87,17 @@ namespace DynamicParser
                 throw new ArgumentException();
             if (region.Height > Height)
                 throw new ArgumentException();
-            for (int y = 0; y < region.Height; y++)
-                for (int x = 0; x < region.Width; x++)
-                {
-                    Registered reg = region[x, y];
-                    if (reg == null)
-                        continue;
-                    reg.Register = Find(reg.Region);
-                }
+            if (!InRange(region))
+                throw new ArgumentException();
+            //for (int y = 0; y < region.Height; y++)
+            //  for (int x = 0; x < region.Width; x++)
+            foreach (Registered reg in region.Elements)
+            {
+                //Registered reg = region[x, y];
+                // if (reg == null)
+                //   continue;
+                reg.Register = Find(reg.Region);
+            }
         }
     }
 }

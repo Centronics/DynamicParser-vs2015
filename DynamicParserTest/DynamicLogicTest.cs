@@ -11,26 +11,26 @@ namespace DynamicParserTest
         [TestMethod]
         public void ParserTest()
         {
-            Bitmap btm = new Bitmap(1, 1); //new Bitmap(@"D:\разработки\Примеры\Пример1\ImgMain.bmp");
-            Bitmap btm1 = new Bitmap(1, 1);//(@"D:\разработки\Примеры\Пример1\Img1.bmp");
-            Bitmap btm2 = new Bitmap(1, 1); //(@"D:\разработки\Примеры\Пример1\Img2.bmp");
-            Bitmap btm3 = new Bitmap(1, 1); //(@"D:\разработки\Примеры\Пример1\Img3.bmp");
+            Bitmap btm = new Bitmap(@"D:\разработки\Примеры\Пример1\ImgMain.bmp");//new Bitmap(1, 1);
+            Bitmap btm1 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img1.bmp");//new Bitmap(1, 1);
+            Bitmap btm2 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img2.bmp");//new Bitmap(1, 1);
+            Bitmap btm3 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img3.bmp");//new Bitmap(1, 1);
 
-            btm.SetPixel(0, 0, Color.Black);
-            btm1.SetPixel(0, 0, Color.Red);
-            btm2.SetPixel(0, 0, Color.Gray);
-            btm3.SetPixel(0, 0, Color.Gray);
+            //btm.SetPixel(0, 0, Color.Black);
+            //btm1.SetPixel(0, 0, Color.Red);
+            //btm2.SetPixel(0, 0, Color.Gray);
+            //btm3.SetPixel(0, 0, Color.Gray);
 
             Processor proc = new Processor(btm, "Main");
-            Processor proc1 = new Processor(btm1, "Black");
-            Processor proc2 = new Processor(btm2, "Gray");
-            Processor proc3 = new Processor(btm3, "Gray");
+            Processor proc1 = new Processor(btm1, "A");
+            Processor proc2 = new Processor(btm2, "L");
+            Processor proc3 = new Processor(btm3, "PA");
 
-            ProcessorContainer pc = new ProcessorContainer(proc1, proc2, proc3);
-            SearchResults pr = proc.GetEqual(pc);
-            Region region = new Region(pc.Width, pc.Height);
-            region.Add(new Rectangle(0, 0, 1, 1));
-            pr.FindRegion(region);
+            SearchResults sr = proc.GetEqual(proc1, proc2, proc3);
+            Region region = proc.CurrentRegion;
+            region.Add(new Rectangle(0, 0, 44, 43));
+            region.Add(new Rectangle(47, 7, 44, 43));
+            sr.FindRegion(region);
         }
     }
 }

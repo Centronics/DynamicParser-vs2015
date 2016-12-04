@@ -7,8 +7,8 @@ namespace DynamicParser
 {
     public sealed class Registered
     {
-        public Rectangle Region;
-        public List<Reg> Register;
+        public Rectangle Region { get; set; }
+        public List<Reg> Register { get; set; }
 
         public int X => Region.X;
 
@@ -45,6 +45,8 @@ namespace DynamicParser
         public int MaxRight { get; private set; }
 
         public int MaxBottom { get; private set; }
+
+        public IEnumerable<Registered> Elements => _rects.Values;
 
         public Region(int mx, int my)
         {

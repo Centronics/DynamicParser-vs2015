@@ -103,9 +103,9 @@ namespace DynamicParser
                                 try
                                 {
                                     Processor ps = prc[j];
-                                    SignValue[,] pc = new SignValue[ps.Width, ps.Height];
                                     if (ps.Width > Width - x1 || ps.Height > Height - y1)
                                         return;
+                                    SignValue[,] pc = new SignValue[ps.Width, ps.Height];
                                     Parallel.For(0, prc.Height, y =>
                                     {
                                         try

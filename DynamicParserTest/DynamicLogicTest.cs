@@ -11,10 +11,10 @@ namespace DynamicParserTest
         [TestMethod]
         public void ParserTest()
         {
-            Bitmap btm = new Bitmap(@"D:\разработки\Примеры\Пример1\ImgMain.bmp");//new Bitmap(1, 1);
-            Bitmap btm1 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img1.bmp");//new Bitmap(1, 1);
-            Bitmap btm2 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img2.bmp");//new Bitmap(1, 1);
-            Bitmap btm3 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img3.bmp");//new Bitmap(1, 1);
+            Bitmap btm = new Bitmap(@"D:\разработки\Примеры\Пример1\ImgMain.bmp");
+            Bitmap btm1 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img1.bmp");
+            Bitmap btm2 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img2.bmp");
+            Bitmap btm3 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img3.bmp");
 
             Processor proc = new Processor(btm, "Main");
             Processor proc1 = new Processor(btm1, "A");

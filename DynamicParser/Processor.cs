@@ -123,10 +123,28 @@ namespace DynamicParser
                             {
                                 try
                                 {
-                                    for (int y2 = 0; y2 < prc.Height; y2++)
-                                        for (int x2 = 0; x2 < prc.Width; x2++)
-                                            if (GetMinIndex(procPercent, x2, y2, k))
-                                                mas[k]++;
+                                    Parallel.For(0, prc.Height, y2 =>
+                                    {
+                                        try
+                                        {
+                                            Parallel.For(0, prc.Width, x2 =>
+                                            {
+                                                try
+                                                {
+                                                    if (GetMinIndex(procPercent, x2, y2, k))
+                                                        mas[k]++;
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    errString = ex.Message;
+                                                }
+                                            });
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            errString = ex.Message;
+                                        }
+                                    });
                                     mas[k] /= prc[k].Length;
                                 }
                                 catch (Exception ex)

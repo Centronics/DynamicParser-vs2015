@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attacher.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="ProcessorContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

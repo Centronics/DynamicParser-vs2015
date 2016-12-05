@@ -10,6 +10,8 @@ namespace DynamicParser
         public Rectangle Region { get; set; }
         public List<Reg> Register { get; set; }
 
+        public bool IsEmpty => (Register?.Count ?? 0) <= 0;
+
         public int X => Region.X;
 
         public int Y => Region.Y;
@@ -42,20 +44,18 @@ namespace DynamicParser
 
         public int Height { get; }
 
-        public int MaxRight { get; private set; }
-
-        public int MaxBottom { get; private set; }
-
         public IEnumerable<Registered> Elements => _rects.Values;
 
-        public Region(int mx, int my)
+        public Registered this[Point pt] => this[pt.X, pt.Y];
+
+        public Region(int width, int height)
         {
-            if (mx <= 0)
+            if (width <= 0)
                 throw new ArgumentException();
-            if (my <= 0)
+            if (height <= 0)
                 throw new ArgumentException();
-            Width = mx;
-            Height = my;
+            Width = width;
+            Height = height;
         }
 
         ulong GetIndex(int x, int y)
@@ -75,9 +75,24 @@ namespace DynamicParser
         {
             get
             {
-                Registered reg;
-                return _rects.TryGetValue(GetIndex(x, y), out reg) ? reg : null;
+                if (x < 0)
+                    throw new ArgumentException();
+                if (y < 0)
+                    throw new ArgumentException();
+                return Elements.FirstOrDefault(reg => x >= reg.X && x <= reg.Right && y >= reg.Y && y <= reg.Bottom);
             }
+        }
+
+        public void SetMask(Attacher attacher)
+        {
+            if (attacher == null)
+                throw new ArgumentNullException();
+            if (attacher.Width <= 0)
+                throw new ArgumentException();
+            if (attacher.Height <= 0)
+                throw new ArgumentException();
+            foreach (Attach attach in attacher.Attaches)
+                attach.Regs = this[attach.Point].Register;
         }
 
         public bool Contains(int x, int y)
@@ -94,10 +109,6 @@ namespace DynamicParser
         {
             if (IsConflict(rect))
                 throw new ArgumentException($"{nameof(Add)}: Попытка вставить элемент, конфликтующий с существующими");
-            if (MaxRight < rect.Right)
-                MaxRight = rect.Right;
-            if (MaxBottom < rect.Bottom)
-                MaxBottom = rect.Bottom;
             _rects[GetIndex(rect.X, rect.Y)] = new Registered { Region = rect };
         }
     }

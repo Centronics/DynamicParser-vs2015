@@ -87,7 +87,7 @@ namespace DynamicParser
                 throw new ArgumentException();
             if (prc.Count <= 0)
                 throw new ArgumentException();
-            SearchResults sr = new SearchResults(Width, Height);
+            SearchResults sr = new SearchResults(Width, Height);//можно оптимизировать память, уменьшив размер результирующей карты
             string errString = string.Empty;
             Parallel.For(0, Height, y1 =>
             {

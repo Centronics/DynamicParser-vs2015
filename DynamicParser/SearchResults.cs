@@ -18,6 +18,17 @@ namespace DynamicParser
         public double Percent;
     }
 
+    public enum RegionStatus
+    {
+        Ok,
+        Null,
+        WidthNull,
+        HeightNull,
+        WidthBig,
+        HeightBig,
+        Conflict
+    }
+
     public sealed class SearchResults
     {
         const double DiffEqual = 0.01;
@@ -71,24 +82,29 @@ namespace DynamicParser
             return procs;
         }
 
-        public bool InRange(Region region)
+        bool InRange(Region region)
         {
             return region != null && region.Elements.Where(reg => reg != null).All(reg => reg.Right < Width && reg.Bottom < Height);
         }
 
-        public void FindRegion(Region region)
+        public RegionStatus RegionCorrect(Region region)
         {
             if (region == null)
-                throw new ArgumentNullException();
+                return RegionStatus.Null;
             if (region.Width <= 0)
-                throw new ArgumentException();
+                return RegionStatus.WidthNull;
             if (region.Height <= 0)
-                throw new ArgumentException();
+                return RegionStatus.HeightNull;
             if (region.Width > Width)
-                throw new ArgumentException();
+                return RegionStatus.WidthBig;
             if (region.Height > Height)
-                throw new ArgumentException();
-            if (!InRange(region))
+                return RegionStatus.HeightBig;
+            return InRange(region) ? RegionStatus.Ok : RegionStatus.Conflict;
+        }
+
+        public void FindRegion(Region region)
+        {
+            if (RegionCorrect(region) != RegionStatus.Ok)
                 throw new ArgumentException();
             foreach (Registered reg in region.Elements)
                 reg.Register = Find(reg.Region);

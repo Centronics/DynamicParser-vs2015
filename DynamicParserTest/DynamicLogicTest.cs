@@ -26,6 +26,11 @@ namespace DynamicParserTest
             region.Add(new Rectangle(0, 0, 44, 43));
             region.Add(new Rectangle(47, 7, 44, 43));
             sr.FindRegion(region);
+            Attacher attacher = proc.CurrentAttacher;
+            attacher.Add(0, 0);
+            attacher.Add(48, 7);
+            region.SetMask(attacher);
+            attacher.SetMask(region);
         }
     }
 }

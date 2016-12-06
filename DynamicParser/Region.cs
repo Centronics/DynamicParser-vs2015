@@ -46,6 +46,8 @@ namespace DynamicParser
 
         public IEnumerable<Registered> Elements => _rects.Values;
 
+        public IEnumerable<Rectangle> Rectangles => _rects.Values.Select(reg => reg.Region);
+
         public Registered this[Point pt] => this[pt.X, pt.Y];
 
         public Region(int width, int height)

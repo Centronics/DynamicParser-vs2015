@@ -71,6 +71,8 @@ namespace DynamicParser
                     if (max >= 1.0)
                         goto exit;
                 }
+            if (max <= 0)
+                return null;
             exit: List<Reg> procs = new List<Reg>();
             for (int y = rect.Y; y < rect.Bottom; y++)
                 for (int x = rect.X; x < rect.Right; x++)

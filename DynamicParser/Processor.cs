@@ -26,6 +26,8 @@ namespace DynamicParser
 
         public Region CurrentRegion => new Region(Width, Height);
 
+        public Attacher CurrentAttacher => new Attacher(Width, Height);
+
         public Processor(Bitmap btm, object tag)
         {
             if (btm == null)

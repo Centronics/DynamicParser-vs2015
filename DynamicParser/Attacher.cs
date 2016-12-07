@@ -7,8 +7,40 @@ namespace DynamicParser
 {
     public sealed class Attach
     {
+        public struct Proc
+        {
+            public Point Place;
+            public IEnumerable<Processor> Procs;
+        }
+
         public Point Point { get; set; }
         public List<Reg> Regs { get; set; }
+
+        public IEnumerable<Processor> Processors => (from rg in Regs from proc in rg.Procs select proc).ToList();
+
+        public Proc Unique => new Proc { Place = Point, Procs = UniqueMas };
+
+        IEnumerable<Processor> UniqueMas
+        {
+            get
+            {
+                if (Regs == null)
+                    yield break;
+                IEnumerable<Processor> lst = Processors;
+                List<Processor> uni = new List<Processor>();
+                foreach (Processor pr in lst)
+                    if (!Inclusive(uni, pr.Tag))
+                    {
+                        uni.Add(pr);
+                        yield return pr;
+                    }
+            }
+        }
+
+        static bool Inclusive(IEnumerable<Processor> lst, string str)
+        {
+            return lst != null && lst.Any(s => string.Compare(s.Tag?.Trim() ?? string.Empty, str.Trim(), StringComparison.OrdinalIgnoreCase) == 0);
+        }
     }
 
     public sealed class Attacher

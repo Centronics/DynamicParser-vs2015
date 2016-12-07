@@ -14,7 +14,7 @@ namespace DynamicParser
 
         readonly SignValue[,] _bitmap;
 
-        public object Tag { get; }
+        public string Tag { get; }
 
         public int Width => _bitmap.GetLength(0);
 
@@ -28,7 +28,7 @@ namespace DynamicParser
 
         public Attacher CurrentAttacher => new Attacher(Width, Height);
 
-        public Processor(Bitmap btm, object tag)
+        public Processor(Bitmap btm, string tag)
         {
             if (btm == null)
                 throw new ArgumentNullException();

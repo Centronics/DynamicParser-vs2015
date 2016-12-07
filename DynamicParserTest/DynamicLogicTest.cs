@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DynamicParser;
 using Region = DynamicParser.Region;
@@ -11,17 +13,11 @@ namespace DynamicParserTest
         [TestMethod]
         public void ParserTest()
         {
-            Bitmap btm = new Bitmap(@"D:\разработки\Примеры\Пример1\ImgMain.bmp");
-            Bitmap btm1 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img1.bmp");
-            Bitmap btm2 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img2.bmp");
-            Bitmap btm3 = new Bitmap(@"D:\разработки\Примеры\Пример1\Img3.bmp");
-
-            Processor proc = new Processor(btm, "Main");
-            Processor proc1 = new Processor(btm1, "A");
-            Processor proc2 = new Processor(btm2, "L");
-            Processor proc3 = new Processor(btm3, "PA");
-
-            SearchResults sr = proc.GetEqual(proc1, proc2, proc3);
+            Processor proc = new Processor(new Bitmap(@"D:\разработки\Примеры\Пример1\ImgMain.bmp"), "Main");
+            SearchResults sr = proc.GetEqual(
+                new Processor(new Bitmap(@"D:\разработки\Примеры\Пример1\Img1.bmp"), "A"),
+                new Processor(new Bitmap(@"D:\разработки\Примеры\Пример1\Img2.bmp"), "L"),
+                new Processor(new Bitmap(@"D:\разработки\Примеры\Пример1\Img3.bmp"), "PA"));
             Region region = proc.CurrentRegion;
             region.Add(new Rectangle(0, 0, 44, 43));
             region.Add(new Rectangle(47, 7, 44, 43));
@@ -31,6 +27,7 @@ namespace DynamicParserTest
             attacher.Add(48, 7);
             region.SetMask(attacher);
             attacher.SetMask(region);
+            List<Attach.Proc> lst = attacher.Attaches.Select(att => att.Unique).ToList();
         }
     }
 }

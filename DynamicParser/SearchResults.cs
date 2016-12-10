@@ -5,61 +5,140 @@ using System.Linq;
 
 namespace DynamicParser
 {
+    /// <summary>
+    /// Содержит карты, отобранные по проценту соответствия в заданной точке.
+    /// </summary>
     public struct ProcPerc
     {
+        /// <summary>
+        /// Процент соответствия.
+        /// </summary>
         public double Percent;
+
+        /// <summary>
+        /// Карты.
+        /// </summary>
         public Processor[] Procs;
     }
 
+    /// <summary>
+    /// Содержит карты, отобранные по проценту соответствия в указанной области.
+    /// </summary>
     public struct Reg
     {
+        /// <summary>
+        /// Точка.
+        /// </summary>
         public Point Position;
+
+        /// <summary>
+        /// Карты, отобранные по проценту соответствия.
+        /// </summary>
         public Processor[] Procs;
+
+        /// <summary>
+        /// Процент соответствия.
+        /// </summary>
         public double Percent;
     }
 
+    /// <summary>
+    /// Отражает статус конкретного региона при проверке на совместимость с другим.
+    /// </summary>
     public enum RegionStatus
     {
+        /// <summary>
+        /// Проверка прошла успешно.
+        /// </summary>
         Ok,
+        /// <summary>
+        /// Указанный регион равен null.
+        /// </summary>
         Null,
+        /// <summary>
+        /// Ширина заданного региона равна нулю.
+        /// </summary>
         WidthNull,
+        /// <summary>
+        /// Высота заданного региона равна нулю.
+        /// </summary>
         HeightNull,
+        /// <summary>
+        /// Указанный регион шире существующего.
+        /// </summary>
         WidthBig,
+        /// <summary>
+        /// Указанный регион выше существующего.
+        /// </summary>
         HeightBig,
+        /// <summary>
+        /// Конфликтует с какой-либо существующей областью.
+        /// </summary>
         Conflict
     }
 
+    /// <summary>
+    /// Хранит информацию о соответствии карт в конкретной точке.
+    /// </summary>
     public sealed class SearchResults
     {
+        /// <summary>
+        /// Разница между процентами соответствия, позволяющая считать их равными.
+        /// </summary>
         const double DiffEqual = 0.01;
 
+        /// <summary>
+        /// Хранит информацию о картах и проценте их соответствия в данной точке.
+        /// </summary>
         readonly ProcPerc[,] _coords;
 
+        /// <summary>
+        /// Ширина.
+        /// </summary>
         public int Width => _coords.GetLength(0);
 
+        /// <summary>
+        /// Высота.
+        /// </summary>
         public int Height => _coords.GetLength(1);
 
-        public SearchResults(int mx, int my)
+        /// <summary>
+        /// Инициализирует экземпляр с заданными параметрами ширины и высоты.
+        /// </summary>
+        /// <param name="width">Ширина.</param>
+        /// <param name="height">Высота.</param>
+        public SearchResults(int width, int height)
         {
-            if (mx <= 0)
-                throw new ArgumentException();
-            if (my <= 0)
-                throw new ArgumentException();
-            _coords = new ProcPerc[mx, my];
+            if (width <= 0)
+                throw new ArgumentException($"{nameof(SearchResults)}: Ширина указана некорректно ({width}).", nameof(width));
+            if (height <= 0)
+                throw new ArgumentException($"{nameof(SearchResults)}: Высота указана некорректно ({height}).", nameof(height));
+            _coords = new ProcPerc[width, height];
         }
 
+        /// <summary>
+        /// Получает или задаёт информацию о картах в данной точке.
+        /// </summary>
+        /// <param name="x">Координата X.</param>
+        /// <param name="y">Координата Y.</param>
+        /// <returns>Возвращает информацию о картах в данной точке.</returns>
         public ProcPerc this[int x, int y]
         {
             get { return _coords[x, y]; }
             set { _coords[x, y] = value; }
         }
 
+        /// <summary>
+        /// Выполняет поиск наиболее подходящих карт в указанной области.
+        /// </summary>
+        /// <param name="rect">Указанная область.</param>
+        /// <returns>Возвращает список наиболее подходящих карт в указанной области.</returns>
         List<Reg> Find(Rectangle rect)
         {
             if (rect.Width > Width)
-                throw new ArgumentException();
+                throw new ArgumentException($"{nameof(Find)}: Указанная область шире, чем текущая.", nameof(rect.Width));
             if (rect.Height > Height)
-                throw new ArgumentException();
+                throw new ArgumentException($"{nameof(Find)}: Указанная область выше, чем текущая.", nameof(rect.Height));
             if (rect.Right >= Width || rect.Height >= Height)
                 return null;
             double max = -1.0;
@@ -84,11 +163,21 @@ namespace DynamicParser
             return procs;
         }
 
+        /// <summary>
+        /// Определяет, выходит ли текущий регион за пределы проверяемого региона.
+        /// </summary>
+        /// <param name="region">Проверяемый регион.</param>
+        /// <returns>Возвращает true в случае, если текущий регион входит в пределы проверяемого региона, в противном случае false.</returns>
         bool InRange(Region region)
         {
             return region != null && region.Elements.Where(reg => reg != null).All(reg => reg.Right < Width && reg.Bottom < Height);
         }
 
+        /// <summary>
+        /// Определяет, есть ли какие-либо конфликты между заданным регионом и текущим.
+        /// </summary>
+        /// <param name="region">Регион, относительно которого происходит проверка.</param>
+        /// <returns>Возвращает OK в случае отсутствия конфликтов.</returns>
         public RegionStatus RegionCorrect(Region region)
         {
             if (region == null)
@@ -104,12 +193,19 @@ namespace DynamicParser
             return InRange(region) ? RegionStatus.Ok : RegionStatus.Conflict;
         }
 
-        public void FindRegion(Region region)
+        /// <summary>
+        /// Заполняет указанный Region найденными наиболее подходящими картами в соответствии с расположением областей в указанном регионе.
+        /// </summary>
+        /// <param name="region">Регион для заполнения.</param>
+        /// <returns>Возвращает OK в случае отсутствия конфликтов. Если результат не равен OK, то состояние region не изменяется.</returns>
+        public RegionStatus FindRegion(Region region)
         {
-            if (RegionCorrect(region) != RegionStatus.Ok)
-                throw new ArgumentException();
+            RegionStatus rs = RegionCorrect(region);
+            if (rs != RegionStatus.Ok)
+                return rs;
             foreach (Registered reg in region.Elements)
                 reg.Register = Find(reg.Region);
+            return RegionStatus.Ok;
         }
     }
 }

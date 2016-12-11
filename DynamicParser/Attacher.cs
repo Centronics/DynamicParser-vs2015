@@ -67,14 +67,30 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Проверяет, хранится ли в указанном списке карта с указанным значением поля Tag. Сравнение происходит с обрезанием пробелов и без учёта регистра.
+        /// Проверяет, хранится ли в указанном списке карта с указанным значением свойства Tag. Сравнение происходит с обрезанием пробелов и без учёта регистра.
         /// </summary>
         /// <param name="lst">Список карт для поиска.</param>
-        /// <param name="str">Искомое значение поля Tag.</param>
-        /// <returns>Если карта с указанным значением поля Tag хранится в указанном списке, возвращается true, иначе false.</returns>
+        /// <param name="str">Искомое значение свойства Tag.</param>
+        /// <returns>Если карта с указанным значением свойства Tag хранится в указанном списке, возвращается true, иначе false.</returns>
         static bool Inclusive(IEnumerable<Processor> lst, string str)
         {
-            return lst != null && lst.Any(s => string.Compare(s.Tag?.Trim() ?? string.Empty, str.Trim(), StringComparison.OrdinalIgnoreCase) == 0);
+            return lst != null && lst.Any(s => TagStringCompare(s.Tag, str));
+        }
+
+        /// <summary>
+        /// Сравнивает строки по правилам сравнения свойства "Tag".
+        /// С обрезанием пробелов и без учёта регистра.
+        /// </summary>
+        /// <param name="tag">Строка, которую надо сравнить.</param>
+        /// <param name="cmp">Строка, с которой надо сравнить.</param>
+        /// <returns>Если строки равны, возвращает true, в противном случае false.</returns>
+        public static bool TagStringCompare(string tag, string cmp)
+        {
+            if (string.IsNullOrEmpty(tag))
+                throw new ArgumentException($"{nameof(TagStringCompare)}: Свойство Tag не может быть равно null.", nameof(tag));
+            if (string.IsNullOrEmpty(cmp))
+                throw new ArgumentException($"{nameof(TagStringCompare)}: Свойство Tag не может быть равно null.", nameof(cmp));
+            return string.Compare(tag.Trim(), cmp.Trim(), StringComparison.OrdinalIgnoreCase) == 0;
         }
     }
 

@@ -1,0 +1,3 @@
+D:\разработки\DynamicParser\DynamicParserTest\obj\Debug\ProcessorContainerTest.csprojResolveAssemblyReference.cache
+D:\разработки\DynamicParser\DynamicParserTest\obj\Debug\DynamicParserTest.dll
+D:\разработки\DynamicParser\DynamicParserTest\obj\Debug\DynamicParserTest.pdb

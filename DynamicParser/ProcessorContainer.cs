@@ -53,6 +53,8 @@ namespace DynamicParser
                 return;
             if (!InOneSize(first.Width, first.Height, processors))
                 throw new ArgumentException($"{nameof(ProcessorContainer)}: Обнаружены карты различных размеров.", nameof(processors));
+            if (!InOneTag(processors))
+                throw new ArgumentException($"{nameof(ProcessorContainer)}: Карты с одинаковыми Tag не могут быть в одном списке.", nameof(processors));
             _lstProcs.Add(first);
             Width = first.Width;
             Height = first.Height;
@@ -78,6 +80,8 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(Add)}: Ширина добавляемой карты должна совпадать с шириной хранилища ({proc.Width} и {Width}).", nameof(proc));
             if (proc.Height != Height)
                 throw new ArgumentException($"{nameof(Add)}: Высота добавляемой карты должна совпадать с высотой хранилища ({proc.Height} и {Height}).", nameof(proc));
+            if (ContainsTag(proc.Tag))
+                throw new ArgumentException($"{nameof(Add)}: Попытка добавить карту, с значение свойства Tag которой уже существует в списке.", nameof(proc));
             _lstProcs.Add(proc);
         }
 
@@ -91,6 +95,8 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(procs), $"{nameof(AddRange)}: Попытка добавить коллекцию карт, равную null.");
             if (!InOneSize(Width, Height, procs))
                 throw new ArgumentException($"{nameof(AddRange)}: Размеры добавляемых карт различаются.", nameof(procs));
+            if (!InOneTag(procs))
+                throw new ArgumentException($"{nameof(ProcessorContainer)}: Карты с одинаковыми Tag не могут быть в одном списке.", nameof(procs));
             foreach (Processor pr in procs)
                 if (pr != null)
                     Add(pr);
@@ -106,6 +112,8 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(procs), $"{nameof(AddRange)}: Попытка добавить коллекцию карт, равную null.");
             if (!InOneSize(Width, Height, procs))
                 throw new ArgumentException($"{nameof(AddRange)}: Размеры добавляемых карт различаются.", nameof(procs));
+            if (!InOneTag(procs))
+                throw new ArgumentException($"{nameof(AddRange)}: Обнаружены карты, совпадающие по свойству Tag.", nameof(procs));
             foreach (Processor pr in procs)
                 if (pr != null)
                     Add(pr);
@@ -124,7 +132,7 @@ namespace DynamicParser
             // ReSharper disable once ForCanBeConvertedToForeach
             for (int k = 0; k < processors.Count; k++)
             {
-                object refer = processors.ElementAt(k);
+                object refer = processors[k];
                 uint count = 0;
                 if (!processors.All(pr =>
                  {
@@ -149,6 +157,45 @@ namespace DynamicParser
             if (width <= 0 || height <= 0 || IsEquals(processors))
                 return false;
             return processors.All(pr => pr?.Width == width && pr.Height == height);
+        }
+
+        /// <summary>
+        /// Проверяет присутствие карт с одинаковыми свойствами Tag в указанном списке.
+        /// </summary>
+        /// <param name="tags">Проверяемый список.</param>
+        /// <returns>Возвращает true в случае, когда повторяющиеся значения не встречались, в противном случае false.</returns>
+        public static bool InOneTag(IList<Processor> tags)
+        {
+            if ((tags?.Count ?? 0) <= 0)
+                throw new ArgumentException($"{nameof(InOneTag)}: Список тегов не может быть пустым.", nameof(tags));
+            if (tags == null)
+                return false;
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (int k = 0; k < tags.Count; k++)
+            {
+                string refer = tags[k].Tag;
+                uint count = 0;
+                if (!tags.All(pr =>
+                {
+                    if (Attach.TagStringCompare(pr.Tag, refer))
+                        count++;
+                    return count <= 1;
+                })) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Определяет, существует ли в текущем списке карта с таким же тегом или нет.
+        /// </summary>
+        /// <param name="tag">Искомый тег.</param>
+        /// <returns>Возвращает true в случае, если карта найдена, в противном случае false.</returns>
+        public bool ContainsTag(string tag)
+        {
+            if (string.IsNullOrEmpty(tag))
+                throw new ArgumentException($"{nameof(ContainsTag)}: Значение свойства Tag не может быть пустым.", nameof(ContainsTag));
+            return _lstProcs.Any(pr => Attach.TagStringCompare(pr.Tag, tag));
         }
     }
 }

@@ -80,7 +80,7 @@ namespace DynamicParserTest
             }
             catch (ArgumentException)
             {
-                res = 1;
+                res++;
             }
             try
             {
@@ -88,14 +88,13 @@ namespace DynamicParserTest
             }
             catch (ArgumentNullException)
             {
-                res = 2;
+                res++;
             }
             pc.AddRange(null);
-            pc.Add(proc1);
             Assert.AreEqual(res, 2);
             Assert.AreEqual(2, pc.Count);
             Assert.AreEqual("Одномерный1", pc[0].Tag);
-            Assert.AreEqual("Одномерный1", pc[1].Tag);
+            Assert.AreEqual("Одномерный2", pc[1].Tag);
             Assert.AreEqual(5, pc.Width);
             Assert.AreEqual(1, pc.Height);
         }
@@ -107,7 +106,7 @@ namespace DynamicParserTest
             ProcessorContainer pc = new ProcessorContainer(proc1);
             Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25), new SignValue(98) }, "Одномерный2");
             Processor proc3 = new Processor(new[] { SignValue.MaxValue, new SignValue(18), new SignValue(200), new SignValue(30), new SignValue(99) }, "Одномерный3");
-            IEnumerable<Processor> prcs = new[] { proc1, proc2, null, proc3 };
+            IList<Processor> prcs = new[] { proc2, null, proc3 };
             pc.AddRange(prcs);
             pc.AddRange(null);
             Assert.AreEqual(3, pc.Count);
@@ -143,6 +142,91 @@ namespace DynamicParserTest
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable");
             // ReSharper disable once UnusedVariable
             ProcessorContainer pc = new ProcessorContainer(null, p);
+        }
+
+        [TestMethod]
+        public void ProcessorContainerEx5Test()
+        {
+            SignValue[,] pr1 = new SignValue[2, 3];
+            pr1[0, 0] = SignValue.MaxValue;
+            pr1[1, 0] = SignValue.MinValue;
+
+            pr1[0, 1] = SignValue.MaxValue;
+            pr1[1, 1] = SignValue.MinValue;
+
+            pr1[0, 2] = SignValue.MaxValue;
+            pr1[1, 2] = SignValue.MinValue;
+
+            SignValue[,] pr2 = new SignValue[2, 3];
+            pr2[0, 0] = new SignValue(10);
+            pr2[1, 0] = new SignValue(109);
+
+            pr2[0, 1] = new SignValue(14);
+            pr2[1, 1] = SignValue.MinValue;
+
+            pr2[0, 2] = new SignValue(20);
+            pr2[1, 2] = new SignValue(90);
+
+            SignValue[,] pr3 = new SignValue[3, 3];
+            pr3[0, 0] = new SignValue(10);
+            pr3[1, 0] = new SignValue(109);
+            pr3[2, 0] = new SignValue(14);
+
+            pr3[0, 1] = new SignValue(14);
+            pr3[1, 1] = SignValue.MinValue;
+            pr3[2, 1] = new SignValue(15);
+
+            pr3[0, 2] = new SignValue(20);
+            pr3[1, 2] = new SignValue(90);
+            pr3[2, 2] = new SignValue(25);
+
+            Processor proc1 = new Processor(pr1, "Двумерный1");
+            ProcessorContainer pc = new ProcessorContainer(proc1);
+            Processor proc2 = new Processor(pr2, "Двумерный2");
+            Processor proc3 = new Processor(pr3, "Двумерный3");
+            int count = 0;
+            try
+            {
+                IList<Processor> prcs = new[] { proc1, proc2, null, proc3 };
+                pc.AddRange(prcs);
+            }
+            catch (ArgumentException)
+            {
+                count++;
+            }
+            try
+            {
+                pc.Add(proc1);
+            }
+            catch (ArgumentException)
+            {
+                count++;
+            }
+            proc1 = new Processor(pr1, "Двумерный1");
+            proc2 = new Processor(pr2, "Двумерный2");
+            proc3 = new Processor(pr3, "Двумерный3");
+            try
+            {
+                pc.AddRange(proc1, proc2, null, proc3);
+            }
+            catch (ArgumentException)
+            {
+                count++;
+            }
+            pc.Add(proc2);
+            Assert.AreEqual(3, count);
+            pc.AddRange(null);
+            Assert.AreEqual(2, pc.Count);
+            Assert.AreEqual("Двумерный1", pc[0].Tag);
+            Assert.AreEqual("Двумерный2", pc[1].Tag);
+            Assert.AreEqual(2, pc.Width);
+            Assert.AreEqual(3, pc.Height);
+        }
+
+        [TestMethod]
+        public void ProcessorContainerInOneSizeTest()
+        {
+
         }
     }
 }

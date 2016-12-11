@@ -44,12 +44,14 @@ namespace DynamicParser
         public ProcessorContainer(Processor first, params Processor[] processors)
         {
             if (first == null)
-                throw new ArgumentNullException(nameof(first), $"{nameof(ProcessorContainer)}: {nameof(first)} = null");
-            if (first.Length <= 0)
-                throw new ArgumentException($"{nameof(ProcessorContainer)}: Первая карта не может быть нулевой длины ({first.Length}).", nameof(first));
+                throw new ArgumentNullException(nameof(first), $"{nameof(ProcessorContainer)}: {nameof(first)} = null.");
+            if (first.Width <= 0)
+                throw new ArgumentException($"{nameof(ProcessorContainer)}: Первая карта не может быть нулевой ширины ({first.Width}).", nameof(first.Width));
+            if (first.Height <= 0)
+                throw new ArgumentException($"{nameof(ProcessorContainer)}: Первая карта не может быть нулевой высоты ({first.Height}).", nameof(first.Height));
             if (processors == null)
                 return;
-            if (!InOneSize(first, processors))
+            if (!InOneSize(first.Width, first.Height, processors))
                 throw new ArgumentException($"{nameof(ProcessorContainer)}: Обнаружены карты различных размеров.", nameof(processors));
             _lstProcs.Add(first);
             Width = first.Width;
@@ -69,7 +71,7 @@ namespace DynamicParser
         public void Add(Processor proc)
         {
             if (proc == null)
-                throw new ArgumentNullException(nameof(proc), $"{nameof(Add)}: {nameof(proc)} = null");
+                throw new ArgumentNullException(nameof(proc), $"{nameof(Add)}: {nameof(proc)} = null.");
             if (proc.Length <= 0)
                 throw new ArgumentException($"{nameof(Add)}: Длина добавляемой карты не может быть равна нулю ({proc.Length}).", nameof(proc));
             if (proc.Width != Width)
@@ -80,16 +82,73 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Проверяет, все ли указанные карты одного размера.
+        /// Добавляет коллекцию карт в хранилище.
         /// </summary>
-        /// <param name="proc">Карта-образец для сравнения.</param>
-        /// <param name="processors">Список карт, с которыми идёт сопоставление.</param>
-        /// <returns>Возвращает true в случае, если все ли указанные карты одного размера, в противном случае false.</returns>
-        public static bool InOneSize(Processor proc, Processor[] processors)
+        /// <param name="procs">Добавляемая коллекция карт.</param>
+        public void AddRange(params Processor[] procs)
         {
-            if (proc == null)
+            if (procs == null)
+                throw new ArgumentNullException(nameof(procs), $"{nameof(AddRange)}: Попытка добавить коллекцию карт, равную null.");
+            if (!InOneSize(Width, Height, procs))
+                throw new ArgumentException($"{nameof(AddRange)}: Размеры добавляемых карт различаются.", nameof(procs));
+            foreach (Processor pr in procs)
+                if (pr != null)
+                    Add(pr);
+        }
+
+        /// <summary>
+        /// Добавляет коллекцию карт в хранилище.
+        /// </summary>
+        /// <param name="procs">Добавляемая коллекция карт.</param>
+        public void AddRange(IList<Processor> procs)
+        {
+            if (procs == null)
+                throw new ArgumentNullException(nameof(procs), $"{nameof(AddRange)}: Попытка добавить коллекцию карт, равную null.");
+            if (!InOneSize(Width, Height, procs))
+                throw new ArgumentException($"{nameof(AddRange)}: Размеры добавляемых карт различаются.", nameof(procs));
+            foreach (Processor pr in procs)
+                if (pr != null)
+                    Add(pr);
+        }
+
+        /// <summary>
+        /// Проверяет, присутствуют ли одинаковые ссылки на объекты.
+        /// </summary>
+        /// <param name="processors">Проверяемый массив.</param>
+        /// <returns>В случае, когда обнаружены совпадающе ссылки, возвращает true, иначе false.</returns>
+        public static bool IsEquals(IList<Processor> processors)
+        {
+            if (processors == null)
                 return false;
-            return processors != null && processors.All(pr => pr?.Width == proc.Width && pr.Height == proc.Height);
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (int k = 0; k < processors.Count; k++)
+            {
+                object refer = processors.ElementAt(k);
+                uint count = 0;
+                if (!processors.All(pr =>
+                 {
+                     if (pr == refer)
+                         count++;
+                     return count <= 1;
+                 })) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Проверяет, все ли указанные карты одного размера, также она проверяет присутствие ссылок на один и тот же объект.
+        /// Если они будут обнаружены, функция вернёт false.
+        /// </summary>
+        /// <param name="width">Ширина, которой необходимо соответствие.</param>
+        /// <param name="height">Высота, которой необходимо соответствие.</param>
+        /// <param name="processors">Список карт, с которыми идёт сопоставление.</param>
+        /// <returns>Возвращает true в случае, если все ли указанные карты одного размера и одинаковые ссылки отсутствуют, в противном случае false.</returns>
+        public static bool InOneSize(int width, int height, IList<Processor> processors)
+        {
+            if (width <= 0 || height <= 0 || IsEquals(processors))
+                return false;
+            return processors.All(pr => pr?.Width == width && pr.Height == height);
         }
     }
 }

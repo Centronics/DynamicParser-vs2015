@@ -76,12 +76,54 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(Processor)}: Ширина изображения не может быть меньше или равна нулю ({btm.Width}).", nameof(btm));
             if (btm.Height <= 0)
                 throw new ArgumentException($"{nameof(Processor)}: Высота изображения не может быть меньше или равна нулю ({btm.Height}).", nameof(btm));
-            if (tag == null)
+            if (string.IsNullOrWhiteSpace(tag))
                 throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть равен null.");
             _bitmap = new SignValue[btm.Width, btm.Height];
             for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
                     _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
+            Tag = tag;
+        }
+
+        /// <summary>
+        /// Заргужает указанную карту, создавая внутреннюю её копию.
+        /// </summary>
+        /// <param name="btm">Загружаемая карта.</param>
+        /// <param name="tag">Название карты.</param>
+        public Processor(SignValue[,] btm, string tag)
+        {
+            if (btm == null)
+                throw new ArgumentNullException(nameof(btm), $"{nameof(Processor)}: Загружаемая карта не может быть равна null.");
+            int w = btm.GetLength(0), h = btm.GetLength(1);
+            if (w <= 0)
+                throw new ArgumentException($"{nameof(Processor)}: Ширина загружаемой карты не может быть меньше или равна нулю ({w}).", nameof(btm));
+            if (h <= 0)
+                throw new ArgumentException($"{nameof(Processor)}: Высота загружаемой карты не может быть меньше или равна нулю ({h}).", nameof(btm));
+            if (string.IsNullOrWhiteSpace(tag))
+                throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть равен null.");
+            _bitmap = new SignValue[w, h];
+            for (int y = 0; y < h; y++)
+                for (int x = 0; x < w; x++)
+                    _bitmap[x, y] = btm[x, y];
+            Tag = tag;
+        }
+
+        /// <summary>
+        /// Заргужает указанный массив, создавая внутреннюю его копию.
+        /// </summary>
+        /// <param name="btm">Загружаемый массив.</param>
+        /// <param name="tag">Название карты.</param>
+        public Processor(SignValue[] btm, string tag)
+        {
+            if (btm == null)
+                throw new ArgumentNullException(nameof(btm), $"{nameof(Processor)}: Загружаемая карта не может быть равна null.");
+            if (btm.Length <= 0)
+                throw new ArgumentException($"{nameof(Processor)}: Ширина загружаемой карты не может быть меньше или равна нулю ({btm.Length}).", nameof(btm));
+            if (string.IsNullOrWhiteSpace(tag))
+                throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть равен null.");
+            _bitmap = new SignValue[btm.Length, 1];
+            for (int x = 0; x < btm.Length; x++)
+                _bitmap[x, 0] = btm[x];
             Tag = tag;
         }
 

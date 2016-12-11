@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DynamicParser;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Processor = DynamicParser.Processor;
 using Region = DynamicParser.Region;
 
 namespace DynamicParserTest
 {
     [TestClass]
-    public class DynamicLogicTest
+    public class ProcessorTest
     {
         [TestMethod]
-        public void ParserTest()
+        public void ProcessorTest1()
         {
             Processor proc = new Processor(new Bitmap(@"D:\разработки\Примеры\Пример1\ImgMain.bmp"), "Main");
             SearchResults sr = proc.GetEqual(

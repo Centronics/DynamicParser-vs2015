@@ -154,7 +154,7 @@ namespace DynamicParser
         /// <returns>Возвращает true в случае, если все ли указанные карты одного размера и одинаковые ссылки отсутствуют, в противном случае false.</returns>
         public static bool InOneSize(int width, int height, IList<Processor> processors)
         {
-            if (width <= 0 || height <= 0 || IsEquals(processors))
+            if (width <= 0 || height <= 0 || processors.Count <= 0 || IsEquals(processors))
                 return false;
             return processors.All(pr => pr?.Width == width && pr.Height == height);
         }
@@ -166,9 +166,7 @@ namespace DynamicParser
         /// <returns>Возвращает true в случае, когда повторяющиеся значения не встречались, в противном случае false.</returns>
         public static bool InOneTag(IList<Processor> tags)
         {
-            if ((tags?.Count ?? 0) <= 0)
-                throw new ArgumentException($"{nameof(InOneTag)}: Список тегов не может быть пустым.", nameof(tags));
-            if (tags == null)
+            if ((tags?.Count ?? 0) <= 0 || tags == null)
                 return false;
             // ReSharper disable once LoopCanBeConvertedToQuery
             // ReSharper disable once ForCanBeConvertedToForeach
@@ -193,9 +191,7 @@ namespace DynamicParser
         /// <returns>Возвращает true в случае, если карта найдена, в противном случае false.</returns>
         public bool ContainsTag(string tag)
         {
-            if (string.IsNullOrEmpty(tag))
-                throw new ArgumentException($"{nameof(ContainsTag)}: Значение свойства Tag не может быть пустым.", nameof(ContainsTag));
-            return _lstProcs.Any(pr => Attach.TagStringCompare(pr.Tag, tag));
+            return !string.IsNullOrWhiteSpace(tag) && _lstProcs.Any(pr => Attach.TagStringCompare(pr.Tag, tag));
         }
     }
 }

@@ -16,7 +16,7 @@ namespace DynamicParser
     public sealed class Processor
     {
         /// <summary>
-        /// Разница между процентами соответствия объектов, которая позволяет считать их одинаковыми.
+        /// Разница между процентами соответствия объектов, которая позволяет считать их равными.
         /// </summary>
         const double DiffEqual = 0.01;
 
@@ -50,7 +50,7 @@ namespace DynamicParser
         /// </summary>
         /// <param name="x">Координата X.</param>
         /// <param name="y">Координата Y.</param>
-        /// <returns></returns>
+        /// <returns>Возвращает запрашиваемый объект рабочего поля.</returns>
         public SignValue this[int x, int y] => _bitmap[x, y];
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Заргужает указанный массив, создавая внутреннюю его копию.
+        /// Загружает указанный массив, создавая внутреннюю его копию.
         /// </summary>
         /// <param name="btm">Загружаемый массив.</param>
         /// <param name="tag">Название карты.</param>

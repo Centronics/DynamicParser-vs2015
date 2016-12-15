@@ -119,7 +119,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx2Test()
+        public void ProcessorContainerEx1Test()
         {
             Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
             Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25) }, "Одномерный2");
@@ -129,7 +129,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ProcessorContainerEx3Test()
+        public void ProcessorContainerEx2Test()
         {
             // ReSharper disable once UnusedVariable
             ProcessorContainer pc = new ProcessorContainer(null);
@@ -137,7 +137,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ProcessorContainerEx4Test()
+        public void ProcessorContainerEx3Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable");
             // ReSharper disable once UnusedVariable
@@ -145,7 +145,7 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
-        public void ProcessorContainerEx5Test()
+        public void ProcessorContainerEx4Test()
         {
             SignValue[,] pr1 = new SignValue[2, 3];
             pr1[0, 0] = SignValue.MaxValue;
@@ -225,7 +225,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx6Test()
+        public void ProcessorContainerEx5Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " Unusedvariable ");
@@ -235,7 +235,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx7Test()
+        public void ProcessorContainerEx6Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable");
             // ReSharper disable once UnusedVariable
@@ -244,7 +244,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx8Test()
+        public void ProcessorContainerEx7Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
@@ -254,7 +254,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx9Test()
+        public void ProcessorContainerEx8Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
@@ -264,7 +264,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx10Test()
+        public void ProcessorContainerEx9Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
@@ -274,7 +274,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx11Test()
+        public void ProcessorContainerEx10Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
@@ -285,12 +285,27 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx12Test()
+        public void ProcessorContainerEx11Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(null, p, p1);
             Processor[] procs =
+            {
+                new Processor(new[] {SignValue.MaxValue}, " UnusedVariable "),
+                new Processor(new[] {SignValue.MaxValue}, " UnusedVariable4 ")
+            };
+            pc.AddRange(procs);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorContainerEx12Test()
+        {
+            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
+                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            ProcessorContainer pc = new ProcessorContainer(null, p, p1);
+            IList<Processor> procs = new[]
             {
                 new Processor(new[] {SignValue.MaxValue}, " UnusedVariable "),
                 new Processor(new[] {SignValue.MaxValue}, " UnusedVariable4 ")
@@ -305,9 +320,9 @@ namespace DynamicParserTest
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(null, p, p1);
-            IList<Processor> procs = new[]
+            Processor[] procs =
             {
-                new Processor(new[] {SignValue.MaxValue}, " UnusedVariable "),
+                p,
                 new Processor(new[] {SignValue.MaxValue}, " UnusedVariable4 ")
             };
             pc.AddRange(procs);
@@ -322,21 +337,6 @@ namespace DynamicParserTest
             ProcessorContainer pc = new ProcessorContainer(null, p, p1);
             Processor[] procs =
             {
-                p,
-                new Processor(new[] {SignValue.MaxValue}, " UnusedVariable4 ")
-            };
-            pc.AddRange(procs);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx15Test()
-        {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
-            ProcessorContainer pc = new ProcessorContainer(null, p, p1);
-            Processor[] procs =
-            {
                 new Processor(new[] {SignValue.MaxValue}, " UnusedVariable "),
                 p1
             };
@@ -345,7 +345,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx16Test()
+        public void ProcessorContainerEx15Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
@@ -360,7 +360,7 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ProcessorContainerEx17Test()
+        public void ProcessorContainerEx16Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");

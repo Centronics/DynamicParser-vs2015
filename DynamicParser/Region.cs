@@ -47,34 +47,13 @@ namespace DynamicParser
         public int Bottom => Region.Bottom;
 
         /// <summary>
-        /// Выясняет, перекрывается ли текущая область с указанной.
+        /// Выясняет, пересекается ли текущая область с указанной.
         /// </summary>
         /// <param name="rect">Проверяемая область.</param>
-        /// <returns>Возвращает true в случае обнаружения перекрытия.</returns>
+        /// <returns>Возвращает true в случае обнаружения пересечения.</returns>
         public bool IsConflict(Rectangle rect)
         {
-            return IsConflict(rect, Region);
-        }
-
-        /// <summary>
-        /// Выясняет, перекрывается ли текущая область с указанной.
-        /// </summary>
-        /// <param name="rect1">Проверяемая область.</param>
-        /// <param name="rect2">Проверяемая область.</param>
-        /// <returns>Возвращает true в случае обнаружения перекрытия.</returns>
-        public static bool IsConflict(Rectangle rect1, Rectangle rect2)
-        {
-            if (rect1.X >= rect2.X && rect1.Right <= rect2.Right)
-                return true;
-            if (rect1.Y >= rect2.Y && rect1.Bottom <= rect2.Bottom)
-                return true;
-            if (rect1.Right >= rect2.X && rect1.Right <= rect2.Right)
-                return true;
-            if (rect1.Bottom >= rect2.Y && rect1.Bottom <= rect2.Bottom)
-                return true;
-            if (rect1.X <= rect2.X && rect1.Right >= rect2.Right)
-                return true;
-            return rect1.Y <= rect2.Y && rect1.Bottom >= rect2.Bottom;
+            return rect.IntersectsWith(Region);
         }
     }
 
@@ -219,6 +198,18 @@ namespace DynamicParser
             if (IsConflict(rect))
                 throw new ArgumentException($"{nameof(Add)}: Попытка вставить элемент, конфликтующий с существующими.", nameof(rect));
             _rects[GetIndex(rect.X, rect.Y)] = new Registered { Region = rect };
+        }
+
+        /// <summary>
+        /// Вставляет указанную область в коллекцию.
+        /// </summary>
+        /// <param name="x">Координата X.</param>
+        /// <param name="y">Координата Y.</param>
+        /// <param name="width">Ширина.</param>
+        /// <param name="height">Высота.</param>
+        public void Add(int x, int y, int width, int height)
+        {
+            Add(new Rectangle(x, y, width, height));
         }
     }
 }

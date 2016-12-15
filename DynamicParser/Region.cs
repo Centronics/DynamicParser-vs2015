@@ -165,7 +165,7 @@ namespace DynamicParser
                 throw new ArgumentException(
                     $"{nameof(SetMask)}: Высота объекта, содержащего информацию о точках, не может быть меньше или равна нулю ({attacher.Height}).", nameof(attacher));
             foreach (Attach attach in attacher.Attaches)
-                attach.Regs = this[attach.Point].Register;
+                attach.Regs = this[attach.Point]?.Register;
         }
 
         /// <summary>

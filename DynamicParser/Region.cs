@@ -151,24 +151,6 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Заполняет объект Attacher информацией об областях, на которые попадают указанные в нём точки.
-        /// </summary>
-        /// <param name="attacher">Объект, содержащий данные об искомых точках.</param>
-        public void SetMask(Attacher attacher)
-        {
-            if (attacher == null)
-                throw new ArgumentNullException(nameof(attacher), $"{nameof(SetMask)}: Объект, содержащий информацию об искомых точках, не может быть равен null.");
-            if (attacher.Width <= 0)
-                throw new ArgumentException(
-                    $"{nameof(SetMask)}: Ширина объекта, содержащего информацию о точках, не может быть меньше или равна нулю ({attacher.Width}).", nameof(attacher));
-            if (attacher.Height <= 0)
-                throw new ArgumentException(
-                    $"{nameof(SetMask)}: Высота объекта, содержащего информацию о точках, не может быть меньше или равна нулю ({attacher.Height}).", nameof(attacher));
-            foreach (Attach attach in attacher.Attaches)
-                attach.Regs = this[attach.Point]?.Register;
-        }
-
-        /// <summary>
         /// Определяет, приходится ли начало какой-либо области по указанным координатам.
         /// </summary>
         /// <param name="x">Координата X.</param>

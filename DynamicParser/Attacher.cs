@@ -147,7 +147,7 @@ namespace DynamicParser
         /// <returns>В случае попадания возвращает true, в противном случае false.</returns>
         public static bool IsConflict(Point pt, Rectangle rect)
         {
-            return pt.X >= rect.X && pt.X <= rect.Right && pt.Y >= rect.Y && pt.Y <= rect.Bottom;
+            return pt.X >= rect.X && pt.X < rect.Right && pt.Y >= rect.Y && pt.Y < rect.Bottom;
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace DynamicParser
         public bool IsConflict(Region region)
         {
             if (region == null)
-                throw new ArgumentNullException(nameof(region), $"{nameof(IsConflict)}: {nameof(region)} = null");
+                throw new ArgumentNullException(nameof(region), $"{nameof(IsConflict)}: {nameof(region)} = null.");
             return region.Rectangles.Any(IsConflict);
         }
 
@@ -185,6 +185,12 @@ namespace DynamicParser
         /// <param name="region">Регион, на который необходимо наложить маску.</param>
         public void SetMask(Region region)
         {
+            if (region == null)
+                throw new ArgumentNullException(nameof(region), $"{nameof(SetMask)}: {nameof(region)} = null.");
+            if (region.Width != Width)
+                throw new ArgumentException($"{nameof(SetMask)}: Region и Attacher должны быть равны по ширине.", nameof(region));
+            if (region.Height != Height)
+                throw new ArgumentException($"{nameof(SetMask)}: Region и Attacher должны быть равны по высоте.", nameof(region));
             if (IsConflict(region))
                 throw new ArgumentException($"{nameof(SetMask)}: Найдено две или более точек, указывающих на один и тот же регион.", nameof(region));
             foreach (Attach att in Attaches)
@@ -198,7 +204,7 @@ namespace DynamicParser
         /// <returns>Если в списке содержится указанная точка, возвращается true, в противном случае false.</returns>
         public bool Contains(Point point)
         {
-            return _attaches.Contains(new Attach { Point = point });
+            return _attaches.Exists(att => att.Point == point);
         }
 
         /// <summary>
@@ -209,6 +215,10 @@ namespace DynamicParser
         {
             if (Contains(point))
                 throw new ArgumentException($"{nameof(Add)}: Указанная точка уже содержится в списке x = {point.X}, y = {point.Y}.", nameof(point));
+            if (point.X >= Width)
+                throw new ArgumentException($"{nameof(Add)}: Указанная точка выходит за предел описанной области x = {point.X}, Width = {Width}.", nameof(point));
+            if (point.Y >= Height)
+                throw new ArgumentException($"{nameof(Add)}: Указанная точка выходит за предел описанной области y = {point.Y}, Height = {Height}.", nameof(point));
             _attaches.Add(new Attach { Point = point });
         }
 

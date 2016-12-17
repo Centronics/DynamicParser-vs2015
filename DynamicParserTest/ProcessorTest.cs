@@ -28,7 +28,7 @@ namespace DynamicParserTest
             Attacher attacher = proc.CurrentAttacher;
             attacher.Add(0, 0);
             attacher.Add(48, 7);
-            region.SetMask(attacher);
+            //region.SetMask(attacher);
             attacher.SetMask(region);
             List<Attach.Proc> lst = attacher.Attaches.Select(att => att.Unique).ToList();
         }
@@ -134,7 +134,7 @@ namespace DynamicParserTest
                     attacher = proc.CurrentAttacher;
                     attacher.Add(0, 0);
                     attacher.Add(48, 7);
-                    region.SetMask(attacher);
+                    //region.SetMask(attacher);
                     attacher.SetMask(region);
                 }
 
@@ -147,7 +147,7 @@ namespace DynamicParserTest
                     attacher1 = proc.CurrentAttacher;
                     attacher1.Add(0, 0);
                     attacher1.Add(48, 7);
-                    region1.SetMask(attacher1);
+                    //region1.SetMask(attacher1);
                     attacher1.SetMask(region1);
                 }
 

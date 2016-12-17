@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using DynamicParser;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -171,6 +172,54 @@ namespace DynamicParserTest
             Assert.AreEqual(RegionStatus.Ok, sr.FindRegion(new Region(4, 5)));
             Assert.AreEqual(RegionStatus.Ok, sr.RegionCorrect(new Region(5, 4)));
             Assert.AreEqual(RegionStatus.Ok, sr.FindRegion(new Region(5, 4)));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SearchEx1Test()
+        {
+            // ReSharper disable once ObjectCreationAsStatement
+            new SearchResults(-5, 5);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SearchEx2Test()
+        {
+            // ReSharper disable once ObjectCreationAsStatement
+            new SearchResults(5, -5);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SearchEx3Test()
+        {
+            // ReSharper disable once ObjectCreationAsStatement
+            new SearchResults(-5, -5);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SearchEx4Test()
+        {
+            // ReSharper disable once ObjectCreationAsStatement
+            new SearchResults(0, 5);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SearchEx5Test()
+        {
+            // ReSharper disable once ObjectCreationAsStatement
+            new SearchResults(5, 0);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SearchEx6Test()
+        {
+            // ReSharper disable once ObjectCreationAsStatement
+            new SearchResults(0, 0);
         }
     }
 }

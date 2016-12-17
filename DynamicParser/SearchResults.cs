@@ -70,11 +70,7 @@ namespace DynamicParser
         /// <summary>
         /// Указанный регион выше существующего.
         /// </summary>
-        HeightBig,
-        /// <summary>
-        /// Конфликтует с какой-либо существующей областью.
-        /// </summary>
-        Conflict
+        HeightBig
     }
 
     /// <summary>
@@ -164,16 +160,6 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Определяет, выходит ли текущий регион за пределы проверяемого региона.
-        /// </summary>
-        /// <param name="region">Проверяемый регион.</param>
-        /// <returns>Возвращает true в случае, если текущий регион входит в пределы проверяемого региона, в противном случае false.</returns>
-        bool InRange(Region region)
-        {
-            return region != null && region.Elements.Where(reg => reg != null).All(reg => reg.Right < Width && reg.Bottom < Height);
-        }
-
-        /// <summary>
         /// Определяет, есть ли какие-либо конфликты между заданным регионом и текущим.
         /// </summary>
         /// <param name="region">Регион, относительно которого происходит проверка.</param>
@@ -190,7 +176,7 @@ namespace DynamicParser
                 return RegionStatus.WidthBig;
             if (region.Height > Height)
                 return RegionStatus.HeightBig;
-            return InRange(region) ? RegionStatus.Ok : RegionStatus.Conflict;
+            return RegionStatus.Ok;
         }
 
         /// <summary>

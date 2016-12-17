@@ -146,7 +146,7 @@ namespace DynamicParser
                     throw new ArgumentException($"Indexer: Координата X не может быть больше или равна ширине ({x}).", nameof(x));
                 if (y >= Height)
                     throw new ArgumentException($"Indexer: Координата Y не может быть больше или равна высоте ({y}).", nameof(y));
-                return Elements.FirstOrDefault(reg => x >= reg.X && x <= reg.Right && y >= reg.Y && y <= reg.Bottom);
+                return Elements.FirstOrDefault(reg => x >= reg.X && x < reg.Right && y >= reg.Y && y < reg.Bottom);
             }
         }
 

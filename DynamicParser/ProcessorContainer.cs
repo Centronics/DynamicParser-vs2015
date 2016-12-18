@@ -53,7 +53,7 @@ namespace DynamicParser
                 return;
             if (!InOneSize(first.Width, first.Height, processors))
                 throw new ArgumentException($"{nameof(ProcessorContainer)}: Обнаружены карты различных размеров.", nameof(processors));
-            if (!InOneTag(processors))
+            if (!InOneTag(processors, first.Tag))
                 throw new ArgumentException($"{nameof(ProcessorContainer)}: Карты с одинаковыми Tag не могут быть в одном списке.", nameof(processors));
             _lstProcs.Add(first);
             Width = first.Width;
@@ -161,27 +161,52 @@ namespace DynamicParser
 
         /// <summary>
         /// Проверяет присутствие карт с одинаковыми свойствами Tag в указанном списке.
+        /// Соответствие tagex, также считается повторением.
+        /// </summary>
+        /// <param name="tags">Проверяемый список.</param>
+        /// <param name="tagex">Tag, равенство которому будет приводить к тому, что функция вернёт false.</param>
+        /// <returns>Возвращает true в случае, когда повторяющиеся значения не встречались, в противном случае false.</returns>
+        public static bool InOneTag(IList<Processor> tags, string tagex)
+        {
+            if ((tags?.Count ?? 0) <= 0 || tags == null || string.IsNullOrEmpty(tagex))
+                return true;
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (Processor tag in tags)
+            {
+                if (Attach.TagStringCompare(tag.Tag, tagex))
+                    return false;
+                uint count = 0;
+                if (!tags.All(pr =>
+                {
+                    if (Attach.TagStringCompare(pr.Tag, tag.Tag))
+                        count++;
+                    return count <= 1;
+                })) return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Проверяет присутствие карт с одинаковыми свойствами Tag в указанном списке.
         /// </summary>
         /// <param name="tags">Проверяемый список.</param>
         /// <returns>Возвращает true в случае, когда повторяющиеся значения не встречались, в противном случае false.</returns>
         public static bool InOneTag(IList<Processor> tags)
         {
             if ((tags?.Count ?? 0) <= 0 || tags == null)
-                return false;
+                return true;
             // ReSharper disable once LoopCanBeConvertedToQuery
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (int k = 0; k < tags.Count; k++)
+            foreach (Processor tag in tags)
             {
-                string refer = tags[k].Tag;
                 uint count = 0;
                 if (!tags.All(pr =>
                 {
-                    if (Attach.TagStringCompare(pr.Tag, refer))
+                    if (Attach.TagStringCompare(pr.Tag, tag.Tag))
                         count++;
                     return count <= 1;
-                })) return true;
+                })) return false;
             }
-            return false;
+            return true;
         }
 
         /// <summary>

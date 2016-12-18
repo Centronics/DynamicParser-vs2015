@@ -82,7 +82,7 @@ namespace DynamicParser
             for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
                     _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
-            Tag = tag;
+            Tag = tag.Trim();
         }
 
         /// <summary>

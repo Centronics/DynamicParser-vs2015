@@ -127,22 +127,22 @@ namespace DynamicParserTest
         [TestMethod]
         public void AttacherIsConflictTest()
         {
-            Assert.AreEqual(true, Attacher.IsConflict(new Point(1, 1), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(true, Attacher.IsConflict(new Point(0, 1), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(true, Attacher.IsConflict(new Point(1, 0), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(true, Attacher.IsConflict(new Point(1, 1), new Rectangle(2, 2, 2, 2)));
-            Assert.AreEqual(true, Attacher.IsConflict(new Point(1, 1), new Rectangle(1, 1, 2, 2)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(1, 1), new Rectangle(0, 0, 0, 0)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(1, 3), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(2, 2), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(3, 2), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(3, 3), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(2, 5), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(5, 2), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(4, 4), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(3, 1), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(2, 0), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(false, Attacher.IsConflict(new Point(0, 2), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(true, Attacher.InRectangle(new Point(1, 1), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(true, Attacher.InRectangle(new Point(0, 1), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(true, Attacher.InRectangle(new Point(1, 0), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(true, Attacher.InRectangle(new Point(1, 1), new Rectangle(2, 2, 2, 2)));
+            Assert.AreEqual(true, Attacher.InRectangle(new Point(1, 1), new Rectangle(1, 1, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(1, 1), new Rectangle(0, 0, 0, 0)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(1, 3), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(2, 2), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(3, 2), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(3, 3), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(2, 5), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(5, 2), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(4, 4), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(3, 1), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(2, 0), new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(0, 2), new Rectangle(0, 0, 2, 2)));
         }
 
         [TestMethod]

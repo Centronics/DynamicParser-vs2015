@@ -179,7 +179,7 @@ namespace DynamicParserTest
             attacher.Add(0, 0);
             attacher.Add(2, 2);
             attacher.Add(3, 3);
-            region.SetMask(attacher);
+//            region.SetMask(attacher);
             attacher.SetMask(region);
             foreach (Attach.Proc proc in attacher.Attaches.Select(att => att.Unique))
             {

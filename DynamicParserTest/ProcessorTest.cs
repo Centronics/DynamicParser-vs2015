@@ -28,7 +28,6 @@ namespace DynamicParserTest
             Attacher attacher = proc.CurrentAttacher;
             attacher.Add(0, 0);
             attacher.Add(48, 7);
-            //region.SetMask(attacher);
             attacher.SetMask(region);
             List<Attach.Proc> lst = attacher.Attaches.Select(att => att.Unique).ToList();
         }
@@ -36,14 +35,14 @@ namespace DynamicParserTest
         [TestMethod]
         public void ProcessorTest1()
         {
-            Processor proc = new Processor(new Bitmap(15, 10), "f1");
+            Processor proc = new Processor(new Bitmap(15, 10), " f1   ");
             Assert.AreEqual("f1", proc.Tag);
             Assert.AreEqual(15, proc.Width);
             Assert.AreEqual(10, proc.Height);
             Assert.AreEqual(150, proc.Length);
             Region cr = proc.CurrentRegion;
             Assert.AreEqual(15, cr.Width);
-            Assert.AreEqual(10, cr.Width);
+            Assert.AreEqual(10, cr.Height);
             Attacher at = proc.CurrentAttacher;
             Assert.AreEqual(15, at.Width);
             Assert.AreEqual(10, at.Height);
@@ -102,8 +101,8 @@ namespace DynamicParserTest
                 Assert.AreEqual(proc.Width, sr2.Width);
                 Assert.AreEqual(proc.Height, sr2.Height);
 
-                Assert.AreEqual(100.0, sr1[0, 0].Percent);
-                Assert.AreEqual(100.0, sr2[2, 3].Percent);
+                Assert.AreEqual(1.0, sr1[0, 0].Percent);
+                Assert.AreEqual(1.0, sr2[2, 3].Percent);
 
                 for (int y = 0; y < sr1.Height; y++)
                     for (int x = 0; x < sr1.Width; x++)
@@ -147,7 +146,6 @@ namespace DynamicParserTest
                     attacher1 = proc.CurrentAttacher;
                     attacher1.Add(0, 0);
                     attacher1.Add(48, 7);
-                    //region1.SetMask(attacher1);
                     attacher1.SetMask(region1);
                 }
 
@@ -186,6 +184,47 @@ namespace DynamicParserTest
                             Assert.AreEqual(true, sr3[x, y].Percent < 100.0);
                     }
             }
+        }
+
+        [TestMethod]
+        public void ProcessorTest3()
+        {
+            Bitmap btm1 = new Bitmap(2, 2);
+            btm1.SetPixel(0, 0, Color.IndianRed);
+            btm1.SetPixel(1, 0, Color.Chocolate);
+            btm1.SetPixel(0, 1, Color.Aquamarine);
+            btm1.SetPixel(1, 1, Color.DarkSeaGreen);
+            Bitmap btm2 = new Bitmap(2, 1);
+            btm2.SetPixel(0, 0, Color.Red);
+            btm2.SetPixel(1, 0, SignValue.MaxValue.ValueColor);
+
+            SignValue[,] mas1 = new SignValue[2, 2];
+            mas1[0, 0] = new SignValue(Color.IndianRed);
+            mas1[1, 0] = new SignValue(Color.Chocolate);
+            mas1[0, 1] = new SignValue(Color.Aquamarine);
+            mas1[1, 1] = new SignValue(Color.DarkSeaGreen);
+            SignValue[] mas2 = { new SignValue(Color.Red), SignValue.MaxValue };
+
+            Processor procb1 = new Processor(btm1, "b1");
+            Processor procb2 = new Processor(btm2, "b2");
+            Processor procm1 = new Processor(mas1, "m1");
+            Processor procm2 = new Processor(mas2, "m2");
+
+            Assert.AreEqual(procb1[0, 0], procm1[0, 0]);
+            Assert.AreEqual(procb1[0, 1], procm1[0, 1]);
+            Assert.AreEqual(procb1[0, 1], procm1[0, 1]);
+            Assert.AreEqual(procb1[1, 1], procm1[1, 1]);
+
+            Assert.AreEqual(procb1[0, 0].ValueColor, Color.FromArgb(Color.IndianRed.ToArgb() | unchecked((int)0xFF000000)));
+            Assert.AreEqual(procb1[0, 1].ValueColor, Color.FromArgb(Color.Aquamarine.ToArgb() | unchecked((int)0xFF000000)));
+            Assert.AreEqual(procb1[1, 0].ValueColor, Color.FromArgb(Color.Chocolate.ToArgb() | unchecked((int)0xFF000000)));
+            Assert.AreEqual(procb1[1, 1].ValueColor, Color.FromArgb(Color.DarkSeaGreen.ToArgb() | unchecked((int)0xFF000000)));
+
+            Assert.AreEqual(procb2[0, 0], procm2[0, 0]);
+            Assert.AreEqual(procb2[1, 0], procm2[1, 0]);
+
+            Assert.AreEqual(procb2[0, 0].ValueColor, Color.FromArgb(Color.Red.ToArgb() | unchecked((int)0xFF000000)));
+            Assert.AreEqual(procb2[1, 0].ValueColor, SignValue.MaxValue.ValueColor);
         }
 
         [TestMethod]

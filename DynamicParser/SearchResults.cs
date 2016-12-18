@@ -134,7 +134,7 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(Find)}: Указанная область шире, чем текущая.", nameof(rect.Width));
             if (rect.Height > Height)
                 throw new ArgumentException($"{nameof(Find)}: Указанная область выше, чем текущая.", nameof(rect.Height));
-            if (rect.Right >= Width || rect.Height >= Height)
+            if (rect.Right >= Width || rect.Height >= Height || rect.Width <= 0 || rect.Height <= 0 || rect.X < 0 || rect.Y < 0)
                 return null;
             double max = -1.0;
             for (int y = rect.Y; y < rect.Bottom; y++)

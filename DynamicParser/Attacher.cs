@@ -145,7 +145,7 @@ namespace DynamicParser
         /// <param name="pt">Точка.</param>
         /// <param name="rect">Область.</param>
         /// <returns>В случае попадания возвращает true, в противном случае false.</returns>
-        public static bool IsConflict(Point pt, Rectangle rect)
+        public static bool InRectangle(Point pt, Rectangle rect)
         {
             return pt.X >= rect.X && pt.X < rect.Right && pt.Y >= rect.Y && pt.Y < rect.Bottom;
         }
@@ -159,7 +159,7 @@ namespace DynamicParser
         {
             bool one = false;
             foreach (Point pt in Points)
-                if (IsConflict(pt, rect))
+                if (InRectangle(pt, rect))
                     if (one)
                         return true;
                     else

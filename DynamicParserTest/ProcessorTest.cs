@@ -104,48 +104,66 @@ namespace DynamicParserTest
                 Assert.AreEqual(1.0, sr1[0, 0].Percent);
                 Assert.AreEqual(1.0, sr2[2, 3].Percent);
 
+                Assert.AreEqual(1, sr1[0, 0].Percent);
+                Assert.AreEqual("1", sr1[0, 0].Procs[0].Tag);
+                Assert.AreEqual(1, sr2[0, 0].Percent);
+                Assert.AreEqual("1", sr2[0, 0].Procs[0].Tag);
+                Assert.AreEqual(0.5, sr1[1, 0].Percent);
+                Assert.AreEqual(0.5, sr2[1, 0].Percent);
+                Assert.AreEqual(0.5, sr1[0, 1].Percent);
+                Assert.AreEqual(0.5, sr2[0, 1].Percent);
+                Assert.AreEqual(0.75, sr1[1, 1].Percent);
+                Assert.AreEqual(0.75, sr2[1, 1].Percent);
+
+                Assert.AreEqual(1, sr1[2, 3].Percent);
+                Assert.AreEqual("2", sr1[2, 3].Procs[0].Tag);
+                Assert.AreNotEqual(null, sr1[2, 3].Procs);
+                Assert.AreEqual(1, sr2[2, 3].Percent);
+                Assert.AreEqual("2", sr2[2, 3].Procs[0].Tag);
+                Assert.AreNotEqual(null, sr2[2, 3].Procs);
+                Assert.AreEqual(1, sr1[3, 3].Percent);
+                Assert.AreNotEqual(null, sr1[3, 3].Procs);
+                Assert.AreEqual(1, sr2[3, 3].Percent);
+                Assert.AreNotEqual(null, sr2[3, 3].Procs);
+
+                Assert.AreEqual(0, sr1[2, 4].Percent);
+                Assert.AreEqual(null, sr1[2, 4].Procs);
+                Assert.AreEqual(0, sr2[2, 4].Percent);
+                Assert.AreEqual(null, sr2[2, 4].Procs);
+                Assert.AreEqual(0, sr1[3, 4].Percent);
+                Assert.AreEqual(null, sr1[2 + 1, 4].Procs);
+                Assert.AreEqual(0, sr2[3, 4].Percent);
+                Assert.AreEqual(null, sr2[3, 4].Procs);
+
                 for (int y = 0; y < sr1.Height; y++)
                     for (int x = 0; x < sr1.Width; x++)
                     {
                         Assert.AreEqual(sr1[x, y].Percent, sr2[x, y].Percent);
-                        if (x != 0 && y != 0 && x != 2 && y != 3)
-                        {
-                            Assert.AreEqual(true, sr1[x, y].Percent < 100);
-                            Assert.AreEqual(true, sr2[x, y].Percent < 100);
-                        }
-                        if (x >= 3 || y >= 3)
-                        {
-                            Assert.AreEqual(0, sr1[x, y].Percent);
-                            Assert.AreEqual(null, sr1[x, y].Procs);
-                            Assert.AreEqual(0, sr2[x, y].Percent);
-                            Assert.AreEqual(null, sr2[x, y].Procs);
-                        }
-                        for (int k = 0; k < sr1[x, y].Procs.Length; k++)
-                            Assert.AreEqual(sr1[x, y].Procs[k].Tag, sr2[x, y].Procs[k].Tag);
+                        for (int k = 0; k < (sr1[x, y].Procs?.Length ?? 0); k++)
+                            Assert.AreEqual(sr1[x, y].Procs?[k].Tag, sr2[x, y].Procs[k].Tag);
                     }
 
                 Attacher attacher;
                 {
                     Region region = proc.CurrentRegion;
-                    region.Add(new Rectangle(0, 0, 44, 43));
-                    region.Add(new Rectangle(47, 7, 44, 43));
+                    region.Add(new Rectangle(0, 0, 2, 2));
+                    region.Add(new Rectangle(2, 3, 1, 1));
                     sr1.FindRegion(region);
                     attacher = proc.CurrentAttacher;
                     attacher.Add(0, 0);
-                    attacher.Add(48, 7);
-                    //region.SetMask(attacher);
+                    attacher.Add(2, 3);
                     attacher.SetMask(region);
                 }
 
                 Attacher attacher1;
                 {
                     Region region1 = proc.CurrentRegion;
-                    region1.Add(new Rectangle(0, 0, 44, 43));
-                    region1.Add(new Rectangle(47, 7, 44, 43));
+                    region1.Add(new Rectangle(0, 0, 2, 2));
+                    region1.Add(new Rectangle(2, 3, 1, 1));
                     sr2.FindRegion(region1);
                     attacher1 = proc.CurrentAttacher;
                     attacher1.Add(0, 0);
-                    attacher1.Add(48, 7);
+                    attacher1.Add(2, 3);
                     attacher1.SetMask(region1);
                 }
 
@@ -162,7 +180,7 @@ namespace DynamicParserTest
                     Assert.AreEqual(true, pr.Place == pr1.Place);
                     Assert.AreEqual(true, pr.Procs.Count() == pr1.Procs.Count());
                     for (int j = 0; j < pr.Procs.Count(); j++)
-                        Assert.AreEqual(pr.Procs.ElementAt(j).Tag, pr1.Procs.ElementAt(j));
+                        Assert.AreEqual(pr.Procs.ElementAt(j).Tag, pr1.Procs.ElementAt(j).Tag);
                 }
 
                 Bitmap btm3 = new Bitmap(1, 1);
@@ -172,7 +190,7 @@ namespace DynamicParserTest
 
                 Assert.AreEqual(5, sr3.Width);
                 Assert.AreEqual(5, sr3.Height);
-                Assert.AreEqual(100.0, sr3[4, 4].Percent);
+                Assert.AreEqual(1, sr3[4, 4].Percent);
 
                 for (int y = 0; y < sr3.Height; y++)
                     for (int x = 0; x < sr3.Width; x++)
@@ -181,7 +199,7 @@ namespace DynamicParserTest
                         Assert.AreEqual(1, sr3[x, y].Procs.Length);
                         Assert.AreSame(pr3, sr3[x, y].Procs[0]);
                         if (x != 4 && y != 4)
-                            Assert.AreEqual(true, sr3[x, y].Percent < 100.0);
+                            Assert.AreEqual(1, sr3[x, y].Percent);
                     }
             }
         }

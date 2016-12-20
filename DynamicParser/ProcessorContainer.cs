@@ -146,17 +146,23 @@ namespace DynamicParser
 
         /// <summary>
         /// Проверяет, все ли указанные карты одного размера, также она проверяет присутствие ссылок на один и тот же объект.
-        /// Если они будут обнаружены, функция вернёт false.
+        /// Если они будут обнаружены, функция породит исключение ArgumentException.
         /// </summary>
-        /// <param name="width">Ширина, которой необходимо соответствие.</param>
-        /// <param name="height">Высота, которой необходимо соответствие.</param>
+        /// <param name="width">Ширина, с которой необходимо соответствие.</param>
+        /// <param name="height">Высота, с которой необходимо соответствие.</param>
         /// <param name="processors">Список карт, с которыми идёт сопоставление.</param>
-        /// <returns>Возвращает true в случае, если все ли указанные карты одного размера и одинаковые ссылки отсутствуют, в противном случае false.</returns>
+        /// <returns>Возвращает true в случае, если все ли указанные карты одного размера, в противном случае false.</returns>
         public static bool InOneSize(int width, int height, IList<Processor> processors)
         {
-            if (width <= 0 || height <= 0 || processors.Count <= 0 || IsEquals(processors))
-                return false;
-            return processors.All(pr => pr?.Width == width && pr.Height == height);
+            if (width <= 0)
+                throw new ArgumentException($"{nameof(InOneSize)}: Ширина не может быть меньше или равна нулю ({nameof(width)}).", nameof(width));
+            if (height <= 0)
+                throw new ArgumentException($"{nameof(InOneSize)}: Высота не может быть меньше или равна нулю ({nameof(height)}).", nameof(height));
+            if (processors == null)
+                throw new ArgumentNullException(nameof(processors), $"{nameof(InOneSize)}: Массив сопоставляемых карт равен null.");
+            if (IsEquals(processors))
+                throw new ArgumentException($"{nameof(InOneSize)}: Обнаружены ссылки, указывающие на одни и те же карты.", nameof(processors));
+            return processors.Count <= 0 || processors.All(pr => pr?.Width == width && pr.Height == height);
         }
 
         /// <summary>

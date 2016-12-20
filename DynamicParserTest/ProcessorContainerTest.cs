@@ -273,7 +273,7 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void ProcessorContainerEx10Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
@@ -284,7 +284,7 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void ProcessorContainerEx11Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
@@ -304,7 +304,7 @@ namespace DynamicParserTest
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
-            ProcessorContainer pc = new ProcessorContainer(null, p, p1);
+            ProcessorContainer pc = new ProcessorContainer(p, p1);
             IList<Processor> procs = new[]
             {
                 new Processor(new[] {SignValue.MaxValue}, " UnusedVariable "),
@@ -314,18 +314,18 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void ProcessorContainerEx13Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
                 p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
-            ProcessorContainer pc = new ProcessorContainer(null, p, p1);
+            ProcessorContainer pc = new ProcessorContainer(p, p1);
             Processor[] procs =
             {
                 p,
                 new Processor(new[] {SignValue.MaxValue}, " UnusedVariable4 ")
             };
-            pc.AddRange(procs);
+            pc.AddRange(procs);//не может сравнивать с существующими (БАГ)
         }
 
         [TestMethod]

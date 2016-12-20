@@ -219,6 +219,10 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(Add)}: Указанная точка выходит за предел описанной области x = {point.X}, Width = {Width}.", nameof(point));
             if (point.Y >= Height)
                 throw new ArgumentException($"{nameof(Add)}: Указанная точка выходит за предел описанной области y = {point.Y}, Height = {Height}.", nameof(point));
+            if (point.X < 0)
+                throw new ArgumentException($"{nameof(Add)}: Координата X меньше нуля ({point.X}).", nameof(point));
+            if (point.Y < 0)
+                throw new ArgumentException($"{nameof(Add)}: Координата Y меньше нуля ({point.Y}).", nameof(point));
             _attaches.Add(new Attach { Point = point });
         }
 

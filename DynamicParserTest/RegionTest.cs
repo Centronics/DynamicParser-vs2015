@@ -133,32 +133,6 @@ namespace DynamicParserTest
             Assert.AreEqual(null, region[new Point(4, 3)]);
             Assert.AreEqual(null, region[new Point(4, 4)]);
 
-            Assert.AreEqual(true, region.Contains(0, 0));
-            Assert.AreEqual(false, region.Contains(0, 1));
-            Assert.AreEqual(false, region.Contains(0, 2));
-            Assert.AreEqual(false, region.Contains(0, 3));
-            Assert.AreEqual(false, region.Contains(0, 4));
-            Assert.AreEqual(false, region.Contains(1, 0));
-            Assert.AreEqual(false, region.Contains(1, 1));
-            Assert.AreEqual(false, region.Contains(1, 2));
-            Assert.AreEqual(false, region.Contains(1, 3));
-            Assert.AreEqual(false, region.Contains(1, 4));
-            Assert.AreEqual(false, region.Contains(2, 0));
-            Assert.AreEqual(false, region.Contains(2, 1));
-            Assert.AreEqual(true, region.Contains(2, 2));
-            Assert.AreEqual(false, region.Contains(2, 3));
-            Assert.AreEqual(false, region.Contains(2, 4));
-            Assert.AreEqual(false, region.Contains(3, 0));
-            Assert.AreEqual(false, region.Contains(3, 1));
-            Assert.AreEqual(false, region.Contains(3, 2));
-            Assert.AreEqual(true, region.Contains(3, 3));
-            Assert.AreEqual(false, region.Contains(3, 4));
-            Assert.AreEqual(false, region.Contains(4, 0));
-            Assert.AreEqual(false, region.Contains(4, 1));
-            Assert.AreEqual(false, region.Contains(4, 2));
-            Assert.AreEqual(false, region.Contains(4, 3));
-            Assert.AreEqual(false, region.Contains(4, 4));
-
             foreach (Registered reg1 in region.Elements)
             {
                 bool bl1 = reg1.X == 0 && reg1.Y == 0 && reg1.Right == 2 && reg1.Bottom == 2;
@@ -226,7 +200,7 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void RegisteredTestEx5()
         {
-            Region reg = new Region(10, 10);
+            Region reg = new Region(9, 10);
             reg.Add(new Rectangle(0, 3, 10, 5));
         }
 
@@ -242,8 +216,8 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void RegisteredTestEx7()
         {
-            Region reg = new Region(10, 10);
-            reg.Add(0, 3, 10, 5);
+            Region reg = new Region(10, 9);
+            reg.Add(0, 2, 10, 8);
         }
 
         [TestMethod]

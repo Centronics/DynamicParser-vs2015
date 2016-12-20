@@ -130,7 +130,7 @@ namespace DynamicParserTest
             Assert.AreEqual(true, Attacher.InRectangle(new Point(1, 1), new Rectangle(0, 0, 2, 2)));
             Assert.AreEqual(true, Attacher.InRectangle(new Point(0, 1), new Rectangle(0, 0, 2, 2)));
             Assert.AreEqual(true, Attacher.InRectangle(new Point(1, 0), new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(true, Attacher.InRectangle(new Point(1, 1), new Rectangle(2, 2, 2, 2)));
+            Assert.AreEqual(false, Attacher.InRectangle(new Point(1, 1), new Rectangle(2, 2, 2, 2)));
             Assert.AreEqual(true, Attacher.InRectangle(new Point(1, 1), new Rectangle(1, 1, 2, 2)));
             Assert.AreEqual(false, Attacher.InRectangle(new Point(1, 1), new Rectangle(0, 0, 0, 0)));
             Assert.AreEqual(false, Attacher.InRectangle(new Point(1, 3), new Rectangle(0, 0, 2, 2)));

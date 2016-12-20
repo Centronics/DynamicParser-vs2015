@@ -151,17 +151,6 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Определяет, приходится ли начало какой-либо области по указанным координатам.
-        /// </summary>
-        /// <param name="x">Координата X.</param>
-        /// <param name="y">Координата Y.</param>
-        /// <returns>Возвращает true в случае, если начало области приходится на заданные координаты, false в противном случае.</returns>
-        public bool Contains(int x, int y)
-        {
-            return _rects.ContainsKey(GetIndex(x, y));
-        }
-
-        /// <summary>
         /// Определяет, перекрывается ли указанная область с какой-либо из содержащихся в объекте.
         /// </summary>
         /// <param name="rect">Проверяемая область.</param>
@@ -177,6 +166,12 @@ namespace DynamicParser
         /// <param name="rect">Вставляемая область.</param>
         public void Add(Rectangle rect)
         {
+            if (rect.Right > Width)
+                throw new ArgumentException($@"{nameof(Add)}: Попытка вставить элемент, конфликтующий с шириной региона (Width = {Width
+                    }, Right = {rect.Right}).", nameof(rect));
+            if (rect.Bottom > Height)
+                throw new ArgumentException($@"{nameof(Add)}: Попытка вставить элемент, конфликтующий с высотой региона (Height = {Height
+                    }, Bottom = {rect.Bottom}).", nameof(rect));
             if (IsConflict(rect))
                 throw new ArgumentException($"{nameof(Add)}: Попытка вставить элемент, конфликтующий с существующими.", nameof(rect));
             _rects[GetIndex(rect.X, rect.Y)] = new Registered { Region = rect };

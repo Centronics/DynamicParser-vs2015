@@ -81,7 +81,7 @@ namespace DynamicParser
             if (proc.Height != Height)
                 throw new ArgumentException($"{nameof(Add)}: Высота добавляемой карты должна совпадать с высотой хранилища ({proc.Height} и {Height}).", nameof(proc));
             if (ContainsTag(proc.Tag))
-                throw new ArgumentException($"{nameof(Add)}: Попытка добавить карту, с значение свойства Tag которой уже существует в списке.", nameof(proc));
+                throw new ArgumentException($"{nameof(Add)}: Попытка добавить карту, значение свойства Tag которой уже существует в списке.", nameof(proc));
             _lstProcs.Add(proc);
         }
 
@@ -96,7 +96,7 @@ namespace DynamicParser
             if (!InOneSize(Width, Height, procs))
                 throw new ArgumentException($"{nameof(AddRange)}: Размеры добавляемых карт различаются.", nameof(procs));
             if (!InOneTag(procs))
-                throw new ArgumentException($"{nameof(ProcessorContainer)}: Карты с одинаковыми Tag не могут быть в одном списке.", nameof(procs));
+                throw new ArgumentException($"{nameof(AddRange)}: Карты с одинаковыми Tag не могут быть в одном списке.", nameof(procs));
             foreach (Processor pr in procs)
                 if (pr != null)
                     Add(pr);
@@ -162,7 +162,7 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(processors), $"{nameof(InOneSize)}: Массив сопоставляемых карт равен null.");
             if (IsEquals(processors))
                 throw new ArgumentException($"{nameof(InOneSize)}: Обнаружены ссылки, указывающие на одни и те же карты.", nameof(processors));
-            return processors.Count <= 0 || processors.All(pr => pr?.Width == width && pr.Height == height);
+            return processors.Count <= 0 || processors.All(pr => pr == null || pr.Width == width && pr.Height == height);
         }
 
         /// <summary>
@@ -179,11 +179,15 @@ namespace DynamicParser
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (Processor tag in tags)
             {
+                if (tag == null)
+                    continue;
                 if (Attach.TagStringCompare(tag.Tag, tagex))
                     return false;
                 uint count = 0;
                 if (!tags.All(pr =>
                 {
+                    if (pr == null)
+                        return true;
                     if (Attach.TagStringCompare(pr.Tag, tag.Tag))
                         count++;
                     return count <= 1;

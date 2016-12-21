@@ -154,22 +154,17 @@ namespace DynamicParserTest
             region.Add(9, 9, 1, 1);
             region.Add(9, 6, 1, 2);
             Attacher attacher = new Attacher(10, 10);
-            attacher.Add(5, 5);
             attacher.Add(0, 0);
             attacher.Add(2, 2);
-            attacher.SetMask(region);
-            List<Attach> lst = attacher.Attaches.ToList();
-            bool b1 = false, b2 = false, b3 = false;
-            foreach (Attach att in lst)
-            {
-                if (att.Point == new Point(0, 0))
-                    b1 = true;
-                if (att.Point == new Point(2, 2))
-                    b2 = true;
-                if (att.Point == new Point(5, 5))
-                    b3 = true;
-            }
-            Assert.AreEqual(true, b1 && b2 && !b3);
+            attacher.Add(5, 5);
+            Registered nn = region[0, 0];
+            Registered nb = region[2, 2];
+            Registered np = region[5, 5];
+            Assert.AreEqual(true, nn.IsEmpty);
+            Assert.AreEqual(true, nb.IsEmpty);
+            Assert.AreNotEqual(null, nn);
+            Assert.AreNotEqual(null, nb);
+            Assert.AreEqual(null, np);
         }
 
         [TestMethod]

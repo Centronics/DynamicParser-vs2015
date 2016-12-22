@@ -30,11 +30,16 @@ namespace DynamicParserTest
                 pr2 = new Processor(new[] { SignValue.MaxValue }, " DD  "),
                 pr3 = new Processor(new[] { SignValue.MaxValue }, "dD"),
                 pr4 = new Processor(new[] { SignValue.MaxValue }, " nn");
-            Attach attach = new Attach();
-            attach.Regs.Add(new Reg { Procs = new[] { pr1 } });
-            attach.Regs.Add(new Reg { Procs = new[] { pr2 } });
-            attach.Regs.Add(new Reg { Procs = new[] { pr3 } });
-            attach.Regs.Add(new Reg { Procs = new[] { pr4 } });
+            Attach attach = new Attach
+            {
+                Regs = new List<Reg>
+                {
+                    new Reg {Procs = new[] {pr1}},
+                    new Reg {Procs = new[] {pr2}},
+                    new Reg {Procs = new[] {pr3}},
+                    new Reg {Procs = new[] {pr4}}
+                }
+            };
 
             List<Processor> lst = new List<Processor>(attach.Processors);
             Assert.AreEqual(true, lst.Contains(pr1));
@@ -53,7 +58,11 @@ namespace DynamicParserTest
             Attacher attacher = new Attacher(2, 3);
             Assert.AreEqual(2, attacher.Width);
             Assert.AreEqual(3, attacher.Height);
-            attacher.Add(new Point(1, 1));
+            attacher.Add(new Point(0, 0));
+            attacher.Add(1, 0);
+            attacher.Add(0, 1);
+            attacher.Add(1, 1);
+            attacher.Add(0, 2);
             attacher.Add(1, 2);
             bool ex1 = false, ex2 = false;
             foreach (Attach at in attacher.Attaches)
@@ -77,7 +86,7 @@ namespace DynamicParserTest
             Assert.AreEqual(true, ex2);
             Assert.AreEqual(true, attacher.Contains(new Point(1, 1)));
             Assert.AreEqual(true, attacher.Contains(new Point(1, 2)));
-            Assert.AreEqual(false, attacher.Contains(new Point(1, 0)));
+            Assert.AreEqual(true, attacher.Contains(new Point(1, 0)));
             Assert.AreEqual(false, attacher.Contains(new Point(0, 10)));
 
             Assert.AreEqual(false, attacher.IsConflict(new Rectangle(0, 0, 1, 1)));
@@ -93,35 +102,31 @@ namespace DynamicParserTest
             Assert.AreEqual(true, attacher.IsConflict(new Rectangle(1, 1, 1, 2)));
             Assert.AreEqual(true, attacher.IsConflict(new Rectangle(0, 0, 3, 3)));
             Assert.AreEqual(true, attacher.IsConflict(new Rectangle(1, 1, 2, 2)));
-            Assert.AreEqual(true, attacher.IsConflict(new Rectangle(0, 2, 2, 1)));
-            Assert.AreEqual(true, attacher.IsConflict(new Rectangle(0, 0, 2, 2)));
-            Assert.AreEqual(true, attacher.IsConflict(new Rectangle(1, 0, 1, 2)));
+            Assert.AreEqual(false, attacher.IsConflict(new Rectangle(0, 3, 2, 1)));
+            Assert.AreEqual(false, attacher.IsConflict(new Rectangle(4, 6, 2, 2)));
+            Assert.AreEqual(false, attacher.IsConflict(new Rectangle(1, 2, 1, 2)));
             Assert.AreEqual(true, attacher.IsConflict(new Rectangle(0, 1, 5, 5)));
 
             Region region1 = new Region(10, 10);
             region1.Add(new Rectangle(0, 0, 1, 1));
-            region1.Add(new Rectangle(1, 1, 1, 1));
-            region1.Add(new Rectangle(1, 2, 1, 1));
-            region1.Add(new Rectangle(2, 3, 15, 1));
-            region1.Add(new Rectangle(1, 1, 5, 1));
-            region1.Add(new Rectangle(1, 1, 1, 1));
-            region1.Add(new Rectangle(1, 2, 12, 10));
+            region1.Add(new Rectangle(1, 3, 2, 3));
+            region1.Add(new Rectangle(5, 4, 2, 1));
             region1.Add(new Rectangle(7, 8, 1, 1));
-            region1.Add(new Rectangle(1, 0, 2, 1));
-            region1.Add(new Rectangle(0, 1, 1, 1));
+            region1.Add(new Rectangle(1, 9, 2, 1));
+            region1.Add(new Rectangle(8, 1, 2, 1));
 
             Assert.AreEqual(false, attacher.IsConflict(region1));
 
             Region region2 = new Region(10, 10);
-            region2.Add(new Rectangle(1, 1, 1, 2));
-            region2.Add(new Rectangle(0, 0, 3, 3));
-            region2.Add(new Rectangle(1, 1, 2, 2));
-            region2.Add(new Rectangle(0, 2, 2, 1));
-            region2.Add(new Rectangle(0, 0, 2, 2));
-            region2.Add(new Rectangle(1, 0, 1, 2));
-            region2.Add(new Rectangle(0, 1, 5, 5));
+            region2.Add(9, 9, 1, 1);
+            region2.Add(9, 0, 1, 3);
+            region2.Add(7, 7, 2, 2);
+            region2.Add(3, 9, 2, 1);
+            region2.Add(2, 0, 2, 2);
+            region2.Add(3, 4, 1, 2);
+            region2.Add(2, 6, 2, 3);
 
-            Assert.AreEqual(true, attacher.IsConflict(region2));
+            Assert.AreEqual(false, attacher.IsConflict(region2));
         }
 
         [TestMethod]

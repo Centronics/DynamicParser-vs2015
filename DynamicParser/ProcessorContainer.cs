@@ -51,6 +51,8 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(ProcessorContainer)}: Первая карта не может быть нулевой высоты ({first.Height}).", nameof(first.Height));
             if (processors == null)
                 return;
+            if (IsEquals(processors))
+                throw new ArgumentException($"{nameof(ProcessorContainer)}: Обнаружены ссылки, указывающие на одни и те же карты.", nameof(processors));
             if (!InOneSize(first.Width, first.Height, processors))
                 throw new ArgumentException($"{nameof(ProcessorContainer)}: Обнаружены карты различных размеров.", nameof(processors));
             if (!InOneTag(processors, first.Tag))
@@ -93,6 +95,8 @@ namespace DynamicParser
         {
             if (procs == null)
                 throw new ArgumentNullException(nameof(procs), $"{nameof(AddRange)}: Попытка добавить коллекцию карт, равную null.");
+            if (IsEquals(procs))
+                throw new ArgumentException($"{nameof(AddRange)}: Обнаружены ссылки, указывающие на одни и те же карты.", nameof(procs));
             if (!InOneSize(Width, Height, procs))
                 throw new ArgumentException($"{nameof(AddRange)}: Размеры добавляемых карт различаются.", nameof(procs));
             if (!InOneTag(procs))
@@ -110,6 +114,8 @@ namespace DynamicParser
         {
             if (procs == null)
                 throw new ArgumentNullException(nameof(procs), $"{nameof(AddRange)}: Попытка добавить коллекцию карт, равную null.");
+            if (IsEquals(procs))
+                throw new ArgumentException($"{nameof(AddRange)}: Обнаружены ссылки, указывающие на одни и те же карты.", nameof(procs));
             if (!InOneSize(Width, Height, procs))
                 throw new ArgumentException($"{nameof(AddRange)}: Размеры добавляемых карт различаются.", nameof(procs));
             if (!InOneTag(procs))
@@ -132,14 +138,19 @@ namespace DynamicParser
             // ReSharper disable once ForCanBeConvertedToForeach
             for (int k = 0; k < processors.Count; k++)
             {
-                object refer = processors[k];
+                Processor prc = processors[k];
+                if (prc == null)
+                    continue;
+                object refer = prc;
                 uint count = 0;
                 if (!processors.All(pr =>
-                 {
-                     if (pr == refer)
-                         count++;
-                     return count <= 1;
-                 })) return true;
+                {
+                    if (pr == null)
+                        return true;
+                    if (pr == refer)
+                        count++;
+                    return count <= 1;
+                })) return true;
             }
             return false;
         }
@@ -155,13 +166,11 @@ namespace DynamicParser
         public static bool InOneSize(int width, int height, IList<Processor> processors)
         {
             if (width <= 0)
-                throw new ArgumentException($"{nameof(InOneSize)}: Ширина не может быть меньше или равна нулю ({nameof(width)}).", nameof(width));
+                return false;
             if (height <= 0)
-                throw new ArgumentException($"{nameof(InOneSize)}: Высота не может быть меньше или равна нулю ({nameof(height)}).", nameof(height));
+                return false;
             if (processors == null)
-                throw new ArgumentNullException(nameof(processors), $"{nameof(InOneSize)}: Массив сопоставляемых карт равен null.");
-            if (IsEquals(processors))
-                throw new ArgumentException($"{nameof(InOneSize)}: Обнаружены ссылки, указывающие на одни и те же карты.", nameof(processors));
+                return false;
             return processors.Count <= 0 || processors.All(pr => pr == null || pr.Width == width && pr.Height == height);
         }
 
@@ -203,14 +212,18 @@ namespace DynamicParser
         /// <returns>Возвращает true в случае, когда повторяющиеся значения не встречались, в противном случае false.</returns>
         public static bool InOneTag(IList<Processor> tags)
         {
-            if ((tags?.Count ?? 0) <= 0 || tags == null)
+            if ((tags?.Count ?? 0) <= 1 || tags == null)
                 return true;
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (Processor tag in tags)
             {
+                if (tag == null)
+                    continue;
                 uint count = 0;
                 if (!tags.All(pr =>
                 {
+                    if (pr == null)
+                        return true;
                     if (Attach.TagStringCompare(pr.Tag, tag.Tag))
                         count++;
                     return count <= 1;

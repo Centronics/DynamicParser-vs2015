@@ -168,10 +168,10 @@ namespace DynamicParser
         {
             if (rect.Right > Width)
                 throw new ArgumentException($@"{nameof(Add)}: Попытка вставить элемент, конфликтующий с шириной региона (Width = {Width
-                    }, Right = {rect.Right}).", nameof(rect));
+                    }, rect.Right = {rect.Right}).", nameof(rect));
             if (rect.Bottom > Height)
                 throw new ArgumentException($@"{nameof(Add)}: Попытка вставить элемент, конфликтующий с высотой региона (Height = {Height
-                    }, Bottom = {rect.Bottom}).", nameof(rect));
+                    }, rect.Bottom = {rect.Bottom}).", nameof(rect));
             if (IsConflict(rect))
                 throw new ArgumentException($"{nameof(Add)}: Попытка вставить элемент, конфликтующий с существующими.", nameof(rect));
             _rects[GetIndex(rect.X, rect.Y)] = new Registered { Region = rect };

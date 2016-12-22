@@ -36,13 +36,12 @@ namespace DynamicParserTest
             bool res = false;
             try
             {
-                pc.AddRange(proc2, null, proc3);
+                pc.AddRange(proc2,  proc3);
             }
             catch (ArgumentException)
             {
                 res = true;
             }
-            pc.AddRange(null);
             Assert.AreEqual(res, true);
             Assert.AreEqual(1, pc.Count);
             Assert.AreEqual("Одномерный1", pc[0].Tag);
@@ -58,7 +57,6 @@ namespace DynamicParserTest
             Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25), new SignValue(98) }, "Одномерный2");
             Processor proc3 = new Processor(new[] { SignValue.MaxValue, new SignValue(18), new SignValue(200), new SignValue(30), new SignValue(99) }, "Одномерный3");
             pc.AddRange(proc2, null, proc3);
-            pc.AddRange(null);
             Assert.AreEqual(3, pc.Count);
             Assert.AreEqual("Одномерный1", pc[0].Tag);
             Assert.AreEqual("Одномерный2", pc[1].Tag);
@@ -90,11 +88,9 @@ namespace DynamicParserTest
             {
                 res++;
             }
-            pc.AddRange(null);
             Assert.AreEqual(res, 2);
-            Assert.AreEqual(2, pc.Count);
+            Assert.AreEqual(1, pc.Count);
             Assert.AreEqual("Одномерный1", pc[0].Tag);
-            Assert.AreEqual("Одномерный2", pc[1].Tag);
             Assert.AreEqual(5, pc.Width);
             Assert.AreEqual(1, pc.Height);
         }
@@ -108,7 +104,6 @@ namespace DynamicParserTest
             Processor proc3 = new Processor(new[] { SignValue.MaxValue, new SignValue(18), new SignValue(200), new SignValue(30), new SignValue(99) }, "Одномерный3");
             IList<Processor> prcs = new[] { proc2, null, proc3 };
             pc.AddRange(prcs);
-            pc.AddRange(null);
             Assert.AreEqual(3, pc.Count);
             Assert.AreEqual("Одномерный1", pc[0].Tag);
             Assert.AreEqual("Одномерный2", pc[1].Tag);
@@ -484,7 +479,7 @@ namespace DynamicParserTest
             Assert.AreEqual(false, ProcessorContainer.InOneTag(new[] { proc1, proc2, proc3 }));
             proc1 = new Processor(pr2, " pR1 ");
             Assert.AreEqual(false, ProcessorContainer.InOneTag(new[] { proc1, proc2, proc3 }));
-            Assert.AreEqual(false, ProcessorContainer.InOneTag(new[] { proc1 }));
+            Assert.AreEqual(true, ProcessorContainer.InOneTag(new[] { proc1 }));
             proc2 = new Processor(pr2, " pt1");
             Assert.AreEqual(true, ProcessorContainer.InOneTag(new[] { proc1, proc2, proc3 }));
         }

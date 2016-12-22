@@ -214,15 +214,15 @@ namespace DynamicParser
         public void Add(Point point)
         {
             if (Contains(point))
-                throw new ArgumentException($"{nameof(Add)}: Указанная точка уже содержится в списке x = {point.X}, y = {point.Y}.", nameof(point));
+                throw new ArgumentException($"{nameof(Add)}: Указанная точка уже содержится в списке point.X = {point.X}, point.Y = {point.Y}.", nameof(point));
             if (point.X >= Width)
-                throw new ArgumentException($"{nameof(Add)}: Указанная точка выходит за предел описанной области x = {point.X}, Width = {Width}.", nameof(point));
+                throw new ArgumentException($"{nameof(Add)}: Указанная точка выходит за предел описанной области point.X = {point.X}, Width = {Width}.", nameof(point));
             if (point.Y >= Height)
-                throw new ArgumentException($"{nameof(Add)}: Указанная точка выходит за предел описанной области y = {point.Y}, Height = {Height}.", nameof(point));
+                throw new ArgumentException($"{nameof(Add)}: Указанная точка выходит за предел описанной области point.Y = {point.Y}, Height = {Height}.", nameof(point));
             if (point.X < 0)
-                throw new ArgumentException($"{nameof(Add)}: Координата X меньше нуля ({point.X}).", nameof(point));
+                throw new ArgumentException($"{nameof(Add)}: Координата point.X меньше нуля ({point.X}).", nameof(point));
             if (point.Y < 0)
-                throw new ArgumentException($"{nameof(Add)}: Координата Y меньше нуля ({point.Y}).", nameof(point));
+                throw new ArgumentException($"{nameof(Add)}: Координата point.Y меньше нуля ({point.Y}).", nameof(point));
             _attaches.Add(new Attach { Point = point });
         }
 

@@ -55,14 +55,6 @@ namespace DynamicParser
         /// </summary>
         Null,
         /// <summary>
-        /// Ширина заданного региона равна нулю.
-        /// </summary>
-        WidthNull,
-        /// <summary>
-        /// Высота заданного региона равна нулю.
-        /// </summary>
-        HeightNull,
-        /// <summary>
         /// Указанный регион шире существующего.
         /// </summary>
         WidthBig,
@@ -167,10 +159,6 @@ namespace DynamicParser
         {
             if (region == null)
                 return RegionStatus.Null;
-            if (region.Width <= 0)
-                return RegionStatus.WidthNull;
-            if (region.Height <= 0)
-                return RegionStatus.HeightNull;
             if (region.Width > Width)
                 return RegionStatus.WidthBig;
             if (region.Height > Height)

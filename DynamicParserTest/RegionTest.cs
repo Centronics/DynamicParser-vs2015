@@ -26,16 +26,16 @@ namespace DynamicParserTest
             Assert.AreEqual(false, reg.IsConflict(new Rectangle(3, 3, 8, 7)));
             Assert.AreEqual(false, reg.IsConflict(new Rectangle(3, 3, 8, 8)));
             Assert.AreEqual(false, reg.IsConflict(new Rectangle(3, 3, 8, 8)));
-            Assert.AreEqual(true, reg.IsConflict(new Rectangle(24, 10, 20, 8)));
-            Assert.AreEqual(true, reg.IsConflict(new Rectangle(27, 26, 1, 1)));
+            Assert.AreEqual(false, reg.IsConflict(new Rectangle(24, 10, 20, 8)));
+            Assert.AreEqual(false, reg.IsConflict(new Rectangle(27, 26, 1, 1)));
             Assert.AreEqual(false, reg.IsConflict(new Rectangle(24, 26, 0, 0)));
             Assert.AreEqual(true, reg.IsConflict(new Rectangle(11, 12, 20, 8)));
             Assert.AreEqual(true, reg.IsConflict(new Rectangle(11, 12, 1, 1)));
             Assert.AreEqual(false, reg.IsConflict(new Rectangle(11, 12, 0, 0)));
             Assert.AreEqual(false, reg.IsConflict(new Rectangle(30, 10, 20, 8)));
-            Assert.AreEqual(true, reg.IsConflict(new Rectangle(5, 20, 1, 10)));
+            Assert.AreEqual(false, reg.IsConflict(new Rectangle(5, 20, 1, 10)));
             Assert.AreEqual(false, reg.IsConflict(new Rectangle(27, 28, 0, 0)));
-            Assert.AreEqual(false, reg.IsConflict(new Rectangle(12, 13, 5, 5)));
+            Assert.AreEqual(true, reg.IsConflict(new Rectangle(12, 13, 5, 5)));
         }
 
         [TestMethod]
@@ -65,8 +65,8 @@ namespace DynamicParserTest
             Assert.AreEqual(2, region[2, 2].Y);
             Assert.AreEqual(3, region[2, 2].Right);
             Assert.AreEqual(3, region[2, 2].Bottom);
-            Assert.AreEqual(2, region[3, 3].X);
-            Assert.AreEqual(2, region[3, 3].Y);
+            Assert.AreEqual(3, region[3, 3].X);
+            Assert.AreEqual(3, region[3, 3].Y);
             Assert.AreEqual(4, region[3, 3].Right);
             Assert.AreEqual(4, region[3, 3].Bottom);
             Assert.AreEqual(null, region[0, 2]);
@@ -109,8 +109,8 @@ namespace DynamicParserTest
             Assert.AreEqual(2, region[new Point(2, 2)].Y);
             Assert.AreEqual(3, region[new Point(2, 2)].Right);
             Assert.AreEqual(3, region[new Point(2, 2)].Bottom);
-            Assert.AreEqual(2, region[new Point(3, 3)].X);
-            Assert.AreEqual(2, region[new Point(3, 3)].Y);
+            Assert.AreEqual(3, region[new Point(3, 3)].X);
+            Assert.AreEqual(3, region[new Point(3, 3)].Y);
             Assert.AreEqual(4, region[new Point(3, 3)].Right);
             Assert.AreEqual(4, region[new Point(3, 3)].Bottom);
             Assert.AreEqual(null, region[new Point(0, 2)]);

@@ -5,3 +5,4 @@ D:\разработки\DynamicParser\DynamicParser\bin\Debug\DynamicProcessor.x
 D:\разработки\DynamicParser\DynamicParser\obj\Debug\DynamicParser.dll
 D:\разработки\DynamicParser\DynamicParser\obj\Debug\DynamicParser.pdb
 D:\разработки\DynamicParser\DynamicParser\obj\Debug\DynamicParser.csprojResolveAssemblyReference.cache
+D:\разработки\DynamicParser\DynamicParser\bin\Debug\DynamicParser.XML

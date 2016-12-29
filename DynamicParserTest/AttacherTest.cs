@@ -127,6 +127,156 @@ namespace DynamicParserTest
             region2.Add(2, 6, 2, 3);
 
             Assert.AreEqual(false, attacher.IsConflict(region2));
+
+            Region region3 = new Region(10, 10);
+            region3.Add(0, 0, 4, 2);
+
+            Assert.AreEqual(true, attacher.IsConflict(region3));
+
+            Region region4 = new Region(10, 10);
+            region4.Add(1, 1, 2, 2);
+
+            Assert.AreEqual(true, attacher.IsConflict(region4));
+
+            Region region5 = new Region(10, 10);
+            region5.Add(1, 0, 3, 3);
+
+            Assert.AreEqual(true, attacher.IsConflict(region5));
+
+            Region region6 = new Region(10, 10);
+            region6.Add(0, 1, 2, 2);
+
+            Assert.AreEqual(true, attacher.IsConflict(region6));
+
+            Region region7 = new Region(10, 10);
+            region7.Add(0, 1, 5, 4);
+
+            Assert.AreEqual(true, attacher.IsConflict(region7));
+
+            Region region8 = new Region(10, 10);
+            region8.Add(1, 3, 1, 2);
+
+            Assert.AreEqual(false, attacher.IsConflict(region8));
+
+            Region region9 = new Region(10, 10);
+            region9.Add(0, 0, 1, 1);
+
+            Assert.AreEqual(false, attacher.IsConflict(region9));
+
+            Region region10 = new Region(10, 10);
+            region10.Add(1, 0, 1, 1);
+
+            Assert.AreEqual(false, attacher.IsConflict(region10));
+
+            Region region11 = new Region(10, 10);
+            region11.Add(2, 0, 1, 1);
+
+            Assert.AreEqual(false, attacher.IsConflict(region11));
+
+            Region region12 = new Region(10, 10);
+            region12.Add(0, 1, 1, 1);
+
+            Assert.AreEqual(false, attacher.IsConflict(region12));
+
+            Region region13 = new Region(10, 10);
+            region13.Add(1, 1, 1, 1);
+
+            Assert.AreEqual(false, attacher.IsConflict(region13));
+
+            Region region14 = new Region(10, 10);
+            region14.Add(2, 1, 1, 1);
+
+            Assert.AreEqual(false, attacher.IsConflict(region14));
+
+            Region region15 = new Region(10, 10);
+            region15.Add(3, 1, 1, 1);
+
+            Assert.AreEqual(false, attacher.IsConflict(region15));
+
+            Region region16 = new Region(10, 10);
+            region16.Add(0, 2, 1, 2);
+
+            Assert.AreEqual(false, attacher.IsConflict(region16));
+
+            Region region17 = new Region(10, 10);
+            region17.Add(0, 2, 1, 5);
+
+            Assert.AreEqual(false, attacher.IsConflict(region17));
+
+            Region region18 = new Region(10, 10);
+            region18.Add(0, 3, 4, 3);
+
+            Assert.AreEqual(false, attacher.IsConflict(region18));
+
+            Region region19 = new Region(10, 10);
+            region19.Add(1, 3, 4, 3);
+
+            Assert.AreEqual(false, attacher.IsConflict(region19));
+
+            Region region20 = new Region(10, 10);
+            region20.Add(2, 3, 4, 3);
+
+            Assert.AreEqual(false, attacher.IsConflict(region20));
+
+            Region region21 = new Region(10, 10);
+            region21.Add(1, 2, 1, 2);
+
+            Assert.AreEqual(false, attacher.IsConflict(region21));
+
+            Region region22 = new Region(10, 10);
+            region22.Add(0, 0, 2, 1);
+
+            Assert.AreEqual(true, attacher.IsConflict(region22));
+
+            Region region23 = new Region(10, 10);
+            region23.Add(0, 1, 2, 1);
+
+            Assert.AreEqual(true, attacher.IsConflict(region23));
+
+            Region region24 = new Region(10, 10);
+            region24.Add(0, 2, 2, 1);
+
+            Assert.AreEqual(true, attacher.IsConflict(region24));
+
+            Region region25 = new Region(10, 10);
+            region25.Add(0, 0, 1, 3);
+
+            Assert.AreEqual(true, attacher.IsConflict(region25));
+
+            Region region26 = new Region(10, 10);
+            region26.Add(1, 0, 1, 3);
+
+            Assert.AreEqual(true, attacher.IsConflict(region26));
+
+            Region region27 = new Region(10, 10);
+            region27.Add(0, 0, 1, 2);
+
+            Assert.AreEqual(true, attacher.IsConflict(region27));
+
+            Region region28 = new Region(10, 10);
+            region28.Add(1, 0, 1, 2);
+
+            Assert.AreEqual(true, attacher.IsConflict(region28));
+
+            Region region29 = new Region(10, 10);
+            region29.Add(0, 0, 1, 2);
+
+            Assert.AreEqual(true, attacher.IsConflict(region29));
+
+            Region region30 = new Region(10, 10);
+            region30.Add(0, 0, 2, 1);
+
+            Assert.AreEqual(true, attacher.IsConflict(region30));
+
+            Region region31 = new Region(10, 10);
+            region31.Add(1, 1, 6, 1);
+
+            Assert.AreEqual(false, attacher.IsConflict(region31));
+
+            Region region32 = new Region(10, 10);
+            region32.Add(1, 2, 1, 5);
+
+            Assert.AreEqual(false, attacher.IsConflict(region32));
         }
 
         [TestMethod]

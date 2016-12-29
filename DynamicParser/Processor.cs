@@ -206,16 +206,17 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(GetEqual)}: Массив карт для поиска ничего не содержит.", nameof(prc));
             SearchResults sr = new SearchResults(Width, Height);
             string errString = string.Empty;
-            Parallel.For(0, Height, y1 =>
+            bool exThrown = false;
+            Parallel.For(0, Height, (y1, stateHeightMain) =>
             {
                 try
                 {
-                    Parallel.For(0, Width, x1 =>
+                    Parallel.For(0, Width, (x1, stateWidthMain) =>
                     {
                         try
                         {
                             ConcurrentDictionary<int, SignValue[,]> procPercent = new ConcurrentDictionary<int, SignValue[,]>();
-                            Parallel.For(0, prc.Count, j =>
+                            Parallel.For(0, prc.Count, (j, stateCountMap) =>
                             {
                                 try
                                 {
@@ -223,25 +224,34 @@ namespace DynamicParser
                                     if (ps.Width > Width - x1 || ps.Height > Height - y1)
                                         return;
                                     SignValue[,] pc = new SignValue[ps.Width, ps.Height];
-                                    Parallel.For(0, prc.Height, y =>
+                                    Parallel.For(0, prc.Height, (y, stateCountY) =>
                                     {
                                         try
                                         {
-                                            Parallel.For(0, prc.Width, x =>
+                                            if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped || stateCountY.IsStopped)
+                                                return;
+                                            Parallel.For(0, prc.Width, (x, stateCountX) =>
                                             {
                                                 try
                                                 {
+                                                    if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped ||
+                                                        stateCountY.IsStopped || stateCountX.IsStopped)
+                                                        return;
                                                     pc[x, y] = ps[x, y] - this[x + x1, y + y1];
                                                 }
                                                 catch (Exception ex)
                                                 {
                                                     errString = ex.Message;
+                                                    exThrown = true;
+                                                    stateCountX.Stop();
                                                 }
                                             });
                                         }
                                         catch (Exception ex)
                                         {
                                             errString = ex.Message;
+                                            exThrown = true;
+                                            stateCountY.Stop();
                                         }
                                     });
                                     procPercent[j] = pc;
@@ -249,35 +259,48 @@ namespace DynamicParser
                                 catch (Exception ex)
                                 {
                                     errString = ex.Message;
+                                    exThrown = true;
+                                    stateCountMap.Stop();
                                 }
                             });
-                            if (procPercent.Count <= 0)
+                            if (procPercent.Count <= 0 || stateHeightMain.IsStopped || stateWidthMain.IsStopped)
                                 return;
                             double[] mas = new double[prc.Count];
-                            Parallel.For(0, prc.Count, k =>
+                            Parallel.For(0, prc.Count, (k, stateCountMap) =>
                             {
                                 try
                                 {
-                                    Parallel.For(0, prc.Height, y2 =>
+                                    if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped)
+                                        return;
+                                    Parallel.For(0, prc.Height, (y2, stateHeightCount) =>
                                     {
                                         try
                                         {
-                                            Parallel.For(0, prc.Width, x2 =>
+                                            if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped || stateHeightCount.IsStopped)
+                                                return;
+                                            Parallel.For(0, prc.Width, (x2, stateWidthCount) =>
                                             {
                                                 try
                                                 {
+                                                    if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped ||
+                                                        stateHeightCount.IsStopped || stateWidthCount.IsStopped)
+                                                        return;
                                                     if (GetMinIndex(procPercent, x2, y2, k))
                                                         mas[k]++;
                                                 }
                                                 catch (Exception ex)
                                                 {
                                                     errString = ex.Message;
+                                                    exThrown = true;
+                                                    stateWidthCount.Stop();
                                                 }
                                             });
                                         }
                                         catch (Exception ex)
                                         {
                                             errString = ex.Message;
+                                            exThrown = true;
+                                            stateHeightCount.Stop();
                                         }
                                     });
                                     mas[k] /= prc[k].Length;
@@ -285,8 +308,12 @@ namespace DynamicParser
                                 catch (Exception ex)
                                 {
                                     errString = ex.Message;
+                                    exThrown = true;
+                                    stateCountMap.Stop();
                                 }
                             });
+                            if (stateHeightMain.IsStopped || stateWidthMain.IsStopped)
+                                return;
                             double db = mas.Max();
                             sr[x1, y1] = new ProcPerc
                             {
@@ -297,15 +324,19 @@ namespace DynamicParser
                         catch (Exception ex)
                         {
                             errString = ex.Message;
+                            exThrown = true;
+                            stateWidthMain.Stop();
                         }
                     });
                 }
                 catch (Exception ex)
                 {
                     errString = ex.Message;
+                    exThrown = true;
+                    stateHeightMain.Stop();
                 }
             });
-            if (!string.IsNullOrEmpty(errString))
+            if (exThrown)
                 throw new Exception(errString);
             return sr;
         }

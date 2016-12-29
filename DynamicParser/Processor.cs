@@ -244,6 +244,9 @@ namespace DynamicParser
                                                     errString = ex.Message;
                                                     exThrown = true;
                                                     stateCountX.Stop();
+                                                    stateCountY.Stop();
+                                                    stateCountMap.Stop();
+                                                    stateWidthMain.Stop();
                                                 }
                                             });
                                         }
@@ -252,6 +255,8 @@ namespace DynamicParser
                                             errString = ex.Message;
                                             exThrown = true;
                                             stateCountY.Stop();
+                                            stateCountMap.Stop();
+                                            stateWidthMain.Stop();
                                         }
                                     });
                                     procPercent[j] = pc;
@@ -261,6 +266,7 @@ namespace DynamicParser
                                     errString = ex.Message;
                                     exThrown = true;
                                     stateCountMap.Stop();
+                                    stateWidthMain.Stop();
                                 }
                             });
                             if (procPercent.Count <= 0 || stateHeightMain.IsStopped || stateWidthMain.IsStopped)
@@ -293,6 +299,9 @@ namespace DynamicParser
                                                     errString = ex.Message;
                                                     exThrown = true;
                                                     stateWidthCount.Stop();
+                                                    stateHeightCount.Stop();
+                                                    stateHeightMain.Stop();
+                                                    stateWidthMain.Stop();
                                                 }
                                             });
                                         }
@@ -301,6 +310,9 @@ namespace DynamicParser
                                             errString = ex.Message;
                                             exThrown = true;
                                             stateHeightCount.Stop();
+                                            stateCountMap.Stop();
+                                            stateHeightMain.Stop();
+                                            stateWidthMain.Stop();
                                         }
                                     });
                                     mas[k] /= prc[k].Length;
@@ -310,6 +322,8 @@ namespace DynamicParser
                                     errString = ex.Message;
                                     exThrown = true;
                                     stateCountMap.Stop();
+                                    stateHeightMain.Stop();
+                                    stateWidthMain.Stop();
                                 }
                             });
                             if (stateHeightMain.IsStopped || stateWidthMain.IsStopped)
@@ -325,6 +339,7 @@ namespace DynamicParser
                         {
                             errString = ex.Message;
                             exThrown = true;
+                            stateHeightMain.Stop();
                             stateWidthMain.Stop();
                         }
                     });

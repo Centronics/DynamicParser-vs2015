@@ -254,6 +254,20 @@
             <param name="processors">Все остальные карты. Может быть null.</param>
             <returns>Возвращает SearchResults, содержащий поле с результатами поиска.</returns>
         </member>
+        <member name="M:DynamicParser.Processor.GetEqual(System.Collections.Generic.ICollection{DynamicParser.ProcessorContainer})">
+            <summary>
+            Находит соответствие между заданным массивом карт и рабочей областью в многопоточном режиме.
+            </summary>
+            <param name="processors">Массив искомых карт.</param>
+            <returns>Возвращает массив SearchResults, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
+        </member>
+        <member name="M:DynamicParser.Processor.GetEqual(DynamicParser.ProcessorContainer[])">
+            <summary>
+            Находит соответствие между заданным массивом карт и рабочей областью в многопоточном режиме.
+            </summary>
+            <param name="pc">Массив искомых карт.</param>
+            <returns>Возвращает массив SearchResults, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
+        </member>
         <member name="M:DynamicParser.Processor.GetEqual(DynamicParser.ProcessorContainer)">
             <summary>
             Производит поиск указанных карт на рабочей области и возвращает результат в виде класса SearchResults,

@@ -189,6 +189,55 @@ namespace DynamicParser
         }
 
         /// <summary>
+        /// Находит соответствие между заданным массивом карт и рабочей областью в многопоточном режиме.
+        /// </summary>
+        /// <param name="processors">Массив искомых карт.</param>
+        /// <returns>Возвращает массив SearchResults, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
+        public SearchResults[] GetEqual(ICollection<ProcessorContainer> processors)
+        {
+            if (processors == null)
+                throw new ArgumentNullException();
+            if (processors.Count <= 0)
+                throw new ArgumentException();
+            SearchResults[] sr = new SearchResults[processors.Count];
+            string errString = string.Empty;
+            bool exThrown = false;
+            Parallel.For(0, processors.Count, (k, state) =>
+            {
+                try
+                {
+                    sr[k] = GetEqual(processors.ElementAt(k));
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
+                        state.Stop();
+                        errString = ex.Message;
+                        exThrown = true;
+                    }
+                    catch
+                    {
+                        //ignored
+                    }
+                }
+            });
+            if (exThrown)
+                throw new Exception(errString);
+            return sr;
+        }
+
+        /// <summary>
+        /// Находит соответствие между заданным массивом карт и рабочей областью в многопоточном режиме.
+        /// </summary>
+        /// <param name="pc">Массив искомых карт.</param>
+        /// <returns>Возвращает массив SearchResults, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
+        public SearchResults[] GetEqual(params ProcessorContainer[] pc)
+        {
+            return GetEqual((ICollection<ProcessorContainer>)pc);
+        }
+
+        /// <summary>
         /// Производит поиск указанных карт на рабочей области и возвращает результат в виде класса SearchResults,
         /// содержащего поле с результатами поиска.
         /// </summary>
@@ -234,39 +283,57 @@ namespace DynamicParser
                                             {
                                                 try
                                                 {
-                                                    if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped ||
-                                                        stateCountY.IsStopped || stateCountX.IsStopped)
-                                                        return;
                                                     pc[x, y] = ps[x, y] - this[x + x1, y + y1];
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    errString = ex.Message;
-                                                    exThrown = true;
-                                                    stateCountX.Stop();
-                                                    stateCountY.Stop();
-                                                    stateCountMap.Stop();
-                                                    stateWidthMain.Stop();
+                                                    try
+                                                    {
+                                                        errString = ex.Message;
+                                                        exThrown = true;
+                                                        stateCountX.Stop();
+                                                        stateCountY.Stop();
+                                                        stateCountMap.Stop();
+                                                        stateWidthMain.Stop();
+                                                    }
+                                                    catch
+                                                    {
+                                                        //ignored
+                                                    }
                                                 }
                                             });
                                         }
                                         catch (Exception ex)
                                         {
-                                            errString = ex.Message;
-                                            exThrown = true;
-                                            stateCountY.Stop();
-                                            stateCountMap.Stop();
-                                            stateWidthMain.Stop();
+                                            try
+                                            {
+                                                errString = ex.Message;
+                                                exThrown = true;
+                                                stateCountY.Stop();
+                                                stateCountMap.Stop();
+                                                stateWidthMain.Stop();
+                                            }
+                                            catch
+                                            {
+                                                //ignored
+                                            }
                                         }
                                     });
                                     procPercent[j] = pc;
                                 }
                                 catch (Exception ex)
                                 {
-                                    errString = ex.Message;
-                                    exThrown = true;
-                                    stateCountMap.Stop();
-                                    stateWidthMain.Stop();
+                                    try
+                                    {
+                                        errString = ex.Message;
+                                        exThrown = true;
+                                        stateCountMap.Stop();
+                                        stateWidthMain.Stop();
+                                    }
+                                    catch
+                                    {
+                                        //ignored
+                                    }
                                 }
                             });
                             if (procPercent.Count <= 0 || stateHeightMain.IsStopped || stateWidthMain.IsStopped)
@@ -296,34 +363,55 @@ namespace DynamicParser
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    errString = ex.Message;
-                                                    exThrown = true;
-                                                    stateWidthCount.Stop();
-                                                    stateHeightCount.Stop();
-                                                    stateHeightMain.Stop();
-                                                    stateWidthMain.Stop();
+                                                    try
+                                                    {
+                                                        errString = ex.Message;
+                                                        exThrown = true;
+                                                        stateWidthCount.Stop();
+                                                        stateHeightCount.Stop();
+                                                        stateHeightMain.Stop();
+                                                        stateWidthMain.Stop();
+                                                    }
+                                                    catch
+                                                    {
+                                                        //ignored
+                                                    }
                                                 }
                                             });
                                         }
                                         catch (Exception ex)
                                         {
-                                            errString = ex.Message;
-                                            exThrown = true;
-                                            stateHeightCount.Stop();
-                                            stateCountMap.Stop();
-                                            stateHeightMain.Stop();
-                                            stateWidthMain.Stop();
+                                            try
+                                            {
+                                                errString = ex.Message;
+                                                exThrown = true;
+                                                stateHeightCount.Stop();
+                                                stateCountMap.Stop();
+                                                stateHeightMain.Stop();
+                                                stateWidthMain.Stop();
+                                            }
+                                            catch
+                                            {
+                                                //ignored
+                                            }
                                         }
                                     });
                                     mas[k] /= prc[k].Length;
                                 }
                                 catch (Exception ex)
                                 {
-                                    errString = ex.Message;
-                                    exThrown = true;
-                                    stateCountMap.Stop();
-                                    stateHeightMain.Stop();
-                                    stateWidthMain.Stop();
+                                    try
+                                    {
+                                        errString = ex.Message;
+                                        exThrown = true;
+                                        stateCountMap.Stop();
+                                        stateHeightMain.Stop();
+                                        stateWidthMain.Stop();
+                                    }
+                                    catch
+                                    {
+                                        //ignored
+                                    }
                                 }
                             });
                             if (stateHeightMain.IsStopped || stateWidthMain.IsStopped)
@@ -337,18 +425,32 @@ namespace DynamicParser
                         }
                         catch (Exception ex)
                         {
-                            errString = ex.Message;
-                            exThrown = true;
-                            stateHeightMain.Stop();
-                            stateWidthMain.Stop();
+                            try
+                            {
+                                errString = ex.Message;
+                                exThrown = true;
+                                stateHeightMain.Stop();
+                                stateWidthMain.Stop();
+                            }
+                            catch
+                            {
+                                //ignored
+                            }
                         }
                     });
                 }
                 catch (Exception ex)
                 {
-                    errString = ex.Message;
-                    exThrown = true;
-                    stateHeightMain.Stop();
+                    try
+                    {
+                        errString = ex.Message;
+                        exThrown = true;
+                        stateHeightMain.Stop();
+                    }
+                    catch
+                    {
+                        //ignored
+                    }
                 }
             });
             if (exThrown)

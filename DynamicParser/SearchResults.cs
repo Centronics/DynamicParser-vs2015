@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace DynamicParser
 {
@@ -161,9 +162,7 @@ namespace DynamicParser
                 return RegionStatus.Null;
             if (region.Width > Width)
                 return RegionStatus.WidthBig;
-            if (region.Height > Height)
-                return RegionStatus.HeightBig;
-            return RegionStatus.Ok;
+            return region.Height > Height ? RegionStatus.HeightBig : RegionStatus.Ok;
         }
 
         /// <summary>
@@ -179,6 +178,75 @@ namespace DynamicParser
             foreach (Registered reg in region.Elements)
                 reg.Register = Find(reg.Region);
             return RegionStatus.Ok;
+        }
+
+        /// <summary>
+        /// Накладывает одни результаты поиска карт на другие и вычисляет, какие карты соответствуют друг другу в конкретной точке более всего.
+        /// Карты должны быть одного размера.
+        /// </summary>
+        /// <param name="srs">Результаты поиска.</param>
+        /// <returns>Возвращает обобщённые результаты поиска.</returns>
+        public static SearchResults Combine(IList<SearchResults> srs)
+        {
+            if (srs == null)
+                throw new ArgumentNullException(nameof(srs), $"{nameof(Combine)}: Коллекция не может быть равна null.");
+            if (srs.Count <= 0)
+                throw new ArgumentException($"{nameof(Combine)}: В коллекции должен быть хотя бы один элемент.", nameof(srs));
+            if (!InOneSize(srs))
+                throw new ArgumentException($"{nameof(Combine)}: Результаты поиска должны совпадать по размерам.", nameof(srs));
+            int width = srs[0].Width;
+            int height = srs[0].Height;
+            SearchResults sr = new SearchResults(width, height);
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
+                {
+                    double? pp = null;
+                    foreach (SearchResults searchResults in srs)
+                    {
+                        if (searchResults == null)
+                            continue;
+                        ProcPerc pp1 = searchResults[x, y];
+                        if (pp == null || pp1.Percent >= pp.Value)
+                            pp = pp1.Percent;
+                    }
+                    if (pp == null)
+                        continue;
+                    List<Processor> lstProcessors = new List<Processor>();
+                    foreach (SearchResults searchResults in srs)
+                    {
+                        ProcPerc pp1 = searchResults[x, y];
+                        if (pp1.Procs != null && pp1.Procs.Length > 0)
+                            lstProcessors.AddRange(pp1.Procs);
+                    }
+                    sr[x, y] = new ProcPerc { Percent = pp.Value, Procs = lstProcessors.ToArray() };
+                }
+            return sr;
+        }
+
+        /// <summary>
+        /// Накладывает одни результаты поиска карт на другие и вычисляет, какие карты соответствуют друг другу в конкретной точке более всего.
+        /// Карты должны быть одного размера.
+        /// </summary>
+        /// <param name="srs">Результаты поиска.</param>
+        /// <returns>Возвращает обобщённые результаты поиска.</returns>
+        public static SearchResults Combine(params SearchResults[] srs)
+        {
+            return Combine((IList<SearchResults>)srs);
+        }
+
+        /// <summary>
+        /// Проверяет, соответствуют ли все результаты поиска одному размеру.
+        /// </summary>
+        /// <returns>Возвращает true в случае соответствия, иначе false.</returns>
+        public static bool InOneSize(IList<SearchResults> srs)
+        {
+            if (srs == null)
+                throw new ArgumentNullException(nameof(srs), $"{nameof(InOneSize)}: Коллекция не может быть равна null.");
+            if (srs.Count <= 0)
+                return true;
+            int width = srs[0].Width;
+            int height = srs[0].Height;
+            return srs.All(sr => sr.Width == width && sr.Height == height);
         }
     }
 }

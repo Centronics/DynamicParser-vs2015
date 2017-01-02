@@ -180,12 +180,11 @@ namespace DynamicParser
         /// <summary>
         /// Находит соответствие между заданными картами и рабочей областью, производя поиск по ней.
         /// </summary>
-        /// <param name="first">Первая карта, которая определяет размеры последующих. Не может быть null. Длина не может быть 0.</param>
         /// <param name="processors">Все остальные карты. Может быть null.</param>
         /// <returns>Возвращает SearchResults, содержащий поле с результатами поиска.</returns>
-        public SearchResults GetEqual(Processor first, params Processor[] processors)
+        public SearchResults GetEqual(params Processor[] processors)
         {
-            return GetEqual(new ProcessorContainer(first, processors));
+            return GetEqual(new ProcessorContainer(processors));
         }
 
         /// <summary>
@@ -355,9 +354,6 @@ namespace DynamicParser
                                             {
                                                 try
                                                 {
-                                                    if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped ||
-                                                        stateHeightCount.IsStopped || stateWidthCount.IsStopped)
-                                                        return;
                                                     if (GetMinIndex(procPercent, x2, y2, k))
                                                         mas[k]++;
                                                 }
@@ -371,6 +367,7 @@ namespace DynamicParser
                                                         stateHeightCount.Stop();
                                                         stateHeightMain.Stop();
                                                         stateWidthMain.Stop();
+                                                        stateCountMap.Stop();
                                                     }
                                                     catch
                                                     {

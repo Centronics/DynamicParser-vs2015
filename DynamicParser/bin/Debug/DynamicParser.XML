@@ -502,6 +502,13 @@
             <param name="width">Ширина.</param>
             <param name="height">Высота.</param>
         </member>
+        <member name="M:DynamicParser.Region.Remove(System.Int32,System.Int32)">
+            <summary>
+            Удаляет область по указанным координатам.
+            </summary>
+            <param name="x">Координата X.</param>
+            <param name="y">Координата Y.</param>
+        </member>
         <member name="T:DynamicParser.ProcPerc">
             <summary>
             Содержит карты, отобранные по проценту соответствия в заданной точке.

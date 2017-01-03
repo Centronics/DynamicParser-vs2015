@@ -193,5 +193,15 @@ namespace DynamicParser
         {
             Add(new Rectangle(x, y, width, height));
         }
+
+        /// <summary>
+        /// Удаляет область по указанным координатам.
+        /// </summary>
+        /// <param name="x">Координата X.</param>
+        /// <param name="y">Координата Y.</param>
+        public void Remove(int x, int y)
+        {
+            _rects.Remove(GetIndex(x, y));
+        }
     }
 }

@@ -83,6 +83,11 @@ namespace DynamicParser
         public IEnumerable<Registered> Elements => _rects.Values;
 
         /// <summary>
+        /// Получает количество добавленных областей.
+        /// </summary>
+        public int Count => _rects.Count;
+
+        /// <summary>
         /// Получает коллекцию хранимых координат областей.
         /// </summary>
         public IEnumerable<Rectangle> Rectangles => _rects.Values.Select(reg => reg.Region);

@@ -120,8 +120,10 @@ namespace DynamicParser
                     if (proc == null)
                         continue;
                     Rectangle rect = new Rectangle(pp.Position, proc.Size);
-                    if (!region.IsConflict(rect))
-                        region.Add(rect);
+                    if (region.IsConflict(rect)) continue;
+                    region.Add(rect);
+                    Registered registered = region[rect.X, rect.Y];
+                    registered.Register = new List<Reg> { pp };
                 }
                 return region;
             }
@@ -159,10 +161,10 @@ namespace DynamicParser
         /// Находит ближайший процент (в меньшую строну) относительно указанного.
         /// Если указанный процент меньше или равен нолю, то возвращается ноль.
         /// Если процент более единицы, то поиск производится как меньше или равно единице.
-        /// Проценты указываются от 0 до 1.
+        /// Проценты указываются от 0 до 1 типа double.
         /// </summary>
         /// <param name="percent">Процент, ниже или равен которому должен быть результат.</param>
-        /// <returns>Возвращает ближайший процент (в меньшую строну) относительно указанного.</returns>
+        /// <returns>Возвращает ближайший процент (в меньшую сторону) относительно указанного.</returns>
         public double FindPercent(double percent)
         {
             if (percent <= 0.0)
@@ -171,11 +173,8 @@ namespace DynamicParser
                 percent = 1.0;
             double max = 0.0;
             foreach (ProcPerc pp in _coords)
-            {
-                double d = percent - pp.Percent;
-                if (d <= DiffEqual && d >= 0.0)
+                if (percent >= pp.Percent && max < pp.Percent)
                     max = pp.Percent;
-            }
             return max;
         }
 

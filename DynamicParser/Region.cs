@@ -162,6 +162,8 @@ namespace DynamicParser
         /// <returns>В случае, если перекрываются, возвращает true, в противном случае false.</returns>
         public bool IsConflict(Rectangle rect)
         {
+            if (rect.Right > Width || rect.Bottom > Height)
+                return true;
             return _rects.Values.Any(reg => reg.IsConflict(rect));
         }
 
@@ -173,10 +175,10 @@ namespace DynamicParser
         {
             if (rect.Right > Width)
                 throw new ArgumentException($@"{nameof(Add)}: Попытка вставить элемент, конфликтующий с шириной региона (Width = {Width
-                    }, rect.Right = {rect.Right}).", nameof(rect));
+                    }, {nameof(rect.Right)} = {rect.Right}).", nameof(rect));
             if (rect.Bottom > Height)
                 throw new ArgumentException($@"{nameof(Add)}: Попытка вставить элемент, конфликтующий с высотой региона (Height = {Height
-                    }, rect.Bottom = {rect.Bottom}).", nameof(rect));
+                    }, {nameof(rect.Bottom)} = {rect.Bottom}).", nameof(rect));
             if (IsConflict(rect))
                 throw new ArgumentException($"{nameof(Add)}: Попытка вставить элемент, конфликтующий с существующими.", nameof(rect));
             _rects[GetIndex(rect.X, rect.Y)] = new Registered { Region = rect };

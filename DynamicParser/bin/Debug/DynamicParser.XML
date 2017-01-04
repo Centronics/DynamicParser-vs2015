@@ -188,6 +188,11 @@
             Длина. Вычисляется как: Width * Height.
             </summary>
         </member>
+        <member name="P:DynamicParser.Processor.Size">
+            <summary>
+            Получает размер карты.
+            </summary>
+        </member>
         <member name="P:DynamicParser.Processor.Item(System.Int32,System.Int32)">
             <summary>
             Извлекает объект рабочего поля.
@@ -600,6 +605,27 @@
             </summary>
             <param name="width">Ширина.</param>
             <param name="height">Высота.</param>
+        </member>
+        <member name="P:DynamicParser.SearchResults.FindAll">
+            <summary>
+            Получает все наиболее подходящие карты, не перекрывающие друг друга.
+            </summary>
+        </member>
+        <member name="P:DynamicParser.SearchResults.FindObjects">
+            <summary>
+            Находит объекты, процент соответствия которых меньше или равен указанному.
+            </summary>
+            <returns>Возвращает объекты, процент соответствия которых меньше или равен указанному.</returns>
+        </member>
+        <member name="M:DynamicParser.SearchResults.FindPercent(System.Double)">
+            <summary>
+            Находит ближайший процент (в меньшую строну) относительно указанного.
+            Если указанный процент меньше или равен нолю, то возвращается ноль.
+            Если процент более единицы, то поиск производится как меньше или равно единице.
+            Проценты указываются от 0 до 1.
+            </summary>
+            <param name="percent">Процент, ниже или равен которому должен быть результат.</param>
+            <returns>Возвращает ближайший процент (в меньшую строну) относительно указанного.</returns>
         </member>
         <member name="P:DynamicParser.SearchResults.Item(System.Int32,System.Int32)">
             <summary>

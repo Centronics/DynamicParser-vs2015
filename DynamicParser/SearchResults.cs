@@ -105,6 +105,81 @@ namespace DynamicParser
         }
 
         /// <summary>
+        /// Получает все наиболее подходящие карты, не перекрывающие друг друга.
+        /// </summary>
+        public Region FindAll
+        {
+            get
+            {
+                Region region = new Region(Width, Height);
+                foreach (Reg pp in FindObjects)
+                {
+                    if (pp.Procs == null)
+                        continue;
+                    Processor proc = pp.Procs[0];
+                    if (proc == null)
+                        continue;
+                    Rectangle rect = new Rectangle(pp.Position, proc.Size);
+                    if (!region.IsConflict(rect))
+                        region.Add(rect);
+                }
+                return region;
+            }
+        }
+
+        /// <summary>
+        /// Находит объекты, процент соответствия которых меньше или равен указанному.
+        /// </summary>
+        /// <returns>Возвращает объекты, процент соответствия которых меньше или равен указанному.</returns>
+        public IEnumerable<Reg> FindObjects
+        {
+            get
+            {
+                double percent = FindPercent(100.0);
+                while (percent > 0.0)
+                {
+                    for (int y = 0; y < Height; y++)
+                        for (int x = 0; x < Width; x++)
+                        {
+                            double d = percent - _coords[x, y].Percent;
+                            if (d >= 0.0 && d <= DiffEqual)
+                                yield return new Reg
+                                {
+                                    Percent = _coords[x, y].Percent,
+                                    Position = new Point(x, y),
+                                    Procs = _coords[x, y].Procs
+                                };
+                        }
+                    percent = FindPercent(percent);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Находит ближайший процент (в меньшую строну) относительно указанного.
+        /// Если указанный процент меньше или равен нолю, то возвращается ноль.
+        /// Если процент более единицы, то поиск производится как меньше или равно единице.
+        /// Проценты указываются от 0 до 1.
+        /// </summary>
+        /// <param name="percent">Процент, ниже или равен которому должен быть результат.</param>
+        /// <returns>Возвращает ближайший процент (в меньшую строну) относительно указанного.</returns>
+        public double FindPercent(double percent)
+        {
+            if (percent <= 0.0)
+                return 0.0;
+            if (percent > 1.0)
+                percent = 1.0;
+            double max = 0.0;
+            foreach (ProcPerc pp in _coords)
+            {
+                double d = percent - pp.Percent;
+                if (d <= DiffEqual && d >= 0.0)
+                    max = pp.Percent;
+            }
+            return max;
+        }
+
+        /// <summary>
         /// Получает или задаёт информацию о картах в данной точке.
         /// </summary>
         /// <param name="x">Координата X.</param>

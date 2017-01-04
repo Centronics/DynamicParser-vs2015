@@ -46,6 +46,11 @@ namespace DynamicParser
         public int Length => Width * Height;
 
         /// <summary>
+        /// Получает размер карты.
+        /// </summary>
+        public Size Size => new Size(Width, Height);
+
+        /// <summary>
         /// Извлекает объект рабочего поля.
         /// </summary>
         /// <param name="x">Координата X.</param>

@@ -14,7 +14,7 @@ namespace DynamicParserTest
         {
             TagSearcher ts = new TagSearcher("AbCd");
             {
-                List<FindString> lst1 = new List<FindString>(ts.IsEqual("abcd"));
+                List<FindString> lst1 = new List<FindString>(ts.FindEqual("abcd"));
                 Assert.AreEqual(1, lst1.Count);
                 Assert.AreEqual(0, lst1[0].Position);
                 Assert.AreEqual(true, lst1[0].GetStringEqual("abdc"));
@@ -28,7 +28,7 @@ namespace DynamicParserTest
                 Assert.AreEqual("ABCD", lst1[0].CurrentString);
             }
             {
-                List<FindString> lst2 = new List<FindString>(ts.IsEqual("Abcd"));
+                List<FindString> lst2 = new List<FindString>(ts.FindEqual("Abcd"));
                 Assert.AreEqual(1, lst2.Count);
                 Assert.AreEqual(0, lst2[0].Position);
                 Assert.AreEqual(true, lst2[0].GetStringEqual("abdc"));
@@ -42,7 +42,7 @@ namespace DynamicParserTest
                 Assert.AreEqual("ABCD", lst2[0].CurrentString);
             }
             {
-                List<FindString> lst3 = new List<FindString>(ts.IsEqual("abCd"));
+                List<FindString> lst3 = new List<FindString>(ts.FindEqual("abCd"));
                 Assert.AreEqual(1, lst3.Count);
                 Assert.AreEqual(0, lst3[0].Position);
                 Assert.AreEqual(true, lst3[0].GetStringEqual("acdb"));
@@ -56,7 +56,7 @@ namespace DynamicParserTest
                 Assert.AreEqual("ABCD", lst3[0].CurrentString);
             }
             {
-                List<FindString> lst4 = new List<FindString>(ts.IsEqual("abcD"));
+                List<FindString> lst4 = new List<FindString>(ts.FindEqual("abcD"));
                 Assert.AreEqual(1, lst4.Count);
                 Assert.AreEqual(0, lst4[0].Position);
                 Assert.AreEqual(true, lst4[0].GetStringEqual("bcad"));
@@ -93,7 +93,7 @@ namespace DynamicParserTest
         {
             TagSearcher ts = new TagSearcher("ds");
             // ReSharper disable once UnusedVariable
-            List<FindString> lst = new List<FindString>(ts.IsEqual(string.Empty));
+            List<FindString> lst = new List<FindString>(ts.FindEqual(string.Empty));
         }
 
         [TestMethod]
@@ -102,21 +102,21 @@ namespace DynamicParserTest
         {
             TagSearcher ts = new TagSearcher("fg");
             // ReSharper disable once UnusedVariable
-            List<FindString> lst = new List<FindString>(ts.IsEqual(null));
+            List<FindString> lst = new List<FindString>(ts.FindEqual(null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TagSearcherTest6()
         {
-            Assert.AreEqual(0, new TagSearcher("AbCd").IsEqual("abcdd").Count());
+            Assert.AreEqual(0, new TagSearcher("AbCd").FindEqual("abcdd").Count());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TagSearcherTest7()
         {
-            Assert.AreEqual(0, new TagSearcher("AbCd").IsEqual("abc").Count());
+            Assert.AreEqual(0, new TagSearcher("AbCd").FindEqual("abc").Count());
         }
     }
 }

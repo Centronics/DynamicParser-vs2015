@@ -88,18 +88,32 @@ namespace DynamicParser
         }
 
         /// <summary>
+        /// Возвращает все варианты эквивалентных строк.
+        /// </summary>
+        /// <param name="tag">Проверяемая строка.</param>
+        /// <returns>Возвращает структуры <see cref="FindString" /> в случае, когда требуемые подстроки найдены, в противном случае null.</returns>
+        public IEnumerable<FindString> FindEqual(string tag)
+        {
+            if (tag == null)
+                throw new ArgumentNullException(nameof(tag), $"{nameof(FindEqual)}: Задана пустая строка (null).");
+            if (tag == string.Empty)
+                throw new ArgumentException($"{nameof(FindEqual)}: Задана пустая строка.", nameof(tag));
+            foreach (FindString fs in Find(tag))
+                yield return fs;
+        }
+
+        /// <summary>
         /// Проверяет, является эквивалентом указанная строка по отношению к текущей или нет.
         /// </summary>
         /// <param name="tag">Проверяемая строка.</param>
-        /// <returns>Возвращает структуру <see cref="FindString" /> в случае, когда указанная подстрока найдена, в противном случае null.</returns>
-        public IEnumerable<FindString> IsEqual(string tag)
+        /// <returns>Возвращает значение true в случае, когда указанная подстрока найдена, в противном случае false.</returns>
+        public bool IsEqual(string tag)
         {
             if (tag == null)
                 throw new ArgumentNullException(nameof(tag), $"{nameof(IsEqual)}: Задана пустая строка (null).");
             if (tag == string.Empty)
                 throw new ArgumentException($"{nameof(IsEqual)}: Задана пустая строка.", nameof(tag));
-            foreach (FindString fs in Find(tag))
-                yield return fs;
+            return FindEqual(tag).Any();
         }
 
         /// <summary>

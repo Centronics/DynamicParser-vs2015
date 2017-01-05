@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace DynamicParserTest
+{
+    [TestClass]
+    public class WordSearcherTest
+    {
+        [TestMethod]
+        public void WordSearchTest()
+        {
+
+        }
+    }
+}

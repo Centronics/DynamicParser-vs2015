@@ -73,6 +73,7 @@
     <Compile Include="RegionTest.cs" />
     <Compile Include="SearchResultsTest.cs" />
     <Compile Include="TagSearcherTest.cs" />
+    <Compile Include="WordSearcherTest.cs" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

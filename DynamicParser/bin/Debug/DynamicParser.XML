@@ -622,10 +622,10 @@
             Находит ближайший процент (в меньшую строну) относительно указанного.
             Если указанный процент меньше или равен нолю, то возвращается ноль.
             Если процент более единицы, то поиск производится как меньше или равно единице.
-            Проценты указываются от 0 до 1.
+            Проценты указываются от 0 до 1 типа double.
             </summary>
             <param name="percent">Процент, ниже или равен которому должен быть результат.</param>
-            <returns>Возвращает ближайший процент (в меньшую строну) относительно указанного.</returns>
+            <returns>Возвращает ближайший процент (в меньшую сторону) относительно указанного.</returns>
         </member>
         <member name="P:DynamicParser.SearchResults.Item(System.Int32,System.Int32)">
             <summary>
@@ -730,12 +730,19 @@
             </summary>
             <param name="str">Анализируемая строка.</param>
         </member>
+        <member name="M:DynamicParser.TagSearcher.FindEqual(System.String)">
+            <summary>
+            Возвращает все варианты эквивалентных строк.
+            </summary>
+            <param name="tag">Проверяемая строка.</param>
+            <returns>Возвращает структуры <see cref="T:DynamicParser.FindString" /> в случае, когда требуемые подстроки найдены, в противном случае null.</returns>
+        </member>
         <member name="M:DynamicParser.TagSearcher.IsEqual(System.String)">
             <summary>
             Проверяет, является эквивалентом указанная строка по отношению к текущей или нет.
             </summary>
             <param name="tag">Проверяемая строка.</param>
-            <returns>Возвращает структуру <see cref="T:DynamicParser.FindString" /> в случае, когда указанная подстрока найдена, в противном случае null.</returns>
+            <returns>Возвращает значение true в случае, когда указанная подстрока найдена, в противном случае false.</returns>
         </member>
         <member name="M:DynamicParser.TagSearcher.Find(System.String)">
             <summary>
@@ -750,6 +757,48 @@
             </summary>
             <param name="str">Искомая строка.</param>
             <returns>Возвращает <see cref="T:DynamicParser.FindString" /> для строк, которые равны по длине искомой строке.</returns>
+        </member>
+        <member name="T:DynamicParser.WordSearcher">
+            <summary>
+            Выполняет поиск соответствия слова указанной строке, состоящей из массива слов.
+            </summary>
+        </member>
+        <member name="F:DynamicParser.WordSearcher._words">
+            <summary>
+            Содержит коллекцию слов.
+            </summary>
+        </member>
+        <member name="P:DynamicParser.WordSearcher.Count">
+            <summary>
+            Получает количество слов в коллекции.
+            </summary>
+        </member>
+        <member name="P:DynamicParser.WordSearcher.Item(System.Int32)">
+            <summary>
+            Получает слово по индексу.
+            </summary>
+            <param name="index">Индекс слова.</param>
+            <returns>Возвращает слово по индексу.</returns>
+        </member>
+        <member name="M:DynamicParser.WordSearcher.#ctor(System.Collections.Generic.IEnumerable{System.Collections.Generic.IList{System.String}})">
+            <summary>
+            Инициализирует текущий экземпляр коллекцией слов.
+            </summary>
+            <param name="strs">Коллекция слов.</param>
+        </member>
+        <member name="M:DynamicParser.WordSearcher.FindWord(System.String)">
+            <summary>
+            Выполняет проверку соответствия слов, содержащихся в текущем экземпляре, с заданным словом.
+            </summary>
+            <param name="word">Проверяемое слово.</param>
+            <returns>Возвращает значение true в случае, если соответствие обнаружено, в противном случае - false.</returns>
+        </member>
+        <member name="M:DynamicParser.WordSearcher.GetWord(System.Collections.Generic.IList{System.Int32})">
+            <summary>
+            Генерирует слово из частей, содержащихся в коллекции, основываясь на данных счётчиков.
+            </summary>
+            <param name="count">Данные счётчиков по каждому слову.</param>
+            <returns>Возвращает слово из частей, содержащихся в коллекции.</returns>
         </member>
     </members>
 </doc>

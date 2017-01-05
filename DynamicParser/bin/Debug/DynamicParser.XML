@@ -786,7 +786,7 @@
             </summary>
             <param name="strs">Коллекция слов.</param>
         </member>
-        <member name="M:DynamicParser.WordSearcher.FindWord(System.String)">
+        <member name="M:DynamicParser.WordSearcher.IsEqual(System.String)">
             <summary>
             Выполняет проверку соответствия слов, содержащихся в текущем экземпляре, с заданным словом.
             </summary>

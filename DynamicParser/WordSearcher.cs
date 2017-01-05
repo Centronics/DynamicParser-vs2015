@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DynamicParser
@@ -12,7 +13,7 @@ namespace DynamicParser
         /// <summary>
         /// Содержит коллекцию слов.
         /// </summary>
-        readonly List<IList<string>> _words = new List<IList<string>>();
+        readonly List<List<string>> _words = new List<List<string>>();
 
         /// <summary>
         /// Получает количество слов в коллекции.
@@ -38,7 +39,11 @@ namespace DynamicParser
             {
                 if (str == null || str.Count <= 0)
                     continue;
-                _words.Add(str);
+                List<string> lsts = new List<string>(str.Count);
+                lsts.AddRange(str.Where(s => !string.IsNullOrEmpty(s)));
+                if (lsts.Count <= 0)
+                    continue;
+                _words.Add(lsts);
             }
             if (Count <= 0)
                 throw new ArgumentException($"{nameof(WordSearcher)}: Массив слов пустой ({Count}).", nameof(strs));
@@ -49,28 +54,33 @@ namespace DynamicParser
         /// </summary>
         /// <param name="word">Проверяемое слово.</param>
         /// <returns>Возвращает значение true в случае, если соответствие обнаружено, в противном случае - false.</returns>
-        public bool FindWord(string word)
+        public bool IsEqual(string word)
         {
             if (string.IsNullOrEmpty(word))
                 return false;
             TagSearcher ts = new TagSearcher(word);
             int[] count = new int[Count];
-            for (int counter = Count - 1; counter >= 0;)
+            for (int counter = Count - 1; counter >= 0; counter--)
             {
-                for (int k = 0; k < this[counter][k].Length; k++)
+                for (int x = Count - 1; x >= counter; x--)
                 {
-                    count[counter] = k;
-                    if (ts.IsEqual(GetWord(count)))
-                        return true;
+                    for (int k = 0; k < this[x].Count; k++)
+                    {
+                        count[x] = k;
+                        if (ts.IsEqual(GetWord(count)))
+                            return true;
+                    }
+                    for (int k = x; k < count.Length; k++)
+                        count[k] = 0;
                 }
+                int ind = counter - 1;
+                if (ind >= 0)
+                    if (count[ind] < this[ind].Count - 1)
+                        count[ind]++;
                 for (int k = counter + 1; k < count.Length; k++)
                     count[k] = 0;
-                count[counter]++;
-                if (count[counter] <= this[counter].Count) continue;
-                count[counter] = 0;
-                counter--;
             }
-            return true;
+            return false;
         }
 
         /// <summary>

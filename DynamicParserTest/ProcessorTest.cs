@@ -92,7 +92,7 @@ namespace DynamicParserTest
             {
                 Processor proc = new Processor(btm, "Main");
                 SearchResults sr1 = proc.GetEqual(new Processor(btm1, "1"), new Processor(btm2, "2"));
-                ProcessorContainer pc = new ProcessorContainer(new Processor(btm1, "1"), new Processor(btm2, "2"));
+                ProcessorContainer pc = new ProcessorContainer(new[] { new Processor(btm1, "1"), new Processor(btm2, "2") });
                 SearchResults sr2 = proc.GetEqual(pc);
 
                 Assert.AreEqual(sr1.Width * sr1.Height, sr2.Width * sr2.Height);

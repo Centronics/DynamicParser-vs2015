@@ -7,17 +7,22 @@ namespace DynamicParser
     /// <summary>
     /// Представляет найденную подстроку и позицию её местонахождения.
     /// </summary>
-    public struct FindString
+    public sealed class FindString
     {
         /// <summary>
         /// Найденная подстрока.
         /// </summary>
-        public readonly string CurrentString;
+        public string CurrentString { get; }
 
         /// <summary>
         /// Позиция, на которой находится подстрока.
         /// </summary>
-        public readonly int Position;
+        public int Position { get; }
+
+        /// <summary>
+        /// Счётчик количества каждой буквы в сравниваемой строке.
+        /// </summary>
+        readonly Dictionary<char, int> _dicCurrent;
 
         /// <summary>
         /// Инициализирует структуру <see cref="FindString" /> исходными значениями.
@@ -28,6 +33,7 @@ namespace DynamicParser
         {
             CurrentString = str.ToUpper();
             Position = position;
+            _dicCurrent = GetCount(CurrentString);
         }
 
         /// <summary>
@@ -41,16 +47,38 @@ namespace DynamicParser
                 return false;
             if (str.Length != CurrentString.Length)
                 return false;
-            str = str.ToUpper();
-            List<int> lstCompare = new List<int>(str.Length);
-            foreach (char ch in str)
+            Dictionary<char, int> dicCompare = GetCount(str);
+            foreach (char ch in _dicCurrent.Keys)
             {
-                int count = GetCount(ch);
-                if (count <= 0)
-                    return false;
-                lstCompare.Add(count);
+                int val;
+                if (!dicCompare.TryGetValue(ch, out val)) return false;
+                if (_dicCurrent[ch] == val)
+                    continue;
+                return false;
             }
-            return CurrentString.Length == lstCompare.Sum();
+            return true;
+        }
+
+        /// <summary>
+        /// Получает счётчики количества попаданий каждой буквы.
+        /// Буква является ключом в словаре, значение является количеством попаданий буквы, находящейся на этой позиции.
+        /// </summary>
+        /// <param name="str">Проверяемая строка.</param>
+        /// <returns>Возвращает счётчики количества попаданий каждой буквы.</returns>
+        Dictionary<char, int> GetCount(string str)
+        {
+            str = str.ToUpper();
+            Dictionary<char, int> dic = new Dictionary<char, int>(str.Length);
+            foreach (char t in str)
+            {
+                int cou = GetCount(t);
+                int val;
+                if (dic.TryGetValue(t, out val))
+                    dic[t] = val + cou;
+                else
+                    dic[t] = cou;
+            }
+            return dic;
         }
 
         /// <summary>

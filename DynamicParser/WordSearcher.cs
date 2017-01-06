@@ -58,29 +58,41 @@ namespace DynamicParser
         {
             if (string.IsNullOrEmpty(word))
                 return false;
+            if (word.Length != Count)
+                throw new ArgumentException($@"{nameof(IsEqual)}: Длины сопоставляемых слов должны быть равны (Длина проверяемого слова: {word.Length
+                    }; Сопоставляется с (длина): {Count}).", nameof(word));
             TagSearcher ts = new TagSearcher(word);
             int[] count = new int[Count];
-            for (int counter = Count - 1; counter >= 0; counter--)
+            for (int counter = Count - 1; counter >= 0;)
             {
-                for (int x = Count - 1; x >= counter; x--)
-                {
-                    for (int k = 0; k < this[x].Count; k++)
-                    {
-                        count[x] = k;
-                        if (ts.IsEqual(GetWord(count)))
-                            return true;
-                    }
-                    for (int k = x; k < count.Length; k++)
-                        count[k] = 0;
-                }
-                int ind = counter - 1;
-                if (ind >= 0)
-                    if (count[ind] < this[ind].Count - 1)
-                        count[ind]++;
-                for (int k = counter + 1; k < count.Length; k++)
-                    count[k] = 0;
+                if (ts.IsEqual(GetWord(count)))
+                    return true;
+                counter = ChangeCount(count);
+                if (counter < 0)
+                    return false;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Увеличивает значение старших разрядов счётчика букв, если это возможно.
+        /// Если увеличение было произведено, возвращается номер позиции, на которой произошло изменение, в противном случае -1.
+        /// </summary>
+        /// <param name="count">Массив-счётчик.</param>
+        /// <returns>Возвращается номер позиции, на которой произошло изменение, в противном случае -1.</returns>
+        int ChangeCount(int[] count)
+        {
+            if (count == null || count.Length != Count)
+                throw new ArgumentException($"{nameof(ChangeCount)}: Массив-счётчик не указан или его длина некорректна ({count?.Length}).", nameof(count));
+            for (int k = Count - 1; k >= 0; k--)
+            {
+                if (count[k] >= this[k].Count - 1) continue;
+                count[k]++;
+                for (int x = k + 1; x < count.Length; x++)
+                    count[x] = 0;
+                return k;
+            }
+            return -1;
         }
 
         /// <summary>

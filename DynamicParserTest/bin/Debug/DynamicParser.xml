@@ -683,14 +683,19 @@
             Представляет найденную подстроку и позицию её местонахождения.
             </summary>
         </member>
-        <member name="F:DynamicParser.FindString.CurrentString">
+        <member name="P:DynamicParser.FindString.CurrentString">
             <summary>
             Найденная подстрока.
             </summary>
         </member>
-        <member name="F:DynamicParser.FindString.Position">
+        <member name="P:DynamicParser.FindString.Position">
             <summary>
             Позиция, на которой находится подстрока.
+            </summary>
+        </member>
+        <member name="F:DynamicParser.FindString._dicCurrent">
+            <summary>
+            Счётчик количества каждой буквы в сравниваемой строке.
             </summary>
         </member>
         <member name="M:DynamicParser.FindString.#ctor(System.String,System.Int32)">
@@ -706,6 +711,14 @@
             </summary>
             <param name="str">Сравниваемая строка.</param>
             <returns>Возвращает значение true в случае сходства строк, false в противном случае.</returns>
+        </member>
+        <member name="M:DynamicParser.FindString.GetCount(System.String)">
+            <summary>
+            Получает счётчики количества попаданий каждой буквы.
+            Буква является ключом в словаре, значение является количеством попаданий буквы, находящейся на этой позиции.
+            </summary>
+            <param name="str">Проверяемая строка.</param>
+            <returns>Возвращает счётчики количества попаданий каждой буквы.</returns>
         </member>
         <member name="M:DynamicParser.FindString.GetCount(System.Char)">
             <summary>
@@ -792,6 +805,14 @@
             </summary>
             <param name="word">Проверяемое слово.</param>
             <returns>Возвращает значение true в случае, если соответствие обнаружено, в противном случае - false.</returns>
+        </member>
+        <member name="M:DynamicParser.WordSearcher.ChangeCount(System.Int32[])">
+            <summary>
+            Увеличивает значение старших разрядов счётчика букв, если это возможно.
+            Если увеличение было произведено, возвращается номер позиции, на которой произошло изменение, в противном случае -1.
+            </summary>
+            <param name="count">Массив-счётчик.</param>
+            <returns>Возвращается номер позиции, на которой произошло изменение, в противном случае -1.</returns>
         </member>
         <member name="M:DynamicParser.WordSearcher.GetWord(System.Collections.Generic.IList{System.Int32})">
             <summary>

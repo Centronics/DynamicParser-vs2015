@@ -18,7 +18,7 @@ namespace DynamicParserTest
                 Assert.AreEqual(1, lst1.Count);
                 Assert.AreEqual(0, lst1[0].Position);
                 Assert.AreEqual(true, lst1[0].GetStringEqual("abdc"));
-                Assert.AreEqual(true, lst1[0].GetStringEqual("cbac"));
+                Assert.AreEqual(false, lst1[0].GetStringEqual("cbac"));
                 Assert.AreEqual(true, lst1[0].GetStringEqual("dabc"));
                 Assert.AreEqual(true, lst1[0].GetStringEqual("bacd"));
                 Assert.AreEqual(false, lst1[0].GetStringEqual(""));
@@ -32,7 +32,7 @@ namespace DynamicParserTest
                 Assert.AreEqual(1, lst2.Count);
                 Assert.AreEqual(0, lst2[0].Position);
                 Assert.AreEqual(true, lst2[0].GetStringEqual("abdc"));
-                Assert.AreEqual(true, lst2[0].GetStringEqual("cbac"));
+                Assert.AreEqual(false, lst2[0].GetStringEqual("cbac"));
                 Assert.AreEqual(true, lst2[0].GetStringEqual("dabc"));
                 Assert.AreEqual(true, lst2[0].GetStringEqual("bacd"));
                 Assert.AreEqual(false, lst2[0].GetStringEqual(""));
@@ -46,7 +46,7 @@ namespace DynamicParserTest
                 Assert.AreEqual(1, lst3.Count);
                 Assert.AreEqual(0, lst3[0].Position);
                 Assert.AreEqual(true, lst3[0].GetStringEqual("acdb"));
-                Assert.AreEqual(true, lst3[0].GetStringEqual("cbac"));
+                Assert.AreEqual(false, lst3[0].GetStringEqual("cbac"));
                 Assert.AreEqual(true, lst3[0].GetStringEqual("dcba"));
                 Assert.AreEqual(true, lst3[0].GetStringEqual("dcba"));
                 Assert.AreEqual(false, lst3[0].GetStringEqual(""));
@@ -68,6 +68,28 @@ namespace DynamicParserTest
                 Assert.AreEqual(false, lst4[0].GetStringEqual("abcdf"));
                 Assert.AreEqual(false, lst4[0].GetStringEqual(null));
                 Assert.AreEqual("ABCD", lst4[0].CurrentString);
+            }
+            {
+                ts = new TagSearcher("000");
+                Assert.AreEqual(true, ts.IsEqual("000"));
+            }
+            {
+                ts = new TagSearcher("100");
+                Assert.AreEqual(true, ts.IsEqual("100"));
+                Assert.AreEqual(true, ts.IsEqual("010"));
+                Assert.AreEqual(true, ts.IsEqual("001"));
+            }
+            {
+                ts = new TagSearcher("10");
+                Assert.AreEqual(true, ts.IsEqual("10"));
+                Assert.AreEqual(true, ts.IsEqual("01"));
+                Assert.AreEqual(false, ts.IsEqual("00"));
+                Assert.AreEqual(false, ts.IsEqual("11"));
+            }
+            {
+                ts = new TagSearcher("5");
+                Assert.AreEqual(true, ts.IsEqual("5"));
+                Assert.AreEqual(false, ts.IsEqual("0"));
             }
         }
 

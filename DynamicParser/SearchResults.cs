@@ -125,12 +125,12 @@ namespace DynamicParser
         /// <summary>
         /// Получает все наиболее подходящие карты, не перекрывающие друг друга.
         /// </summary>
-        public Region FindAll
+        public Region AllMaps
         {
             get
             {
                 Region region = new Region(Width, Height);
-                foreach (Reg pp in FindObjects)
+                foreach (Reg pp in MaxObjects)
                 {
                     if (pp.Procs == null)
                         continue;
@@ -151,7 +151,7 @@ namespace DynamicParser
         /// Находит объекты с максимальным процентом соответствия.
         /// </summary>
         /// <returns>Возвращает объекты с максимальным процентом соответствия.</returns>
-        public IEnumerable<Reg> FindObjects
+        public IEnumerable<Reg> MaxObjects
         {
             get
             {

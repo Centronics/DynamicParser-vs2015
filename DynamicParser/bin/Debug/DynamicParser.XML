@@ -232,6 +232,12 @@
             <param name="btm">Загружаемый массив.</param>
             <param name="tag">Название карты.</param>
         </member>
+        <member name="M:DynamicParser.Processor.ToString">
+            <summary>
+            Получает строковое представление текущего экземпляра, которое является значением свойства Tag.
+            </summary>
+            <returns>Возвращает строковое представление текущего экземпляра, которое является значением свойства Tag.</returns>
+        </member>
         <member name="M:DynamicParser.Processor.GetMinIndex(System.Collections.Generic.IDictionary{System.Int32,DynamicProcessor.SignValue[0:,0:]},System.Int32,System.Int32,System.Int32)">
             <summary>
             Подтверждает, является ли карта с указанным индексом наиболее подходящей в данной точке.
@@ -693,17 +699,23 @@
             Позиция, на которой находится подстрока.
             </summary>
         </member>
+        <member name="P:DynamicParser.FindString.SourceString">
+            <summary>
+            Исходная строка.
+            </summary>
+        </member>
         <member name="F:DynamicParser.FindString._dicCurrent">
             <summary>
             Счётчик количества каждой буквы в сравниваемой строке.
             </summary>
         </member>
-        <member name="M:DynamicParser.FindString.#ctor(System.String,System.Int32)">
+        <member name="M:DynamicParser.FindString.#ctor(System.String,System.Int32,System.String)">
             <summary>
             Инициализирует структуру <see cref="T:DynamicParser.FindString" /> исходными значениями.
             </summary>
             <param name="str">Подстрока.</param>
             <param name="position">Позиция подстроки.</param>
+            <param name="source">Исходная строка.</param>
         </member>
         <member name="M:DynamicParser.FindString.GetStringEqual(System.String)">
             <summary>
@@ -734,7 +746,7 @@
         </member>
         <member name="F:DynamicParser.TagSearcher._currentStr">
             <summary>
-            Анализируемая строка.
+            Исходная строка.
             </summary>
         </member>
         <member name="M:DynamicParser.TagSearcher.#ctor(System.String)">

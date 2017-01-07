@@ -59,16 +59,15 @@ namespace DynamicParser
             if (string.IsNullOrEmpty(word))
                 return false;
             if (word.Length != Count)
-                throw new ArgumentException($@"{nameof(IsEqual)}: Длины сопоставляемых слов должны быть равны (Длина проверяемого слова: {word.Length
-                    }; Сопоставляется с (длина): {Count}).", nameof(word));
+                throw new ArgumentException($@"{nameof(IsEqual)}: Длины сопоставляемых слов должны быть равны: проверяемое слово длиной {word.Length
+                    } сопоставляется со словом длиной {Count}.", nameof(word));
             TagSearcher ts = new TagSearcher(word);
             int[] count = new int[Count];
             for (int counter = Count - 1; counter >= 0;)
             {
                 if (ts.IsEqual(GetWord(count)))
                     return true;
-                counter = ChangeCount(count);
-                if (counter < 0)
+                if ((counter = ChangeCount(count)) < 0)
                     return false;
             }
             return false;

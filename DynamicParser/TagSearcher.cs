@@ -20,6 +20,11 @@ namespace DynamicParser
         public int Position { get; }
 
         /// <summary>
+        /// Исходная строка.
+        /// </summary>
+        public string SourceString { get; }
+
+        /// <summary>
         /// Счётчик количества каждой буквы в сравниваемой строке.
         /// </summary>
         readonly Dictionary<char, int> _dicCurrent;
@@ -29,8 +34,20 @@ namespace DynamicParser
         /// </summary>
         /// <param name="str">Подстрока.</param>
         /// <param name="position">Позиция подстроки.</param>
-        public FindString(string str, int position)
+        /// <param name="source">Исходная строка.</param>
+        public FindString(string str, int position, string source)
         {
+            if (str == null)
+                throw new ArgumentNullException(nameof(str), $"{nameof(FindString)}: Подстрока пустая (null).");
+            if (str == string.Empty)
+                throw new ArgumentException($"{nameof(FindString)}: Подстрока не может быть пустой.", nameof(str));
+            if (position < 0)
+                throw new ArgumentException($"{nameof(FindString)}: Позиция подстроки меньше ноля ({position}).", nameof(position));
+            if (source == null)
+                throw new ArgumentException($"{nameof(FindString)}: Исходная строка пустая (null).", nameof(source));
+            if (source == string.Empty)
+                throw new ArgumentException($"{nameof(FindString)}: Исходная строка пустая.", nameof(source));
+            SourceString = source;
             CurrentString = str.ToUpper();
             Position = position;
             _dicCurrent = GetCount(CurrentString);
@@ -98,7 +115,7 @@ namespace DynamicParser
     public class TagSearcher
     {
         /// <summary>
-        /// Анализируемая строка.
+        /// Исходная строка.
         /// </summary>
         readonly string _currentStr;
 
@@ -176,7 +193,7 @@ namespace DynamicParser
                     nameof(str));
             for (int k = 0, max = _currentStr.Length - str.Length, sl = str.Length; k <= max; k++)
             {
-                FindString fs = new FindString(_currentStr.Substring(k, sl), k);
+                FindString fs = new FindString(_currentStr.Substring(k, sl), k, _currentStr);
                 yield return fs;
             }
         }

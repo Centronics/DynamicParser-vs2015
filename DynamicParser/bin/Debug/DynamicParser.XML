@@ -605,12 +605,24 @@
             Высота.
             </summary>
         </member>
-        <member name="M:DynamicParser.SearchResults.#ctor(System.Int32,System.Int32)">
+        <member name="F:DynamicParser.SearchResults.MapWidth">
+            <summary>
+            Ширина карт, которые проходили обработку.
+            </summary>
+        </member>
+        <member name="F:DynamicParser.SearchResults.MapHeight">
+            <summary>
+            Высота карт, которые проходили обработку.
+            </summary>
+        </member>
+        <member name="M:DynamicParser.SearchResults.#ctor(System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
             Инициализирует экземпляр с заданными параметрами ширины и высоты.
             </summary>
             <param name="width">Ширина.</param>
             <param name="height">Высота.</param>
+            <param name="mapWidth">Ширина карт, которые проходили обработку.</param>
+            <param name="mapHeight">Высота карт, которые проходили обработку.</param>
         </member>
         <member name="P:DynamicParser.SearchResults.FindAll">
             <summary>
@@ -680,7 +692,7 @@
         </member>
         <member name="M:DynamicParser.SearchResults.InOneSize(System.Collections.Generic.IList{DynamicParser.SearchResults})">
             <summary>
-            Проверяет, соответствуют ли все результаты поиска одному размеру.
+            Проверяет, соответствуют ли все результаты поиска одному размеру, включая размеры поисковых карт.
             </summary>
             <returns>Возвращает true в случае соответствия, иначе false.</returns>
         </member>

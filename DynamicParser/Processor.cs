@@ -266,7 +266,7 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(GetEqual)}: Карты для поиска превышают существующее поле по высоте ({prc.Height} > {Height}).", nameof(prc));
             if (prc.Count <= 0)
                 throw new ArgumentException($"{nameof(GetEqual)}: Массив карт для поиска ничего не содержит.", nameof(prc));
-            SearchResults sr = new SearchResults(Width, Height);
+            SearchResults sr = new SearchResults(Width, Height, prc.Width, prc.Height);
             string errString = string.Empty;
             bool exThrown = false;
             Parallel.For(0, Height, (y1, stateHeightMain) =>

@@ -91,16 +91,34 @@ namespace DynamicParser
         public int Height => _coords.GetLength(1);
 
         /// <summary>
+        /// Ширина карт, которые проходили обработку.
+        /// </summary>
+        public int MapWidth;
+
+        /// <summary>
+        /// Высота карт, которые проходили обработку.
+        /// </summary>
+        public int MapHeight;
+
+        /// <summary>
         /// Инициализирует экземпляр с заданными параметрами ширины и высоты.
         /// </summary>
         /// <param name="width">Ширина.</param>
         /// <param name="height">Высота.</param>
-        public SearchResults(int width, int height)
+        /// <param name="mapWidth">Ширина карт, которые проходили обработку.</param>
+        /// <param name="mapHeight">Высота карт, которые проходили обработку.</param>
+        public SearchResults(int width, int height, int mapWidth, int mapHeight)
         {
             if (width <= 0)
                 throw new ArgumentException($"{nameof(SearchResults)}: Ширина указана некорректно ({width}).", nameof(width));
             if (height <= 0)
                 throw new ArgumentException($"{nameof(SearchResults)}: Высота указана некорректно ({height}).", nameof(height));
+            if (mapWidth <= 0)
+                throw new ArgumentException($"{nameof(SearchResults)}: Ширина карт указана некорректно ({mapWidth}).", nameof(mapWidth));
+            if (mapHeight <= 0)
+                throw new ArgumentException($"{nameof(SearchResults)}: Высота карт указана некорректно ({mapHeight}).", nameof(mapHeight));
+            MapWidth = mapWidth;
+            MapHeight = mapHeight;
             _coords = new ProcPerc[width, height];
         }
 
@@ -270,7 +288,7 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(Combine)}: Результаты поиска должны совпадать по размерам.", nameof(srs));
             int width = srs[0].Width;
             int height = srs[0].Height;
-            SearchResults sr = new SearchResults(width, height);
+            SearchResults sr = new SearchResults(width, height, srs[0].MapWidth, srs[0].MapHeight);
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
                 {
@@ -309,7 +327,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Проверяет, соответствуют ли все результаты поиска одному размеру.
+        /// Проверяет, соответствуют ли все результаты поиска одному размеру, включая размеры поисковых карт.
         /// </summary>
         /// <returns>Возвращает true в случае соответствия, иначе false.</returns>
         public static bool InOneSize(IList<SearchResults> srs)
@@ -318,9 +336,9 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(srs), $"{nameof(InOneSize)}: Коллекция не может быть равна null.");
             if (srs.Count <= 0)
                 return true;
-            int width = srs[0].Width;
-            int height = srs[0].Height;
-            return srs.All(sr => sr.Width == width && sr.Height == height);
+            int width = srs[0].Width, mapWidth = srs[0].MapWidth;
+            int height = srs[0].Height, mapHeight = srs[0].MapHeight;
+            return srs.All(sr => sr.Width == width && sr.Height == height) && srs.All(sr => sr.MapWidth == mapWidth && sr.MapHeight == mapHeight);
         }
     }
 }

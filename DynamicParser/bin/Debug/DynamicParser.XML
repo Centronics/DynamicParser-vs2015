@@ -624,12 +624,12 @@
             <param name="mapWidth">Ширина карт, которые проходили обработку.</param>
             <param name="mapHeight">Высота карт, которые проходили обработку.</param>
         </member>
-        <member name="P:DynamicParser.SearchResults.FindAll">
+        <member name="P:DynamicParser.SearchResults.AllMaps">
             <summary>
             Получает все наиболее подходящие карты, не перекрывающие друг друга.
             </summary>
         </member>
-        <member name="P:DynamicParser.SearchResults.FindObjects">
+        <member name="P:DynamicParser.SearchResults.MaxObjects">
             <summary>
             Находит объекты с максимальным процентом соответствия.
             </summary>

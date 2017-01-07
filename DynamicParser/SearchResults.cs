@@ -130,14 +130,14 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Находит объекты, процент соответствия которых меньше или равен указанному.
+        /// Находит объекты с максимальным процентом соответствия.
         /// </summary>
-        /// <returns>Возвращает объекты, процент соответствия которых меньше или равен указанному.</returns>
+        /// <returns>Возвращает объекты с максимальным процентом соответствия.</returns>
         public IEnumerable<Reg> FindObjects
         {
             get
             {
-                double percent = FindPercent(100.0);
+                double percent = FindPercent(1.0);
                 while (percent > 0.0)
                 {
                     for (int y = 0; y < Height; y++)

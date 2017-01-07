@@ -619,9 +619,9 @@
         </member>
         <member name="P:DynamicParser.SearchResults.FindObjects">
             <summary>
-            Находит объекты, процент соответствия которых меньше или равен указанному.
+            Находит объекты с максимальным процентом соответствия.
             </summary>
-            <returns>Возвращает объекты, процент соответствия которых меньше или равен указанному.</returns>
+            <returns>Возвращает объекты с максимальным процентом соответствия.</returns>
         </member>
         <member name="M:DynamicParser.SearchResults.FindPercent(System.Double)">
             <summary>

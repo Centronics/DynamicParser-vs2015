@@ -6,7 +6,7 @@
     <members>
         <member name="T:DynamicParser.Attach">
             <summary>
-            Содержит информацию о точке и сопоставленными с ней картами.
+            Содержит информацию о точке и сопоставленных с ней картах.
             </summary>
         </member>
         <member name="T:DynamicParser.Attach.Proc">

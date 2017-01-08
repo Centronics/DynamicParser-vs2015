@@ -6,7 +6,7 @@ using System.Linq;
 namespace DynamicParser
 {
     /// <summary>
-    /// Содержит информацию о точке и сопоставленными с ней картами.
+    /// Содержит информацию о точке и сопоставленных с ней картах.
     /// </summary>
     public sealed class Attach
     {
@@ -39,7 +39,7 @@ namespace DynamicParser
         /// <summary>
         /// Получает список карт из списка сопоставленных карт.
         /// </summary>
-        public IEnumerable<Processor> Processors => (from rg in Regs from proc in rg.Procs select proc).ToList();
+        public IEnumerable<Processor> Processors => from rg in Regs from proc in rg.Procs select proc;
 
         /// <summary>
         /// Получает уникальные по полю Tag карты.

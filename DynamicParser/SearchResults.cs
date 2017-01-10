@@ -151,49 +151,52 @@ namespace DynamicParser
         /// Находит объекты с максимальным процентом соответствия.
         /// </summary>
         /// <returns>Возвращает объекты с максимальным процентом соответствия.</returns>
-        public IEnumerable<Reg> MaxObjects
+        IEnumerable<Reg> MaxObjects
         {
             get
             {
-                double percent = FindPercent(1.0);
-                while (percent > 0.0)
-                {
-                    for (int y = 0; y < Height; y++)
-                        for (int x = 0; x < Width; x++)
+                ProcPerc? total = null;
+                int? px = null, py = null;
+                bool[,] map = new bool[Width, Height];
+                for (int y1 = 0; y1 < Height; y1++)
+                    for (int x1 = 0; x1 < Width; x1++)
+                    {
+                        if (MapWidth > Width - x1 || MapHeight > Height - y1)
+                            yield break;
+                        double percent = 0.0;
+                        for (int y = 0; y < Height; y++)
+                            for (int x = 0; x < Width; x++)
+                            {
+                                if (MapWidth > Width - x || MapHeight > Height - y)
+                                    yield break;
+                                if (map[x, y])
+                                    continue;
+                                ProcPerc pp = _coords[x, y];
+                                if (pp.Procs == null)
+                                    continue;
+                                double p = Math.Abs(1.0 - pp.Percent);
+                                if (p > percent)
+                                    continue;
+                                percent = p;
+                                total = pp;
+                                px = x;
+                                py = y;
+                                if (percent <= 0.0)
+                                    goto end;
+                            }
+                        end:
+                        if (px == null)
+                            yield break;
+                        map[px.Value, py.Value] = true;
+                        Reg reg = new Reg
                         {
-                            double d = percent - _coords[x, y].Percent;
-                            if (d >= 0.0 && d <= DiffEqual)
-                                yield return new Reg
-                                {
-                                    Percent = _coords[x, y].Percent,
-                                    Position = new Point(x, y),
-                                    Procs = _coords[x, y].Procs
-                                };
-                        }
-                    percent = FindPercent(percent);
-                }
+                            Percent = total.Value.Percent,
+                            Position = new Point(x1, y1),
+                            Procs = total.Value.Procs
+                        };
+                        yield return reg;
+                    }
             }
-        }
-
-        /// <summary>
-        /// Находит ближайший процент (в меньшую строну) относительно указанного.
-        /// Если указанный процент меньше или равен нолю, то возвращается ноль.
-        /// Если процент более единицы, то поиск производится как меньше или равно единице.
-        /// Проценты указываются от 0 до 1 типа double.
-        /// </summary>
-        /// <param name="percent">Процент, ниже или равен которому должен быть результат.</param>
-        /// <returns>Возвращает ближайший процент (в меньшую сторону) относительно указанного.</returns>
-        public double FindPercent(double percent)
-        {
-            if (percent <= 0.0)
-                return 0.0;
-            if (percent > 1.0)
-                percent = 1.0;
-            double max = 0.0;
-            foreach (ProcPerc pp in _coords)
-                if (percent >= pp.Percent && max < pp.Percent)
-                    max = pp.Percent;
-            return max;
         }
 
         /// <summary>

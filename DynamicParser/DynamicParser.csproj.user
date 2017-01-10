@@ -2,6 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
-    <StartProgram>D:\разработки\LogicLibExample\LogicLibExample\bin\Debug\LogicLibExample.exe</StartProgram>
+    <StartProgram>D:\разработки\DynamicParserExample\DynamicParserExample\bin\Debug\DynamicParserExample.exe</StartProgram>
   </PropertyGroup>
 </Project>

@@ -605,12 +605,12 @@
             Высота.
             </summary>
         </member>
-        <member name="F:DynamicParser.SearchResults.MapWidth">
+        <member name="P:DynamicParser.SearchResults.MapWidth">
             <summary>
             Ширина карт, которые проходили обработку.
             </summary>
         </member>
-        <member name="F:DynamicParser.SearchResults.MapHeight">
+        <member name="P:DynamicParser.SearchResults.MapHeight">
             <summary>
             Высота карт, которые проходили обработку.
             </summary>
@@ -624,16 +624,38 @@
             <param name="mapWidth">Ширина карт, которые проходили обработку.</param>
             <param name="mapHeight">Высота карт, которые проходили обработку.</param>
         </member>
-        <member name="P:DynamicParser.SearchResults.AllMaps">
+        <member name="M:DynamicParser.SearchResults.FindRelation(System.Collections.Generic.IEnumerable{System.String})">
             <summary>
-            Получает все наиболее подходящие карты, не перекрывающие друг друга.
+            Ищет возможность связывания указанных слов с полями Tag найденных карт.
+            Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова при условии отсутствия пересечений между ними?".
+            Если хотя бы одно слово отсутствует, возвращается значение false.
             </summary>
+            <param name="words">Искомые слова.</param>
+            <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
         </member>
-        <member name="P:DynamicParser.SearchResults.MaxObjects">
+        <member name="M:DynamicParser.SearchResults.FindSymbols">
             <summary>
-            Находит объекты с максимальным процентом соответствия.
+            Вычисляет количество встречающихся букв на карте.
+            Учитывается только первая буква в свойстве Tag.
             </summary>
-            <returns>Возвращает объекты с максимальным процентом соответствия.</returns>
+            <returns>Возвращает словарь со значениями количества встречающихся букв на карте.</returns>
+        </member>
+        <member name="M:DynamicParser.SearchResults.FindSymbol(System.String)">
+            <summary>
+            Вычисляет количество встречающихся символов в указанной строке.
+            Поиск производится без учёта регистра.
+            </summary>
+            <param name="word">Проверяемое слово.</param>
+            <returns>Возвращает словарь с количеством встречающихся символов в указанной строке.</returns>
+        </member>
+        <member name="M:DynamicParser.SearchResults.FindRelation(System.String[])">
+            <summary>
+            Ищет возможность связывания указанных слов с полями Tag найденных карт.
+            Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова при условии отсутствия пересечений между ними?".
+            Если хотя бы одно слово отсутствует, возвращается значение false.
+            </summary>
+            <param name="words">Искомые слова.</param>
+            <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
         </member>
         <member name="P:DynamicParser.SearchResults.Item(System.Int32,System.Int32)">
             <summary>
@@ -757,13 +779,6 @@
             </summary>
             <param name="str">Анализируемая строка.</param>
         </member>
-        <member name="M:DynamicParser.TagSearcher.FindEqual(System.String)">
-            <summary>
-            Возвращает все варианты эквивалентных строк.
-            </summary>
-            <param name="tag">Проверяемая строка.</param>
-            <returns>Возвращает структуры <see cref="T:DynamicParser.FindString" /> в случае, когда требуемые подстроки найдены, в противном случае null.</returns>
-        </member>
         <member name="M:DynamicParser.TagSearcher.IsEqual(System.String)">
             <summary>
             Проверяет, является эквивалентом указанная строка по отношению к текущей или нет.
@@ -771,7 +786,7 @@
             <param name="tag">Проверяемая строка.</param>
             <returns>Возвращает значение true в случае, когда указанная подстрока найдена, в противном случае false.</returns>
         </member>
-        <member name="M:DynamicParser.TagSearcher.Find(System.String)">
+        <member name="M:DynamicParser.TagSearcher.FindEqual(System.String)">
             <summary>
             Выполняет поиск подстроки в строке и возвращает <see cref="T:DynamicParser.FindString" /> в случае соответствия строк.
             </summary>

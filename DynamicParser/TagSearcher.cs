@@ -133,21 +133,6 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Возвращает все варианты эквивалентных строк.
-        /// </summary>
-        /// <param name="tag">Проверяемая строка.</param>
-        /// <returns>Возвращает структуры <see cref="FindString" /> в случае, когда требуемые подстроки найдены, в противном случае null.</returns>
-        public IEnumerable<FindString> FindEqual(string tag)
-        {
-            if (tag == null)
-                throw new ArgumentNullException(nameof(tag), $"{nameof(FindEqual)}: Задана пустая строка (null).");
-            if (tag == string.Empty)
-                throw new ArgumentException($"{nameof(FindEqual)}: Задана пустая строка.", nameof(tag));
-            foreach (FindString fs in Find(tag))
-                yield return fs;
-        }
-
-        /// <summary>
         /// Проверяет, является эквивалентом указанная строка по отношению к текущей или нет.
         /// </summary>
         /// <param name="tag">Проверяемая строка.</param>
@@ -166,12 +151,12 @@ namespace DynamicParser
         /// </summary>
         /// <param name="tag">Строка, поиск которой необходимо выполнить.</param>
         /// <returns>Возвращает <see cref="FindString" /> в случае соответствия строк.</returns>
-        IEnumerable<FindString> Find(string tag)
+        public IEnumerable<FindString> FindEqual(string tag)
         {
             if (tag == null)
-                throw new ArgumentNullException(nameof(tag), $"{nameof(Find)}: Задана пустая строка (null).");
+                throw new ArgumentNullException(nameof(tag), $"{nameof(FindEqual)}: Задана пустая строка (null).");
             if (tag == string.Empty)
-                throw new ArgumentException($"{nameof(Find)}: Задана пустая строка.", nameof(tag));
+                throw new ArgumentException($"{nameof(FindEqual)}: Задана пустая строка.", nameof(tag));
             foreach (FindString fs in GetStringChunk(tag))
                 if (fs.GetStringEqual(tag))
                     yield return fs;

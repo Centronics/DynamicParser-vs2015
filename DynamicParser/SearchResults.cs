@@ -93,12 +93,12 @@ namespace DynamicParser
         /// <summary>
         /// Ширина карт, которые проходили обработку.
         /// </summary>
-        public int MapWidth;
+        public int MapWidth { get; }
 
         /// <summary>
         /// Высота карт, которые проходили обработку.
         /// </summary>
-        public int MapHeight;
+        public int MapHeight { get; }
 
         /// <summary>
         /// Инициализирует экземпляр с заданными параметрами ширины и высоты.
@@ -123,80 +123,96 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Получает все наиболее подходящие карты, не перекрывающие друг друга.
+        /// Ищет возможность связывания указанных слов с полями Tag найденных карт.
+        /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова при условии отсутствия пересечений между ними?".
+        /// Если хотя бы одно слово отсутствует, возвращается значение false.
         /// </summary>
-        public Region AllMaps
+        /// <param name="words">Искомые слова.</param>
+        /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
+        public bool FindRelation(IEnumerable<string> words)
         {
-            get
+            Dictionary<char, uint> allWords = FindSymbols();
+            checked
             {
-                Region region = new Region(Width, Height);
-                foreach (Reg pp in MaxObjects)
+                foreach (string word in words)
                 {
-                    if (pp.Procs == null)
+                    Dictionary<char, uint> symbols = FindSymbol(word);
+                    if (symbols == null)
                         continue;
-                    Processor proc = pp.Procs[0];
-                    if (proc == null)
-                        continue;
-                    Rectangle rect = new Rectangle(pp.Position, proc.Size);
-                    if (region.IsConflict(rect)) continue;
-                    region.Add(rect);
-                    Registered registered = region[rect.X, rect.Y];
-                    registered.Register = new List<Reg> { pp };
+                    foreach (KeyValuePair<char, uint> pair in symbols)
+                    {
+                        uint numberWords;
+                        if (!allWords.TryGetValue(pair.Key, out numberWords))
+                            return false;
+                        if (numberWords < pair.Value)
+                            return false;
+                        allWords[pair.Key] = numberWords - pair.Value;
+                    }
                 }
-                return region;
             }
+            return true;
         }
 
         /// <summary>
-        /// Находит объекты с максимальным процентом соответствия.
+        /// Вычисляет количество встречающихся букв на карте.
+        /// Учитывается только первая буква в свойстве Tag.
         /// </summary>
-        /// <returns>Возвращает объекты с максимальным процентом соответствия.</returns>
-        IEnumerable<Reg> MaxObjects
+        /// <returns>Возвращает словарь со значениями количества встречающихся букв на карте.</returns>
+        Dictionary<char, uint> FindSymbols()
         {
-            get
-            {
-                ProcPerc? total = null;
-                int? px = null, py = null;
-                bool[,] map = new bool[Width, Height];
-                for (int y1 = 0; y1 < Height; y1++)
-                    for (int x1 = 0; x1 < Width; x1++)
+            Dictionary<char, uint> dic = new Dictionary<char, uint>(Width * Height);
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
+                {//УБРАТЬ КОНФЛИКТЫ, ОТСОРТИРОВАТЬ ПО ПРОЦЕНТУ СООТВЕТСТВИЯ
+                    Processor[] procs = this[x, y].Procs;
+                    if (procs == null)
+                        continue;
+                    foreach (Processor proc in procs)
                     {
-                        if (MapWidth > Width - x1 || MapHeight > Height - y1)
-                            yield break;
-                        double percent = 0.0;
-                        for (int y = 0; y < Height; y++)
-                            for (int x = 0; x < Width; x++)
-                            {
-                                if (MapWidth > Width - x || MapHeight > Height - y)
-                                    yield break;
-                                if (map[x, y])
-                                    continue;
-                                ProcPerc pp = _coords[x, y];
-                                if (pp.Procs == null)
-                                    continue;
-                                double p = Math.Abs(1.0 - pp.Percent);
-                                if (p > percent)
-                                    continue;
-                                percent = p;
-                                total = pp;
-                                px = x;
-                                py = y;
-                                if (percent <= 0.0)
-                                    goto end;
-                            }
-                        end:
-                        if (px == null)
-                            yield break;
-                        map[px.Value, py.Value] = true;
-                        Reg reg = new Reg
-                        {
-                            Percent = total.Value.Percent,
-                            Position = new Point(x1, y1),
-                            Procs = total.Value.Procs
-                        };
-                        yield return reg;
+                        if (proc == null)
+                            continue;
+                        char ch = proc.Tag[0];
+                        if (dic.ContainsKey(ch))
+                            dic[ch]++;
+                        else
+                            dic[ch] = 1;
                     }
+                }
+            return dic;
+        }
+
+        /// <summary>
+        /// Вычисляет количество встречающихся символов в указанной строке.
+        /// Поиск производится без учёта регистра.
+        /// </summary>
+        /// <param name="word">Проверяемое слово.</param>
+        /// <returns>Возвращает словарь с количеством встречающихся символов в указанной строке.</returns>
+        static Dictionary<char, uint> FindSymbol(string word)
+        {
+            if (string.IsNullOrEmpty(word))
+                return null;
+            word = word.ToUpper();
+            Dictionary<char, uint> dic = new Dictionary<char, uint>(word.Length);
+            foreach (char ch in word)
+            {
+                if (dic.ContainsKey(ch))
+                    dic[ch]++;
+                else
+                    dic[ch] = 1;
             }
+            return dic;
+        }
+
+        /// <summary>
+        /// Ищет возможность связывания указанных слов с полями Tag найденных карт.
+        /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова при условии отсутствия пересечений между ними?".
+        /// Если хотя бы одно слово отсутствует, возвращается значение false.
+        /// </summary>
+        /// <param name="words">Искомые слова.</param>
+        /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
+        public bool FindRelation(params string[] words)
+        {
+            return FindRelation((IEnumerable<string>)words);
         }
 
         /// <summary>

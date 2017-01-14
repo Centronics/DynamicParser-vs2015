@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 
 namespace DynamicParser
 {
@@ -129,78 +130,9 @@ namespace DynamicParser
         /// </summary>
         /// <param name="words">Искомые слова.</param>
         /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
-        public bool FindRelation(IEnumerable<string> words)
+        public bool FindRelation(params string[] words)
         {
-            Dictionary<char, uint> allWords = FindSymbols();
-            checked
-            {
-                foreach (string word in words)
-                {
-                    Dictionary<char, uint> symbols = FindSymbol(word);
-                    if (symbols == null)
-                        continue;
-                    foreach (KeyValuePair<char, uint> pair in symbols)
-                    {
-                        uint numberWords;
-                        if (!allWords.TryGetValue(pair.Key, out numberWords))
-                            return false;
-                        if (numberWords < pair.Value)
-                            return false;
-                        allWords[pair.Key] = numberWords - pair.Value;
-                    }
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Вычисляет количество встречающихся букв на карте.
-        /// Учитывается только первая буква в свойстве Tag.
-        /// </summary>
-        /// <returns>Возвращает словарь со значениями количества встречающихся букв на карте.</returns>
-        Dictionary<char, uint> FindSymbols()
-        {
-            Dictionary<char, uint> dic = new Dictionary<char, uint>(Width * Height);
-            for (int y = 0; y < Height; y++)
-                for (int x = 0; x < Width; x++)
-                {//УБРАТЬ КОНФЛИКТЫ, ОТСОРТИРОВАТЬ ПО ПРОЦЕНТУ СООТВЕТСТВИЯ
-                    Processor[] procs = this[x, y].Procs;
-                    if (procs == null)
-                        continue;
-                    foreach (Processor proc in procs)
-                    {
-                        if (proc == null)
-                            continue;
-                        char ch = proc.Tag[0];
-                        if (dic.ContainsKey(ch))
-                            dic[ch]++;
-                        else
-                            dic[ch] = 1;
-                    }
-                }
-            return dic;
-        }
-
-        /// <summary>
-        /// Вычисляет количество встречающихся символов в указанной строке.
-        /// Поиск производится без учёта регистра.
-        /// </summary>
-        /// <param name="word">Проверяемое слово.</param>
-        /// <returns>Возвращает словарь с количеством встречающихся символов в указанной строке.</returns>
-        static Dictionary<char, uint> FindSymbol(string word)
-        {
-            if (string.IsNullOrEmpty(word))
-                return null;
-            word = word.ToUpper();
-            Dictionary<char, uint> dic = new Dictionary<char, uint>(word.Length);
-            foreach (char ch in word)
-            {
-                if (dic.ContainsKey(ch))
-                    dic[ch]++;
-                else
-                    dic[ch] = 1;
-            }
-            return dic;
+            return FindRelation((IEnumerable<string>)words);
         }
 
         /// <summary>
@@ -210,9 +142,92 @@ namespace DynamicParser
         /// </summary>
         /// <param name="words">Искомые слова.</param>
         /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
-        public bool FindRelation(params string[] words)
+        public bool FindRelation(IEnumerable<string> words)
         {
-            return FindRelation((IEnumerable<string>)words);
+            Region region = new Region(Width, Height);
+            List<Processor>[,] points = new List<Processor>[Width, Height];
+            foreach (string word in words)
+            {
+                if (string.IsNullOrEmpty(word))
+                    continue;
+                int[] count = new int[word.Length];
+                List<IList<Reg>> lstReg = word.Select(ch => FindSymbols(ch, points)).Cast<IList<Reg>>().ToList();
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Находит объекты в результатах поиска, поле Tag которых соответствует указанному символу по своему первому символу и помечает его обработанным.
+        /// </summary>
+        /// <param name="symbol">Искомый символ.</param>
+        /// <param name="points">Массив данных, содержащий информацию об обработанных объектах.</param>
+        /// <returns>Возвращает информацию о найденных объектах.</returns>
+        List<Reg> FindSymbols(char symbol, List<Processor>[,] points)
+        {
+            symbol = char.ToUpper(symbol);
+            List<Reg> lstRegs = new List<Reg>();
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
+                {
+                    Processor[] procs = this[x, y].Procs;
+                    if (procs == null)
+                        continue;
+                    List<Processor> processors = new List<Processor>();
+                    foreach (Processor pr in procs)
+                    {
+                        if (pr == null || char.ToUpper(pr.Tag[0]) != symbol ||
+                            points[x, y] != null && points[x, y].Where(prc => prc != null).Any(prc => char.ToUpper(prc.Tag[0]) == symbol))
+                            continue;
+                        if (points[x, y] == null)
+                            points[x, y] = new List<Processor>();
+                        processors.Add(pr);
+                        points[x, y].Add(pr);
+                    }
+                    lstRegs.Add(new Reg
+                    {
+                        Percent = this[x, y].Percent,
+                        Position = new Point(x, y),
+                        Procs = processors.ToArray()
+                    });
+                }
+            return lstRegs;
+        }
+
+        /// <summary>
+        /// Увеличивает значение старших разрядов счётчика букв, если это возможно.
+        /// Если увеличение было произведено, возвращается номер позиции, на которой произошло изменение, в противном случае -1.
+        /// </summary>
+        /// <param name="count">Массив-счётчик.</param>
+        /// <param name="lstReg"></param>
+        /// <returns>Возвращается номер позиции, на которой произошло изменение, в противном случае -1.</returns>
+        int ChangeCount(IList<int> count, IList<IList<Reg>> lstReg)
+        {
+            for (int k = count.Count - 1; k >= 0; k--)
+            {
+                if (count[k] >= lstReg[k].Count - 1) continue;
+                count[k]++;
+                for (int x = k + 1; x < count.Count; x++)
+                    count[x] = 0;
+                return k;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Генерирует слово из частей, содержащихся в коллекции, основываясь на данных счётчиков.
+        /// </summary>
+        /// <param name="count">Данные счётчиков по каждому слову.</param>
+        /// <returns>Возвращает слово из частей, содержащихся в коллекции.</returns>
+        string GetWord(IList<int> count)
+        {
+            if (count == null)
+                throw new ArgumentNullException(nameof(count), $"{nameof(GetWord)}: Массив данных равен null.");
+            if (count.Count != Count)
+                throw new ArgumentException($"{nameof(GetWord)}: Длина массива данных должна совпадать с количеством хранимых слов.", nameof(count));
+            StringBuilder sb = new StringBuilder();
+            for (int k = 0; k < Count; k++)
+                sb.Append(this[k][count[k]]);
+            return sb.ToString();
         }
 
         /// <summary>

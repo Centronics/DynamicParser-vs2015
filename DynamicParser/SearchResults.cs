@@ -92,6 +92,11 @@ namespace DynamicParser
         public int Height => _coords.GetLength(1);
 
         /// <summary>
+        /// Размер текущей карты.
+        /// </summary>
+        public Size ResultSize => new Size(Width, Height);
+
+        /// <summary>
         /// Ширина карт, которые проходили обработку.
         /// </summary>
         public int MapWidth { get; }
@@ -100,6 +105,11 @@ namespace DynamicParser
         /// Высота карт, которые проходили обработку.
         /// </summary>
         public int MapHeight { get; }
+
+        /// <summary>
+        /// Размер карт, которые проходили обработку.
+        /// </summary>
+        public Size MapSize => new Size(MapWidth, MapHeight);
 
         /// <summary>
         /// Инициализирует экземпляр с заданными параметрами ширины и высоты.
@@ -132,7 +142,7 @@ namespace DynamicParser
         /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
         public bool FindRelation(params string[] words)
         {
-            return FindRelation((IEnumerable<string>)words);
+            return FindRelation((IList<string>)words);
         }
 
         /// <summary>
@@ -142,18 +152,74 @@ namespace DynamicParser
         /// </summary>
         /// <param name="words">Искомые слова.</param>
         /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
-        public bool FindRelation(IEnumerable<string> words)
+        public bool FindRelation(IList<string> words)
         {
-            Region region = new Region(Width, Height);
-            List<Processor>[,] points = new List<Processor>[Width, Height];
-            foreach (string word in words)
+            if (words == null)
+                throw new ArgumentNullException(nameof(words), $"{nameof(FindRelation)}: Искомые слова отсутствуют (null).");
+            if (words.Count <= 0)
+                return false;
+            if (words.Count == 1)
+                return FindRelation(words[0]);
+            StringBuilder sb = new StringBuilder();
+            foreach (string s in words)
             {
-                if (string.IsNullOrEmpty(word))
+                if (string.IsNullOrEmpty(s))
                     continue;
-                int[] count = new int[word.Length];
-                List<IList<Reg>> lstReg = word.Select(ch => FindSymbols(ch, points)).Cast<IList<Reg>>().ToList();
+                sb.Append(s);
             }
-            return true;
+            string str = sb.ToString();
+            return !string.IsNullOrEmpty(str) && FindRelation(str);
+        }
+
+        /// <summary>
+        /// Ищет возможность связывания указанного слова с полями Tag найденных карт.
+        /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомое слово?".
+        /// Возвращает значение true в случае нахождения слова, в противном случае - false.
+        /// </summary>
+        /// <param name="word">Искомое слово.</param>
+        /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
+        public bool FindRelation(string word)
+        {
+            if (word == null)
+                throw new ArgumentNullException(nameof(word), $"{nameof(FindRelation)}: Искомые слова отсутствуют (null).");
+            if (word.Length <= 0)
+                return false;
+            List<Processor>[,] points = new List<Processor>[Width, Height];
+            List<List<Reg>> lst = new List<List<Reg>>();
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (char ch in word)
+                lst.Add(FindSymbols(ch, points));
+            return GetStrings(lst);
+        }
+
+        /// <summary>
+        /// Получает строки из свойств Tag карт из заданного списка.
+        /// </summary>
+        /// <param name="regs">Обрабатываемый список карт.</param>
+        /// <returns>Возвращает строки из свойств Tag карт из заданного списка.</returns>
+        bool GetStrings(IList<List<Reg>> regs)
+        {
+            if (regs == null)
+                throw new ArgumentNullException(nameof(regs), $"{nameof(GetStrings)}: Список обрабатываемых карт равен null.");
+            int[] count = new int[regs.Count];
+            Region region = new Region(Width, Height);
+            for (int counter = regs.Count - 1; counter >= 0;)
+            {
+                List<Reg> lstReg = GetWord(count, regs);
+                bool result = true;
+                foreach (Reg reg in lstReg)
+                {
+                    Rectangle rect = new Rectangle(reg.Position, MapSize);
+                    if (region.IsConflict(rect))
+                        result = false;
+                    region.Add(rect);
+                }
+                if (result)
+                    return true;
+                if ((counter = ChangeCount(count, regs)) < 0)
+                    return false;
+            }
+            return false;
         }
 
         /// <summary>
@@ -164,6 +230,17 @@ namespace DynamicParser
         /// <returns>Возвращает информацию о найденных объектах.</returns>
         List<Reg> FindSymbols(char symbol, List<Processor>[,] points)
         {
+            if (points == null)
+                throw new ArgumentNullException(nameof(points),
+                    $"{nameof(FindSymbols)}: Массив данных, содержащий информацию об обработанных объектах равен null.");
+            if (points.GetLength(0) != Width)
+                throw new ArgumentException(
+                    $@"{nameof(FindSymbols)}: Массив данных, содержащий информацию об обработанных объектах не соответствует ширине карты ({
+                        points.GetLength(0)} и {Width}).");
+            if (points.GetLength(1) != Height)
+                throw new ArgumentException(
+                    $@"{nameof(FindSymbols)}: Массив данных, содержащий информацию об обработанных объектах не соответствует высоте карты ({
+                        points.GetLength(1)} и {Height}).");
             symbol = char.ToUpper(symbol);
             List<Reg> lstRegs = new List<Reg>();
             for (int y = 0; y < Height; y++)
@@ -198,10 +275,14 @@ namespace DynamicParser
         /// Если увеличение было произведено, возвращается номер позиции, на которой произошло изменение, в противном случае -1.
         /// </summary>
         /// <param name="count">Массив-счётчик.</param>
-        /// <param name="lstReg"></param>
+        /// <param name="lstReg">Список найденных карт.</param>
         /// <returns>Возвращается номер позиции, на которой произошло изменение, в противном случае -1.</returns>
-        int ChangeCount(IList<int> count, IList<IList<Reg>> lstReg)
+        int ChangeCount(IList<int> count, IList<List<Reg>> lstReg)
         {
+            if (lstReg == null)
+                throw new ArgumentNullException(nameof(lstReg), $"{nameof(ChangeCount)}:Список найденных карт равен (null).");
+            if (count == null || count.Count != lstReg.Count)
+                throw new ArgumentException($"{nameof(ChangeCount)}: Массив-счётчик не указан или его длина некорректна ({count?.Count}).", nameof(count));
             for (int k = count.Count - 1; k >= 0; k--)
             {
                 if (count[k] >= lstReg[k].Count - 1) continue;
@@ -217,17 +298,21 @@ namespace DynamicParser
         /// Генерирует слово из частей, содержащихся в коллекции, основываясь на данных счётчиков.
         /// </summary>
         /// <param name="count">Данные счётчиков по каждому слову.</param>
+        /// <param name="lstReg">Список найденных карт.</param>
         /// <returns>Возвращает слово из частей, содержащихся в коллекции.</returns>
-        string GetWord(IList<int> count)
+        List<Reg> GetWord(IList<int> count, IList<List<Reg>> lstReg)
         {
+            if (lstReg == null)
+                throw new ArgumentNullException(nameof(lstReg), $"{nameof(GetWord)}:Список найденных карт равен (null).");
             if (count == null)
                 throw new ArgumentNullException(nameof(count), $"{nameof(GetWord)}: Массив данных равен null.");
-            if (count.Count != Count)
+            if (count.Count != lstReg.Count)
                 throw new ArgumentException($"{nameof(GetWord)}: Длина массива данных должна совпадать с количеством хранимых слов.", nameof(count));
-            StringBuilder sb = new StringBuilder();
-            for (int k = 0; k < Count; k++)
-                sb.Append(this[k][count[k]]);
-            return sb.ToString();
+            List<Reg> lst = new List<Reg>();
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            for (int k = 0; k < lstReg.Count; k++)
+                lst.Add(lstReg[k][count[k]]);
+            return lst;
         }
 
         /// <summary>

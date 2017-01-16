@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DynamicProcessor;
@@ -78,20 +79,38 @@ namespace DynamicParser
             if (btm == null)
                 throw new ArgumentNullException(nameof(btm), $"{nameof(Processor)}: Изображение не может быть равно null.");
             if (btm.Width <= 0)
-                throw new ArgumentException($"{nameof(Processor)}: Ширина изображения не может быть меньше или равна нулю ({btm.Width}).", nameof(btm));
+                throw new ArgumentException($"{nameof(Processor)}: Ширина изображения не может быть меньше или равна нолю ({btm.Width}).", nameof(btm));
             if (btm.Height <= 0)
-                throw new ArgumentException($"{nameof(Processor)}: Высота изображения не может быть меньше или равна нулю ({btm.Height}).", nameof(btm));
+                throw new ArgumentException($"{nameof(Processor)}: Высота изображения не может быть меньше или равна нолю ({btm.Height}).", nameof(btm));
             if (string.IsNullOrWhiteSpace(tag))
                 throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть равен null.");
             _bitmap = new SignValue[btm.Width, btm.Height];
-            for (int y = 0; y < btm.Height; y++)
+            //btm.Save(@"D:\tmp.bmp");
+            using (FileStream fs = new FileStream(@"D:\tmp.bin", FileMode.Create))
+            {
+                for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
-                    _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
+                {
+                    Color col = btm.GetPixel(x, y);
+                    fs.Write(BitConverter.GetBytes(col.ToArgb()), 0, 4);
+                    _bitmap[x, y] = new SignValue(col);
+                }
+            }
+
+            using (FileStream fs = new FileStream(@"D:\tmp.bin", FileMode.Create))
+            {
+                for (int y = 0; y < btm.Height; y++)
+                    for (int x = 0; x < btm.Width; x++)
+                    {
+                        fs.Write(BitConverter.GetBytes(_bitmap[x,y].Value),0,4);
+                    }
+            }
+
             Tag = tag.Trim();
         }
 
         /// <summary>
-        /// Заргужает указанную карту, создавая внутреннюю её копию.
+        /// Загружает указанную карту, создавая внутреннюю её копию.
         /// </summary>
         /// <param name="btm">Загружаемая карта.</param>
         /// <param name="tag">Название карты.</param>
@@ -101,9 +120,9 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(btm), $"{nameof(Processor)}: Загружаемая карта не может быть равна null.");
             int w = btm.GetLength(0), h = btm.GetLength(1);
             if (w <= 0)
-                throw new ArgumentException($"{nameof(Processor)}: Ширина загружаемой карты не может быть меньше или равна нулю ({w}).", nameof(btm));
+                throw new ArgumentException($"{nameof(Processor)}: Ширина загружаемой карты не может быть меньше или равна нолю ({w}).", nameof(btm));
             if (h <= 0)
-                throw new ArgumentException($"{nameof(Processor)}: Высота загружаемой карты не может быть меньше или равна нулю ({h}).", nameof(btm));
+                throw new ArgumentException($"{nameof(Processor)}: Высота загружаемой карты не может быть меньше или равна нолю ({h}).", nameof(btm));
             if (string.IsNullOrWhiteSpace(tag))
                 throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть равен null.");
             _bitmap = new SignValue[w, h];
@@ -123,7 +142,7 @@ namespace DynamicParser
             if (btm == null)
                 throw new ArgumentNullException(nameof(btm), $"{nameof(Processor)}: Загружаемая карта не может быть равна null.");
             if (btm.Length <= 0)
-                throw new ArgumentException($"{nameof(Processor)}: Ширина загружаемой карты не может быть меньше или равна нулю ({btm.Length}).", nameof(btm));
+                throw new ArgumentException($"{nameof(Processor)}: Ширина загружаемой карты не может быть меньше или равна нолю ({btm.Length}).", nameof(btm));
             if (string.IsNullOrWhiteSpace(tag))
                 throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть равен null.");
             _bitmap = new SignValue[btm.Length, 1];
@@ -152,15 +171,15 @@ namespace DynamicParser
         static bool GetMinIndex(IDictionary<int, SignValue[,]> db, int x, int y, int number)
         {
             if (x < 0)
-                throw new ArgumentException($"{nameof(GetMinIndex)}: Координата x меньше нуля ({x}).", nameof(x));
+                throw new ArgumentException($"{nameof(GetMinIndex)}: Координата x меньше ноля ({x}).", nameof(x));
             if (y < 0)
-                throw new ArgumentException($"{nameof(GetMinIndex)}: Координата y меньше нуля ({y}).", nameof(y));
+                throw new ArgumentException($"{nameof(GetMinIndex)}: Координата y меньше ноля ({y}).", nameof(y));
             if (number < 0)
-                throw new ArgumentException($"{nameof(GetMinIndex)}: Индекс проверяемой карты меньше нуля ({number}).", nameof(number));
+                throw new ArgumentException($"{nameof(GetMinIndex)}: Индекс проверяемой карты меньше ноля ({number}).", nameof(number));
             if (db == null)
                 throw new ArgumentNullException(nameof(db), $"{nameof(GetMinIndex)}: Массив карт для поиска равен null.");
             if (db.Count <= 0)
-                throw new ArgumentException($"{nameof(GetMinIndex)}: Длина массива карт для поиска равна нулю ({db.Count}).", nameof(db));
+                throw new ArgumentException($"{nameof(GetMinIndex)}: Длина массива карт для поиска равна нолю ({db.Count}).", nameof(db));
             SignValue ind = SignValue.MaxValue;
             int n = -1;
             foreach (int key in db.Keys)

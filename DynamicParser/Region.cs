@@ -107,9 +107,9 @@ namespace DynamicParser
         public Region(int width, int height)
         {
             if (width <= 0)
-                throw new ArgumentException($"{nameof(Region)}: Ширина не может быть меньше или равна нулю ({width}).", nameof(width));
+                throw new ArgumentException($"{nameof(Region)}: Ширина не может быть меньше или равна нолю ({width}).", nameof(width));
             if (height <= 0)
-                throw new ArgumentException($"{nameof(Region)}: Высота не может быть меньше или равна нулю ({height}).", nameof(height));
+                throw new ArgumentException($"{nameof(Region)}: Высота не может быть меньше или равна нолю ({height}).", nameof(height));
             Width = width;
             Height = height;
         }
@@ -123,9 +123,9 @@ namespace DynamicParser
         ulong GetIndex(int x, int y)
         {
             if (x < 0)
-                throw new ArgumentException($"{nameof(GetIndex)}: Координата X не может быть меньше нуля ({x}).", nameof(x));
+                throw new ArgumentException($"{nameof(GetIndex)}: Координата X не может быть меньше ноля ({x}).", nameof(x));
             if (y < 0)
-                throw new ArgumentException($"{nameof(GetIndex)}: Координата Y не может быть меньше нуля ({y}).", nameof(y));
+                throw new ArgumentException($"{nameof(GetIndex)}: Координата Y не может быть меньше ноля ({y}).", nameof(y));
             if (x >= Width)
                 throw new ArgumentException($"{nameof(GetIndex)}: Координата X не может быть больше или равна ширине ({x}).", nameof(x));
             if (y >= Height)
@@ -144,9 +144,9 @@ namespace DynamicParser
             get
             {
                 if (x < 0)
-                    throw new ArgumentException($"Indexer: Координата X не может быть меньше нуля ({x}).", nameof(x));
+                    throw new ArgumentException($"Indexer: Координата X не может быть меньше ноля ({x}).", nameof(x));
                 if (y < 0)
-                    throw new ArgumentException($"Indexer: Координата Y не может быть меньше нуля ({y}).", nameof(y));
+                    throw new ArgumentException($"Indexer: Координата Y не может быть меньше ноля ({y}).", nameof(y));
                 if (x >= Width)
                     throw new ArgumentException($"Indexer: Координата X не может быть больше или равна ширине ({x}).", nameof(x));
                 if (y >= Height)

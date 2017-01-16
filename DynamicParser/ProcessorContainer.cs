@@ -73,7 +73,7 @@ namespace DynamicParser
             if (proc == null)
                 throw new ArgumentNullException(nameof(proc), $"{nameof(Add)}: {nameof(proc)} = null.");
             if (proc.Length <= 0)
-                throw new ArgumentException($"{nameof(Add)}: Длина добавляемой карты не может быть равна нулю ({proc.Length}).", nameof(proc));
+                throw new ArgumentException($"{nameof(Add)}: Длина добавляемой карты не может быть равна нолю ({proc.Length}).", nameof(proc));
             if (proc.Width != Width)
                 throw new ArgumentException($"{nameof(Add)}: Ширина добавляемой карты должна совпадать с шириной хранилища ({proc.Width} и {Width}).", nameof(proc));
             if (proc.Height != Height)

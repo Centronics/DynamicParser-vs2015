@@ -132,9 +132,9 @@ namespace DynamicParser
         public Attacher(int width, int height)
         {
             if (width <= 0)
-                throw new ArgumentException($"{nameof(Attacher)}: Ширина не может быть меньше или равна нулю ({width}).", nameof(width));
+                throw new ArgumentException($"{nameof(Attacher)}: Ширина не может быть меньше или равна нолю ({width}).", nameof(width));
             if (height <= 0)
-                throw new ArgumentException($"{nameof(Attacher)}: Высота не может быть меньше или равна нулю ({height}).", nameof(height));
+                throw new ArgumentException($"{nameof(Attacher)}: Высота не может быть меньше или равна нолю ({height}).", nameof(height));
             Width = width;
             Height = height;
         }
@@ -220,9 +220,9 @@ namespace DynamicParser
             if (point.Y >= Height)
                 throw new ArgumentException($"{nameof(Add)}: Указанная точка выходит за предел описанной области point.Y = {point.Y}, Height = {Height}.", nameof(point));
             if (point.X < 0)
-                throw new ArgumentException($"{nameof(Add)}: Координата point.X меньше нуля ({point.X}).", nameof(point));
+                throw new ArgumentException($"{nameof(Add)}: Координата point.X меньше ноля ({point.X}).", nameof(point));
             if (point.Y < 0)
-                throw new ArgumentException($"{nameof(Add)}: Координата point.Y меньше нуля ({point.Y}).", nameof(point));
+                throw new ArgumentException($"{nameof(Add)}: Координата point.Y меньше ноля ({point.Y}).", nameof(point));
             _attaches.Add(new Attach { Point = point });
         }
 

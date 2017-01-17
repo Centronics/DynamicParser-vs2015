@@ -107,7 +107,7 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(GetWord)}: Длина массива данных должна совпадать с количеством хранимых слов.", nameof(count));
             StringBuilder sb = new StringBuilder();
             for (int k = 0; k < Count; k++)
-                sb.Append(this[k][count[k]]);
+                sb.Append(this[k][count[k]][0]);
             return sb.ToString();
         }
     }

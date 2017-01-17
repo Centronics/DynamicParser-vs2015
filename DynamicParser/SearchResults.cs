@@ -134,7 +134,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Ищет возможность связывания указанных слов с полями Tag найденных карт.
+        /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
         /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова при условии отсутствия пересечений между ними?".
         /// Если хотя бы одно слово отсутствует, возвращается значение false.
         /// </summary>
@@ -146,7 +146,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Ищет возможность связывания указанных слов с полями Tag найденных карт.
+        /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
         /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова при условии отсутствия пересечений между ними?".
         /// Если хотя бы одно слово отсутствует, возвращается значение false.
         /// </summary>
@@ -172,7 +172,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Ищет возможность связывания указанного слова с полями Tag найденных карт.
+        /// Ищет возможность связывания указанного слова с полями <see cref="Processor.Tag"/> найденных карт.
         /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомое слово?".
         /// Возвращает значение true в случае нахождения слова, в противном случае - false.
         /// </summary>
@@ -188,19 +188,26 @@ namespace DynamicParser
             List<List<Reg>> lst = new List<List<Reg>>();
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (char ch in word)
-                lst.Add(FindSymbols(ch, points));
-            return GetStrings(lst);
+            {
+                List<Reg> lstReg = FindSymbols(ch, points);
+                if (lstReg != null && lstReg.Count > 0)
+                    lst.Add(lstReg);
+            }
+            WordSearcher ws = GetWordSearcher(lst);
+            return ws != null && ws.IsEqual(word);
         }
 
         /// <summary>
-        /// Получает строки из свойств Tag карт из заданного списка.
+        /// Получает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.
         /// </summary>
-        /// <param name="regs">Обрабатываемый список карт.</param>
-        /// <returns>Возвращает строки из свойств Tag карт из заданного списка.</returns>
-        bool GetStrings(IList<List<Reg>> regs)
+        /// <param name="regs">Список обрабатываемых карт.</param>
+        /// <returns>Возвращает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
+        WordSearcher GetWordSearcher(IList<List<Reg>> regs)
         {
             if (regs == null)
-                throw new ArgumentNullException(nameof(regs), $"{nameof(GetStrings)}: Список обрабатываемых карт равен null.");
+                throw new ArgumentNullException(nameof(regs), $"{nameof(GetWordSearcher)}: Список обрабатываемых карт равен null.");
+            if (regs.Count <= 0)
+                return null;
             int[] count = new int[regs.Count];
             Region region = new Region(Width, Height);
             for (int counter = regs.Count - 1; counter >= 0;)
@@ -213,17 +220,40 @@ namespace DynamicParser
                     if (region.IsConflict(rect))
                         result = false;
                     region.Add(rect);
+                    region[reg.Position].Register = new List<Reg> { reg };
                 }
                 if (result)
-                    return true;
+                    return GetStringFromRegion(region);
                 if ((counter = ChangeCount(count, regs)) < 0)
-                    return false;
+                    return null;
             }
-            return false;
+            return null;
         }
 
         /// <summary>
-        /// Находит объекты в результатах поиска, поле Tag которых соответствует указанному символу по своему первому символу и помечает его обработанным.
+        /// Генерирует <see cref="WordSearcher"/> из первых букв названия (<see cref="Processor.Tag"/>) объектов региона.
+        /// </summary>
+        /// <param name="region">Регион, из которого требуется получить <see cref="WordSearcher"/>.</param>
+        /// <returns>Возвращает <see cref="WordSearcher"/> из первых букв названия (<see cref="Processor.Tag"/>) объектов региона.</returns>
+        WordSearcher GetStringFromRegion(Region region)
+        {
+            if (region == null)
+                throw new ArgumentNullException(nameof(region), $"{nameof(GetStringFromRegion)}: Регион равен null.");
+            List<List<string>> lstWords = new List<List<string>>();
+            foreach (Registered registered in region.Elements)
+                foreach (Reg reg in registered.Register)
+                {
+                    List<string> lst = new List<string>();
+                    // ReSharper disable once LoopCanBeConvertedToQuery
+                    foreach (Processor pr in reg.Procs)
+                        lst.Add(pr.Tag);
+                    lstWords.Add(lst);
+                }
+            return new WordSearcher(lstWords);
+        }
+
+        /// <summary>
+        /// Находит объекты в результатах поиска, поле <see cref="Processor.Tag"/> которых по своему первой букве соответствует указанному символу.
         /// </summary>
         /// <param name="symbol">Искомый символ.</param>
         /// <param name="points">Массив данных, содержащий информацию об обработанных объектах.</param>
@@ -252,20 +282,25 @@ namespace DynamicParser
                     List<Processor> processors = new List<Processor>();
                     foreach (Processor pr in procs)
                     {
-                        if (pr == null || char.ToUpper(pr.Tag[0]) != symbol ||
-                            points[x, y] != null && points[x, y].Where(prc => prc != null).Any(prc => char.ToUpper(prc.Tag[0]) == symbol))
+                        if (pr == null || char.ToUpper(pr.Tag[0]) != symbol)
                             continue;
-                        if (points[x, y] == null)
+                        if (points[x, y] != null)
+                        {
+                            if (points[x, y].Where(prc => prc != null).Any(prc => char.ToUpper(prc.Tag[0]) == symbol))
+                                continue;
+                            points[x, y].Add(pr);
+                        }
+                        else
                             points[x, y] = new List<Processor>();
                         processors.Add(pr);
-                        points[x, y].Add(pr);
                     }
-                    lstRegs.Add(new Reg
-                    {
-                        Percent = this[x, y].Percent,
-                        Position = new Point(x, y),
-                        Procs = processors.ToArray()
-                    });
+                    if (processors.Count > 0)
+                        lstRegs.Add(new Reg
+                        {
+                            Percent = this[x, y].Percent,
+                            Position = new Point(x, y),
+                            Procs = processors.ToArray()
+                        });
                 }
             return lstRegs;
         }

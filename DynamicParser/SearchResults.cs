@@ -282,11 +282,11 @@ namespace DynamicParser
                     List<Processor> processors = new List<Processor>();
                     foreach (Processor pr in procs)
                     {
-                        if (pr == null || char.ToUpper(pr.Tag[0]) != symbol)
+                        if (pr == null || pr.Symbol != symbol)
                             continue;
                         if (points[x, y] != null)
                         {
-                            if (points[x, y].Where(prc => prc != null).Any(prc => char.ToUpper(prc.Tag[0]) == symbol))
+                            if (points[x, y].Where(prc => prc != null).Any(prc => prc.Symbol == symbol))
                                 continue;
                             points[x, y].Add(pr);
                         }

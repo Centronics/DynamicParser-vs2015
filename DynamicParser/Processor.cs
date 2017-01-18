@@ -31,9 +31,9 @@ namespace DynamicParser
         public string Tag { get; }
 
         /// <summary>
-        /// Символ текущей карты.
+        /// Символ текущей карты в верхнем регистре.
         /// </summary>
-        public char Symbol => Tag[0];
+        public char Symbol { get; }
 
         /// <summary>
         /// Ширина.
@@ -87,12 +87,13 @@ namespace DynamicParser
             if (btm.Height <= 0)
                 throw new ArgumentException($"{nameof(Processor)}: Высота изображения не может быть меньше или равна нолю ({btm.Height}).", nameof(btm));
             if (string.IsNullOrWhiteSpace(tag))
-                throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть равен null.");
+                throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть пустым.");
             _bitmap = new SignValue[btm.Width, btm.Height];
             for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
                     _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
             Tag = tag.Trim();
+            Symbol = char.ToUpper(Tag[0]);
         }
 
         /// <summary>
@@ -110,12 +111,13 @@ namespace DynamicParser
             if (h <= 0)
                 throw new ArgumentException($"{nameof(Processor)}: Высота загружаемой карты не может быть меньше или равна нолю ({h}).", nameof(btm));
             if (string.IsNullOrWhiteSpace(tag))
-                throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть равен null.");
+                throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть пустым.");
             _bitmap = new SignValue[w, h];
             for (int y = 0; y < h; y++)
                 for (int x = 0; x < w; x++)
                     _bitmap[x, y] = btm[x, y];
-            Tag = tag;
+            Tag = tag.Trim();
+            Symbol = char.ToUpper(Tag[0]);
         }
 
         /// <summary>
@@ -130,11 +132,23 @@ namespace DynamicParser
             if (btm.Length <= 0)
                 throw new ArgumentException($"{nameof(Processor)}: Ширина загружаемой карты не может быть меньше или равна нолю ({btm.Length}).", nameof(btm));
             if (string.IsNullOrWhiteSpace(tag))
-                throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть равен null.");
+                throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть пустым.");
             _bitmap = new SignValue[btm.Length, 1];
             for (int x = 0; x < btm.Length; x++)
                 _bitmap[x, 0] = btm[x];
-            Tag = tag;
+            Tag = tag.Trim();
+            Symbol = char.ToUpper(Tag[0]);
+        }
+
+        /// <summary>
+        /// Проверяет, является ли заданный символ символом текущей карты. Сравнение производится без учёта регистра.
+        /// </summary>
+        /// <param name="symbol">Проверяемый символ.</param>
+        /// <returns>Возвращает значение true в случае, когда проверяемый символ является символом текущей карты, в противном случае - false.</returns>
+        public bool IsSymbol(char symbol)
+        {
+            symbol = char.ToUpper(symbol);
+            return symbol == Symbol;
         }
 
         /// <summary>

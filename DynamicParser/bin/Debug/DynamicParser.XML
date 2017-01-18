@@ -173,6 +173,11 @@
             Название текущей карты.
             </summary>
         </member>
+        <member name="P:DynamicParser.Processor.Symbol">
+            <summary>
+            Символ текущей карты в верхнем регистре.
+            </summary>
+        </member>
         <member name="P:DynamicParser.Processor.Width">
             <summary>
             Ширина.
@@ -231,6 +236,13 @@
             </summary>
             <param name="btm">Загружаемый массив.</param>
             <param name="tag">Название карты.</param>
+        </member>
+        <member name="M:DynamicParser.Processor.IsSymbol(System.Char)">
+            <summary>
+            Проверяет, является ли заданный символ символом текущей карты. Сравнение производится без учёта регистра.
+            </summary>
+            <param name="symbol">Проверяемый символ.</param>
+            <returns>Возвращает значение true в случае, когда проверяемый символ является символом текущей карты, в противном случае - false.</returns>
         </member>
         <member name="M:DynamicParser.Processor.ToString">
             <summary>

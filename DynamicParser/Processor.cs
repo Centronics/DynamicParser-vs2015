@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DynamicProcessor;
@@ -30,6 +29,11 @@ namespace DynamicParser
         /// Название текущей карты.
         /// </summary>
         public string Tag { get; }
+
+        /// <summary>
+        /// Символ текущей карты.
+        /// </summary>
+        public char Symbol => Tag[0];
 
         /// <summary>
         /// Ширина.
@@ -85,27 +89,9 @@ namespace DynamicParser
             if (string.IsNullOrWhiteSpace(tag))
                 throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть равен null.");
             _bitmap = new SignValue[btm.Width, btm.Height];
-            //btm.Save(@"D:\tmp.bmp");
-            using (FileStream fs = new FileStream(@"D:\tmp.bin", FileMode.Create))
-            {
-                for (int y = 0; y < btm.Height; y++)
+            for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
-                {
-                    Color col = btm.GetPixel(x, y);
-                    fs.Write(BitConverter.GetBytes(col.ToArgb()), 0, 4);
-                    _bitmap[x, y] = new SignValue(col);
-                }
-            }
-
-            using (FileStream fs = new FileStream(@"D:\tmp.bin", FileMode.Create))
-            {
-                for (int y = 0; y < btm.Height; y++)
-                    for (int x = 0; x < btm.Width; x++)
-                    {
-                        fs.Write(BitConverter.GetBytes(_bitmap[x,y].Value),0,4);
-                    }
-            }
-
+                    _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
             Tag = tag.Trim();
         }
 

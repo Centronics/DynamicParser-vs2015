@@ -9,7 +9,7 @@ using DynamicProcessor;
 namespace DynamicParser
 {
     /// <summary>
-    /// Процессор, выполняющий поиск соответствующих указанных карт на рабочем поле.
+    /// Процессор (одновременно являющийся картой), выполняющий поиск соответствующих указанных карт на рабочем поле.
     /// Работает по принципу поисковика наиболее подходящей карты для каждого места на рабочем поле.
     /// Поиск производится по всему полю.
     /// </summary>
@@ -29,11 +29,6 @@ namespace DynamicParser
         /// Название текущей карты.
         /// </summary>
         public string Tag { get; }
-
-        /// <summary>
-        /// Символ текущей карты в верхнем регистре.
-        /// </summary>
-        public char Symbol { get; }
 
         /// <summary>
         /// Ширина.
@@ -93,7 +88,6 @@ namespace DynamicParser
                 for (int x = 0; x < btm.Width; x++)
                     _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
             Tag = tag.Trim();
-            Symbol = char.ToUpper(Tag[0]);
         }
 
         /// <summary>
@@ -117,7 +111,6 @@ namespace DynamicParser
                 for (int x = 0; x < w; x++)
                     _bitmap[x, y] = btm[x, y];
             Tag = tag.Trim();
-            Symbol = char.ToUpper(Tag[0]);
         }
 
         /// <summary>
@@ -137,24 +130,40 @@ namespace DynamicParser
             for (int x = 0; x < btm.Length; x++)
                 _bitmap[x, 0] = btm[x];
             Tag = tag.Trim();
-            Symbol = char.ToUpper(Tag[0]);
         }
 
         /// <summary>
-        /// Проверяет, является ли заданный символ символом текущей карты. Сравнение производится без учёта регистра.
+        /// Получает строку, представляющую подстроку поля <see cref="Tag"/> текущей карты.
+        /// Отрицательные значения свидетельствуют о необходимости использовать содержимое свойства <see cref="Tag"/> целиком.
         /// </summary>
-        /// <param name="symbol">Проверяемый символ.</param>
-        /// <returns>Возвращает значение true в случае, когда проверяемый символ является символом текущей карты, в противном случае - false.</returns>
-        public bool IsSymbol(char symbol)
+        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
+        /// <returns>Возвращает строку, представляющую подстроку поля <see cref="Tag"/> текущей карты.</returns>
+        public string GetProcessorName(int startIndex, int length)
         {
-            symbol = char.ToUpper(symbol);
-            return symbol == Symbol;
+            if (startIndex < 0 || startIndex >= Tag.Length || length <= 0 || startIndex + length > Tag.Length || length > Tag.Length)
+                return Tag;
+            return startIndex + length >= Tag.Length ? Tag.Substring(startIndex) : Tag.Substring(startIndex, length);
         }
 
         /// <summary>
-        /// Получает строковое представление текущего экземпляра, которое является значением свойства Tag.
+        /// Проверяет, является ли заданное имя именем текущей карты. Проверка производится без учёта регистра.
         /// </summary>
-        /// <returns>Возвращает строковое представление текущего экземпляра, которое является значением свойства Tag.</returns>
+        /// <param name="name">Проверяемое имя.</param>
+        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
+        /// <returns>Возвращает значение true, если указанное имя соответствует имени карты, в противном случае - false.</returns>
+        public bool IsProcessorName(string name, int startIndex, int length)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+            return string.Compare(name, GetProcessorName(startIndex, length), StringComparison.OrdinalIgnoreCase) == 0;
+        }
+
+        /// <summary>
+        /// Получает строковое представление текущего экземпляра, которое является значением свойства <see cref="Tag"/>.
+        /// </summary>
+        /// <returns>Возвращает строковое представление текущего экземпляра, которое является значением свойства <see cref="Tag"/>.</returns>
         public override string ToString()
         {
             return Tag;
@@ -171,15 +180,15 @@ namespace DynamicParser
         static bool GetMinIndex(IDictionary<int, SignValue[,]> db, int x, int y, int number)
         {
             if (x < 0)
-                throw new ArgumentException($"{nameof(GetMinIndex)}: Координата x меньше ноля ({x}).", nameof(x));
+                throw new ArgumentOutOfRangeException(nameof(x), $"{nameof(GetMinIndex)}: Координата x меньше ноля ({x}).");
             if (y < 0)
-                throw new ArgumentException($"{nameof(GetMinIndex)}: Координата y меньше ноля ({y}).", nameof(y));
+                throw new ArgumentOutOfRangeException(nameof(y), $"{nameof(GetMinIndex)}: Координата y меньше ноля ({y}).");
             if (number < 0)
                 throw new ArgumentException($"{nameof(GetMinIndex)}: Индекс проверяемой карты меньше ноля ({number}).", nameof(number));
             if (db == null)
                 throw new ArgumentNullException(nameof(db), $"{nameof(GetMinIndex)}: Массив карт для поиска равен null.");
             if (db.Count <= 0)
-                throw new ArgumentException($"{nameof(GetMinIndex)}: Длина массива карт для поиска равна нолю ({db.Count}).", nameof(db));
+                throw new ArgumentOutOfRangeException(nameof(db), $"{nameof(GetMinIndex)}: Длина массива карт для поиска равна нолю ({db.Count}).");
             SignValue ind = SignValue.MaxValue;
             int n = -1;
             foreach (int key in db.Keys)

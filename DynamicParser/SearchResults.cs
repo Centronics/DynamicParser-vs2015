@@ -177,8 +177,10 @@ namespace DynamicParser
         /// Возвращает значение true в случае нахождения слова, в противном случае - false.
         /// </summary>
         /// <param name="word">Искомое слово.</param>
+        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
         /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
-        public bool FindRelation(string word)
+        public bool FindRelation(string word, int startIndex = 0, int length = 1)
         {
             if (word == null)
                 throw new ArgumentNullException(nameof(word), $"{nameof(FindRelation)}: Искомые слова отсутствуют (null).");
@@ -187,22 +189,39 @@ namespace DynamicParser
             List<Processor>[,] points = new List<Processor>[Width, Height];
             List<List<Reg>> lst = new List<List<Reg>>();
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (char ch in word)
+            foreach (FindString ch in GetWord(word, length))
             {
-                List<Reg> lstReg = FindSymbols(ch, points);
+                List<Reg> lstReg = FindSymbols(ch.CurrentString, points, startIndex, length);
                 if (lstReg != null && lstReg.Count > 0)
                     lst.Add(lstReg);
             }
-            WordSearcher ws = GetWordSearcher(lst);
+            WordSearcher ws = GetWordSearcher(lst, startIndex, length);
             return ws != null && ws.IsEqual(word);
+        }
+
+        /// <summary>
+        /// Получает части слова указанной длины.
+        /// </summary>
+        /// <param name="word">Искомое слово.</param>
+        /// <param name="length">Требуемое количество букв в подстроке.</param>
+        /// <returns>Возвращает части слова указанной длины.</returns>
+        static IEnumerable<FindString> GetWord(string word, int length)
+        {
+            for (int k = 0, max = word.Length - length; k <= max; k++)
+            {
+                FindString fs = new FindString(word.Substring(k, length), k, word);
+                yield return fs;
+            }
         }
 
         /// <summary>
         /// Получает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.
         /// </summary>
         /// <param name="regs">Список обрабатываемых карт.</param>
+        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
-        WordSearcher GetWordSearcher(IList<List<Reg>> regs)
+        WordSearcher GetWordSearcher(IList<List<Reg>> regs, int startIndex, int length)
         {
             if (regs == null)
                 throw new ArgumentNullException(nameof(regs), $"{nameof(GetWordSearcher)}: Список обрабатываемых карт равен null.");
@@ -218,12 +237,15 @@ namespace DynamicParser
                 {
                     Rectangle rect = new Rectangle(reg.Position, MapSize);
                     if (region.IsConflict(rect))
+                    {
                         result = false;
+                        break;
+                    }
                     region.Add(rect);
                     region[reg.Position].Register = new List<Reg> { reg };
                 }
                 if (result)
-                    return GetStringFromRegion(region);
+                    return GetStringFromRegion(region, startIndex, length);
                 if ((counter = ChangeCount(count, regs)) < 0)
                     return null;
             }
@@ -231,11 +253,13 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Генерирует <see cref="WordSearcher"/> из первых букв названия (<see cref="Processor.Tag"/>) объектов региона.
+        /// Генерирует <see cref="WordSearcher"/> из <see cref="Processor.GetProcessorName"/>.
         /// </summary>
         /// <param name="region">Регион, из которого требуется получить <see cref="WordSearcher"/>.</param>
+        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/> из первых букв названия (<see cref="Processor.Tag"/>) объектов региона.</returns>
-        WordSearcher GetStringFromRegion(Region region)
+        WordSearcher GetStringFromRegion(Region region, int startIndex, int length)
         {
             if (region == null)
                 throw new ArgumentNullException(nameof(region), $"{nameof(GetStringFromRegion)}: Регион равен null.");
@@ -246,19 +270,21 @@ namespace DynamicParser
                     List<string> lst = new List<string>();
                     // ReSharper disable once LoopCanBeConvertedToQuery
                     foreach (Processor pr in reg.Procs)
-                        lst.Add(pr.Tag);
+                        lst.Add(pr.GetProcessorName(startIndex, length));
                     lstWords.Add(lst);
                 }
             return new WordSearcher(lstWords);
         }
 
         /// <summary>
-        /// Находит объекты в результатах поиска, поле <see cref="Processor.Tag"/> которых по своему первой букве соответствует указанному символу.
+        /// Находит объекты в результатах поиска, поля <see cref="Processor.Tag"/> которых по своей первой букве соответствуют указанной букве.
         /// </summary>
-        /// <param name="symbol">Искомый символ.</param>
+        /// <param name="procName">Искомые буквы.</param>
         /// <param name="points">Массив данных, содержащий информацию об обработанных объектах.</param>
+        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
         /// <returns>Возвращает информацию о найденных объектах.</returns>
-        List<Reg> FindSymbols(char symbol, List<Processor>[,] points)
+        List<Reg> FindSymbols(string procName, List<Processor>[,] points, int startIndex, int length)
         {
             if (points == null)
                 throw new ArgumentNullException(nameof(points),
@@ -271,7 +297,6 @@ namespace DynamicParser
                 throw new ArgumentException(
                     $@"{nameof(FindSymbols)}: Массив данных, содержащий информацию об обработанных объектах не соответствует высоте карты ({
                         points.GetLength(1)} и {Height}).");
-            symbol = char.ToUpper(symbol);
             List<Reg> lstRegs = new List<Reg>();
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)
@@ -282,16 +307,14 @@ namespace DynamicParser
                     List<Processor> processors = new List<Processor>();
                     foreach (Processor pr in procs)
                     {
-                        if (pr == null || pr.Symbol != symbol)
+                        if (pr == null || !pr.IsProcessorName(procName, startIndex, length))
                             continue;
                         if (points[x, y] != null)
                         {
-                            if (points[x, y].Where(prc => prc != null).Any(prc => prc.Symbol == symbol))
+                            if (points[x, y].Where(prc => prc != null).Any(prc => prc.IsProcessorName(procName, startIndex, length)))
                                 continue;
                             points[x, y].Add(pr);
                         }
-                        else
-                            points[x, y] = new List<Processor>();
                         processors.Add(pr);
                     }
                     if (processors.Count > 0)

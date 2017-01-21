@@ -40,13 +40,35 @@ namespace DynamicParser
                 if (str == null || str.Count <= 0)
                     continue;
                 List<string> lsts = new List<string>(str.Count);
-                lsts.AddRange(str.Where(s => !string.IsNullOrEmpty(s)));
+                lsts.AddRange(Distinct(str));
                 if (lsts.Count <= 0)
                     continue;
                 _words.Add(lsts);
             }
             if (Count <= 0)
                 throw new ArgumentException($"{nameof(WordSearcher)}: Массив слов пустой ({Count}).", nameof(strs));
+        }
+
+        /// <summary>
+        /// Возвращает список строк, в котором отсутствуют дублирующиеся и пустые значения.
+        /// Отсев производится без учёта регистра.
+        /// </summary>
+        /// <param name="lst">Обрабатываемый список.</param>
+        /// <returns>Возвращает список строк, в котором отсутствуют дублирующиеся значения.</returns>
+        public static List<string> Distinct(IList<string> lst)
+        {
+            if (lst == null)
+                throw new ArgumentNullException(nameof(lst), $"{nameof(Distinct)}: Список равен null.");
+            List<string> result = new List<string>();
+            foreach (string s in lst)
+            {
+                if (string.IsNullOrEmpty(s))
+                    continue;
+                if (result.Any(str => string.Compare(s, str, StringComparison.OrdinalIgnoreCase) == 0))
+                    continue;
+                result.Add(s);
+            }
+            return result;
         }
 
         /// <summary>

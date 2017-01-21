@@ -905,6 +905,14 @@
             </summary>
             <param name="strs">Коллекция слов.</param>
         </member>
+        <member name="M:DynamicParser.WordSearcher.Distinct(System.Collections.Generic.IList{System.String})">
+            <summary>
+            Возвращает список строк, в котором отсутствуют дублирующиеся и пустые значения.
+            Отсев производится без учёта регистра.
+            </summary>
+            <param name="lst">Обрабатываемый список.</param>
+            <returns>Возвращает список строк, в котором отсутствуют дублирующиеся значения.</returns>
+        </member>
         <member name="M:DynamicParser.WordSearcher.IsEqual(System.String)">
             <summary>
             Выполняет проверку соответствия слов, содержащихся в текущем экземпляре, с заданным словом.

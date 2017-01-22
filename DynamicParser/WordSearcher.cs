@@ -18,7 +18,7 @@ namespace DynamicParser
         /// <summary>
         /// Получает количество слов в коллекции.
         /// </summary>
-        public int Count { get; }
+        public int Count => _words.Count;
 
         /// <summary>
         /// Инициализирует текущий экземпляр коллекцией слов.
@@ -31,7 +31,6 @@ namespace DynamicParser
         {
             if (strs == null)
                 throw new ArgumentNullException(nameof(strs), $"{nameof(WordSearcher)}: Массив слов равен null.");
-            int count = 0;
             foreach (IList<string> lst in strs)
             {
                 if (lst == null || lst.Count <= 0)
@@ -44,9 +43,7 @@ namespace DynamicParser
                         continue;
                     _words.Add(str);
                 }
-                count++;
             }
-            Count = count;
             if (Count <= 0)
                 throw new ArgumentException($"{nameof(WordSearcher)}: Массив слов пустой ({Count}).", nameof(strs));
         }
@@ -60,11 +57,12 @@ namespace DynamicParser
         {
             if (string.IsNullOrEmpty(word))
                 return false;
-            if (word.Length != Count)
-                throw new ArgumentException($@"{nameof(IsEqual)}: Длины сопоставляемых слов должны быть равны: проверяемое слово длиной {word.Length
+            if (word.Length > Count)
+                throw new ArgumentException($@"{nameof(IsEqual)
+                    }: Длина проверяемого слова должна быть меньше или равна максимальной длине сопоставляемого слова: проверяемое слово длиной {word.Length
                     } сопоставляется со словом длиной {Count}.", nameof(word));
             TagSearcher ts = new TagSearcher(word);
-            int[] count = new int[Count];
+            int[] count = new int[word.Length];
             for (int counter = Count - 1; counter >= 0;)
             {
                 if (ts.IsEqual(GetWord(count)))

@@ -277,15 +277,19 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Находит объекты в результатах поиска, поля <see cref="Processor.Tag"/> которых по своей первой букве соответствуют указанной букве.
+        /// Находит объекты в результатах поиска, поля <see cref="Processor.Tag"/> которых по указанной позиции соответствуют указанной строке.
         /// </summary>
-        /// <param name="procName">Искомые буквы.</param>
+        /// <param name="procName">Искомая строка.</param>
         /// <param name="points">Массив данных, содержащий информацию об обработанных объектах.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
         /// <param name="length">Максимальное количество символов в строке названия карты.</param>
         /// <returns>Возвращает информацию о найденных объектах.</returns>
         List<Reg> FindSymbols(string procName, List<Processor>[,] points, int startIndex, int length)
         {
+            if (procName == null)
+                throw new ArgumentNullException(nameof(procName), $"{nameof(FindSymbols)}: Искомая строка = null.");
+            if (procName == string.Empty)
+                throw new ArgumentException($"{nameof(FindSymbols)}: Искомая строка должна состоять хотя бы из одиного символа.", nameof(procName));
             if (points == null)
                 throw new ArgumentNullException(nameof(points),
                     $"{nameof(FindSymbols)}: Массив данных, содержащий информацию об обработанных объектах равен null.");
@@ -315,6 +319,8 @@ namespace DynamicParser
                                 continue;
                             points[x, y].Add(pr);
                         }
+                        else
+                            points[x, y] = new List<Processor>();
                         processors.Add(pr);
                     }
                     if (processors.Count > 0)

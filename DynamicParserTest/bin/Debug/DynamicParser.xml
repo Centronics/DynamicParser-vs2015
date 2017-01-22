@@ -709,9 +709,9 @@
         </member>
         <member name="M:DynamicParser.SearchResults.FindSymbols(System.String,System.Collections.Generic.List{DynamicParser.Processor}[0:,0:],System.Int32,System.Int32)">
             <summary>
-            Находит объекты в результатах поиска, поля <see cref="P:DynamicParser.Processor.Tag"/> которых по своей первой букве соответствуют указанной букве.
+            Находит объекты в результатах поиска, поля <see cref="P:DynamicParser.Processor.Tag"/> которых по указанной позиции соответствуют указанной строке.
             </summary>
-            <param name="procName">Искомые буквы.</param>
+            <param name="procName">Искомая строка.</param>
             <param name="points">Массив данных, содержащий информацию об обработанных объектах.</param>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
             <param name="length">Максимальное количество символов в строке названия карты.</param>

@@ -311,7 +311,7 @@ namespace DynamicParser
                     List<Processor> processors = new List<Processor>();
                     foreach (Processor pr in procs)
                     {
-                        if (pr == null || !pr.IsProcessorName(procName, startIndex, length))
+                        if (pr == null || !pr.IsProcessorName(procName, startIndex, length))//МОЖНО СДЕЛАТЬ ВМЕСТО LENGTH procName.Length и points убрать
                             continue;
                         if (points[x, y] != null)
                         {

@@ -57,10 +57,10 @@ namespace DynamicParser
         {
             if (string.IsNullOrEmpty(word))
                 return false;
-            if (word.Length > Count)
-                throw new ArgumentException($@"{nameof(IsEqual)
-                    }: Длина проверяемого слова должна быть меньше или равна максимальной длине сопоставляемого слова: проверяемое слово длиной {word.Length
-                    } сопоставляется со словом длиной {Count}.", nameof(word));
+            //if (word.Length > Count) МОЖНО УБРАТЬ ОГРАНИЧЕНИЕ
+              //  throw new ArgumentException($@"{nameof(IsEqual)
+                //    }: Длина проверяемого слова должна быть меньше или равна максимальной длине сопоставляемого слова: проверяемое слово длиной {word.Length
+                  //  } сопоставляется со словом длиной {Count}.", nameof(word));
             TagSearcher ts = new TagSearcher(word);
             int[] count = new int[word.Length];
             for (int counter = Count - 1; counter >= 0;)

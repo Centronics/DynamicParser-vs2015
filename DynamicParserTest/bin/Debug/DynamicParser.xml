@@ -892,16 +892,12 @@
             Получает количество слов в коллекции.
             </summary>
         </member>
-        <member name="P:DynamicParser.WordSearcher.Item(System.Int32)">
-            <summary>
-            Получает слово по индексу.
-            </summary>
-            <param name="index">Индекс слова.</param>
-            <returns>Возвращает слово по индексу.</returns>
-        </member>
         <member name="M:DynamicParser.WordSearcher.#ctor(System.Collections.Generic.IEnumerable{System.Collections.Generic.IList{System.String}})">
             <summary>
             Инициализирует текущий экземпляр коллекцией слов.
+            Выравнивает (синхронизирует) наличие всех слов в указанных коллекциях, в одной коллекции.
+            Возвращает список строк, в котором отсутствуют дублирующиеся и пустые значения.
+            Отсев производится без учёта регистра.
             </summary>
             <param name="strs">Коллекция слов.</param>
         </member>

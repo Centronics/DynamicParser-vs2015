@@ -13,62 +13,42 @@ namespace DynamicParser
         /// <summary>
         /// Содержит коллекцию слов.
         /// </summary>
-        readonly List<List<string>> _words = new List<List<string>>();
+        readonly List<string> _words = new List<string>();
 
         /// <summary>
         /// Получает количество слов в коллекции.
         /// </summary>
-        public int Count => _words.Count;
-
-        /// <summary>
-        /// Получает слово по индексу.
-        /// </summary>
-        /// <param name="index">Индекс слова.</param>
-        /// <returns>Возвращает слово по индексу.</returns>
-        public IList<string> this[int index] => _words[index];
+        public int Count { get; }
 
         /// <summary>
         /// Инициализирует текущий экземпляр коллекцией слов.
+        /// Выравнивает (синхронизирует) наличие всех слов в указанных коллекциях, в одной коллекции.
+        /// Возвращает список строк, в котором отсутствуют дублирующиеся и пустые значения.
+        /// Отсев производится без учёта регистра.
         /// </summary>
         /// <param name="strs">Коллекция слов.</param>
         public WordSearcher(IEnumerable<IList<string>> strs)
         {
             if (strs == null)
                 throw new ArgumentNullException(nameof(strs), $"{nameof(WordSearcher)}: Массив слов равен null.");
-            foreach (IList<string> str in strs)
+            int count = 0;
+            foreach (IList<string> lst in strs)
             {
-                if (str == null || str.Count <= 0)
+                if (lst == null || lst.Count <= 0)
                     continue;
-                List<string> lsts = new List<string>(str.Count);
-                lsts.AddRange(Distinct(str));
-                if (lsts.Count <= 0)
-                    continue;
-                _words.Add(lsts);
+                foreach (string str in lst)
+                {
+                    if (string.IsNullOrEmpty(str))
+                        continue;
+                    if (_words.Any(s => string.Compare(s, str, StringComparison.OrdinalIgnoreCase) == 0))
+                        continue;
+                    _words.Add(str);
+                }
+                count++;
             }
+            Count = count;
             if (Count <= 0)
                 throw new ArgumentException($"{nameof(WordSearcher)}: Массив слов пустой ({Count}).", nameof(strs));
-        }
-
-        /// <summary>
-        /// Возвращает список строк, в котором отсутствуют дублирующиеся и пустые значения.
-        /// Отсев производится без учёта регистра.
-        /// </summary>
-        /// <param name="lst">Обрабатываемый список.</param>
-        /// <returns>Возвращает список строк, в котором отсутствуют дублирующиеся значения.</returns>
-        public static List<string> Distinct(IList<string> lst)
-        {
-            if (lst == null)
-                throw new ArgumentNullException(nameof(lst), $"{nameof(Distinct)}: Список равен null.");
-            List<string> result = new List<string>();
-            foreach (string s in lst)
-            {
-                if (string.IsNullOrEmpty(s))
-                    continue;
-                if (result.Any(str => string.Compare(s, str, StringComparison.OrdinalIgnoreCase) == 0))
-                    continue;
-                result.Add(s);
-            }
-            return result;
         }
 
         /// <summary>
@@ -107,7 +87,7 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(ChangeCount)}: Массив-счётчик не указан или его длина некорректна ({count?.Length}).", nameof(count));
             for (int k = Count - 1; k >= 0; k--)
             {
-                if (count[k] >= this[k].Count - 1) continue;
+                if (count[k] >= _words.Count - 1) continue;
                 count[k]++;
                 for (int x = k + 1; x < count.Length; x++)
                     count[x] = 0;
@@ -129,7 +109,7 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(GetWord)}: Длина массива данных должна совпадать с количеством хранимых слов.", nameof(count));
             StringBuilder sb = new StringBuilder();
             for (int k = 0; k < Count; k++)
-                sb.Append(this[k][count[k]][0]);
+                sb.Append(_words[count[k]][0]);
             return sb.ToString();
         }
     }

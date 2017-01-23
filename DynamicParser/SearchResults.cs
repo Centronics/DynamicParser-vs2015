@@ -135,7 +135,7 @@ namespace DynamicParser
 
         /// <summary>
         /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова при условии отсутствия пересечений между ними?".
+        /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова?".
         /// Если хотя бы одно слово отсутствует, возвращается значение false.
         /// </summary>
         /// <param name="words">Искомые слова.</param>
@@ -147,7 +147,7 @@ namespace DynamicParser
 
         /// <summary>
         /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова при условии отсутствия пересечений между ними?".
+        /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова?".
         /// Если хотя бы одно слово отсутствует, возвращается значение false.
         /// </summary>
         /// <param name="words">Искомые слова.</param>
@@ -186,12 +186,11 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(word), $"{nameof(FindRelation)}: Искомые слова отсутствуют (null).");
             if (word.Length <= 0)
                 return false;
-            List<Processor>[,] points = new List<Processor>[Width, Height];
             List<List<Reg>> lst = new List<List<Reg>>();
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (FindString ch in GetWord(word, length))
             {
-                List<Reg> lstReg = FindSymbols(ch.CurrentString, points, startIndex, length);
+                List<Reg> lstReg = FindSymbols(ch.CurrentString, startIndex);
                 if (lstReg != null && lstReg.Count > 0)
                     lst.Add(lstReg);
             }
@@ -280,55 +279,26 @@ namespace DynamicParser
         /// Находит объекты в результатах поиска, поля <see cref="Processor.Tag"/> которых по указанной позиции соответствуют указанной строке.
         /// </summary>
         /// <param name="procName">Искомая строка.</param>
-        /// <param name="points">Массив данных, содержащий информацию об обработанных объектах.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
         /// <returns>Возвращает информацию о найденных объектах.</returns>
-        List<Reg> FindSymbols(string procName, List<Processor>[,] points, int startIndex, int length)
+        List<Reg> FindSymbols(string procName, int startIndex)
         {
             if (procName == null)
-                throw new ArgumentNullException(nameof(procName), $"{nameof(FindSymbols)}: Искомая строка = null.");
+                throw new ArgumentNullException(nameof(procName), $"{nameof(FindSymbols)}: Искомая строка равна null.");
             if (procName == string.Empty)
                 throw new ArgumentException($"{nameof(FindSymbols)}: Искомая строка должна состоять хотя бы из одиного символа.", nameof(procName));
-            if (points == null)
-                throw new ArgumentNullException(nameof(points),
-                    $"{nameof(FindSymbols)}: Массив данных, содержащий информацию об обработанных объектах равен null.");
-            if (points.GetLength(0) != Width)
-                throw new ArgumentException(
-                    $@"{nameof(FindSymbols)}: Массив данных, содержащий информацию об обработанных объектах не соответствует ширине карты ({
-                        points.GetLength(0)} и {Width}).");
-            if (points.GetLength(1) != Height)
-                throw new ArgumentException(
-                    $@"{nameof(FindSymbols)}: Массив данных, содержащий информацию об обработанных объектах не соответствует высоте карты ({
-                        points.GetLength(1)} и {Height}).");
             List<Reg> lstRegs = new List<Reg>();
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)
                 {
                     Processor[] procs = this[x, y].Procs;
-                    if (procs == null)
-                        continue;
-                    List<Processor> processors = new List<Processor>();
-                    foreach (Processor pr in procs)
-                    {
-                        if (pr == null || !pr.IsProcessorName(procName, startIndex, length))//МОЖНО СДЕЛАТЬ ВМЕСТО LENGTH procName.Length и points убрать
-                            continue;
-                        if (points[x, y] != null)
-                        {
-                            if (points[x, y].Where(prc => prc != null).Any(prc => prc.IsProcessorName(procName, startIndex, length)))
-                                continue;
-                            points[x, y].Add(pr);
-                        }
-                        else
-                            points[x, y] = new List<Processor>();
-                        processors.Add(pr);
-                    }
-                    if (processors.Count > 0)
+                    Processor[] processors = procs?.Where(pr => pr != null && pr.IsProcessorName(procName, startIndex)).ToArray();
+                    if (processors?.Length > 0)
                         lstRegs.Add(new Reg
                         {
                             Percent = this[x, y].Percent,
                             Position = new Point(x, y),
-                            Procs = processors.ToArray()
+                            Procs = processors
                         });
                 }
             return lstRegs;
@@ -453,75 +423,6 @@ namespace DynamicParser
             foreach (Registered reg in region.Elements)
                 reg.Register = Find(reg.Region);
             return RegionStatus.Ok;
-        }
-
-        /// <summary>
-        /// Накладывает одни результаты поиска карт на другие и вычисляет, какие карты соответствуют друг другу в конкретной точке более всего.
-        /// Карты должны быть одного размера.
-        /// </summary>
-        /// <param name="srs">Результаты поиска.</param>
-        /// <returns>Возвращает обобщённые результаты поиска.</returns>
-        public static SearchResults Combine(IList<SearchResults> srs)
-        {
-            if (srs == null)
-                throw new ArgumentNullException(nameof(srs), $"{nameof(Combine)}: Коллекция не может быть равна null.");
-            if (srs.Count <= 0)
-                throw new ArgumentException($"{nameof(Combine)}: В коллекции должен быть хотя бы один элемент.", nameof(srs));
-            if (!InOneSize(srs))
-                throw new ArgumentException($"{nameof(Combine)}: Результаты поиска должны совпадать по размерам.", nameof(srs));
-            int width = srs[0].Width;
-            int height = srs[0].Height;
-            SearchResults sr = new SearchResults(width, height, srs[0].MapWidth, srs[0].MapHeight);
-            for (int y = 0; y < height; y++)
-                for (int x = 0; x < width; x++)
-                {
-                    double? pp = null;
-                    foreach (SearchResults searchResults in srs)
-                    {
-                        if (searchResults == null)
-                            continue;
-                        ProcPerc pp1 = searchResults[x, y];
-                        if (pp == null || pp1.Percent >= pp.Value)
-                            pp = pp1.Percent;
-                    }
-                    if (pp == null)
-                        continue;
-                    List<Processor> lstProcessors = new List<Processor>();
-                    foreach (SearchResults searchResults in srs)
-                    {
-                        ProcPerc pp1 = searchResults[x, y];
-                        if (pp1.Procs != null && pp1.Procs.Length > 0)
-                            lstProcessors.AddRange(pp1.Procs);
-                    }
-                    sr[x, y] = new ProcPerc { Percent = pp.Value, Procs = lstProcessors.ToArray() };
-                }
-            return sr;
-        }
-
-        /// <summary>
-        /// Накладывает одни результаты поиска карт на другие и вычисляет, какие карты соответствуют друг другу в конкретной точке более всего.
-        /// Карты должны быть одного размера.
-        /// </summary>
-        /// <param name="srs">Результаты поиска.</param>
-        /// <returns>Возвращает обобщённые результаты поиска.</returns>
-        public static SearchResults Combine(params SearchResults[] srs)
-        {
-            return Combine((IList<SearchResults>)srs);
-        }
-
-        /// <summary>
-        /// Проверяет, соответствуют ли все результаты поиска одному размеру, включая размеры поисковых карт.
-        /// </summary>
-        /// <returns>Возвращает true в случае соответствия, иначе false.</returns>
-        public static bool InOneSize(IList<SearchResults> srs)
-        {
-            if (srs == null)
-                throw new ArgumentNullException(nameof(srs), $"{nameof(InOneSize)}: Коллекция не может быть равна null.");
-            if (srs.Count <= 0)
-                return true;
-            int width = srs[0].Width, mapWidth = srs[0].MapWidth;
-            int height = srs[0].Height, mapHeight = srs[0].MapHeight;
-            return srs.All(sr => sr.Width == width && sr.Height == height) && srs.All(sr => sr.MapWidth == mapWidth && sr.MapHeight == mapHeight);
         }
     }
 }

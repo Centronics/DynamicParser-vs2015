@@ -14,25 +14,6 @@ namespace DynamicParserTest
     public class ProcessorTest
     {
         [TestMethod]
-        public void ProcessorTestX()
-        {
-            Processor proc = new Processor(new Bitmap(@"D:\разработки\Примеры\Пример1\ImgMain.bmp"), "Main");
-            SearchResults sr = proc.GetEqual(
-                new Processor(new Bitmap(@"D:\разработки\Примеры\Пример1\Img1.bmp"), "A"),
-                new Processor(new Bitmap(@"D:\разработки\Примеры\Пример1\Img2.bmp"), "L"),
-                new Processor(new Bitmap(@"D:\разработки\Примеры\Пример1\Img3.bmp"), "PA"));
-            Region region = proc.CurrentRegion;
-            region.Add(new Rectangle(0, 0, 44, 43));
-            region.Add(new Rectangle(47, 7, 44, 43));
-            sr.FindRegion(region);
-            Attacher attacher = proc.CurrentAttacher;
-            attacher.Add(0, 0);
-            attacher.Add(48, 7);
-            attacher.SetMask(region);
-            List<Attach.Proc> lst = attacher.Attaches.Select(att => att.Unique).ToList();
-        }
-
-        [TestMethod]
         public void ProcessorTest1()
         {
             Processor proc = new Processor(new Bitmap(15, 10), " f1   ");

@@ -151,13 +151,12 @@ namespace DynamicParser
         /// </summary>
         /// <param name="name">Проверяемое имя.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
         /// <returns>Возвращает значение true, если указанное имя соответствует имени карты, в противном случае - false.</returns>
-        public bool IsProcessorName(string name, int startIndex, int length)
+        public bool IsProcessorName(string name, int startIndex)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return false;
-            return string.Compare(name, GetProcessorName(startIndex, length), StringComparison.OrdinalIgnoreCase) == 0;
+            return string.Compare(name, GetProcessorName(startIndex, name.Length), StringComparison.OrdinalIgnoreCase) == 0;
         }
 
         /// <summary>
@@ -167,6 +166,24 @@ namespace DynamicParser
         public override string ToString()
         {
             return Tag;
+        }
+
+        /// <summary>
+        /// Получает хеш-код текущего экземпляра.
+        /// </summary>
+        /// <returns>Возвращает хеш-код текущего экземпляра.</returns>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = 0;
+                foreach (char ch in Tag)
+                {
+                    result *= 31;
+                    result += ch;
+                }
+                return result;
+            }
         }
 
         /// <summary>

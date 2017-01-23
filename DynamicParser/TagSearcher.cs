@@ -157,7 +157,7 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(tag), $"{nameof(FindEqual)}: Задана пустая строка (null).");
             if (tag == string.Empty)
                 throw new ArgumentException($"{nameof(FindEqual)}: Задана пустая строка.", nameof(tag));
-            foreach (FindString fs in GetStringChunk(tag))
+            foreach (FindString fs in GetStringChunk(tag.Length))
                 if (fs.GetStringEqual(tag))
                     yield return fs;
         }
@@ -165,20 +165,17 @@ namespace DynamicParser
         /// <summary>
         /// Получает части строки, равные по длине искомой строки.
         /// </summary>
-        /// <param name="str">Искомая строка.</param>
-        /// <returns>Возвращает <see cref="FindString" /> для строк, которые равны по длине искомой строке.</returns>
-        IEnumerable<FindString> GetStringChunk(string str)
+        /// <param name="len">Длина искомой строки.</param>
+        /// <returns>Возвращает <see cref="FindString" /> для строк, которые равны по длине искомой строки.</returns>
+        IEnumerable<FindString> GetStringChunk(int len)
         {
-            if (str == null)
-                throw new ArgumentNullException(nameof(str), $"{nameof(GetStringChunk)}: Попытка получить часть пустой строки (null).");
-            if (str == string.Empty)
-                throw new ArgumentException($"{nameof(GetStringChunk)}: Попытка получить часть пустой строки.", nameof(str));
-            if (str.Length != _currentStr.Length)
-                throw new ArgumentException($"{nameof(GetStringChunk)}: Длина искомой строки ({str.Length}) не равна длине исходной ({_currentStr.Length}).",
-                    nameof(str));
-            for (int k = 0, max = _currentStr.Length - str.Length, sl = str.Length; k <= max; k++)
+            if (len < 0)
+                throw new ArgumentOutOfRangeException(nameof(len), $"{nameof(GetStringChunk)}: Длина искомой строки меньше ноля ({len}).");
+            if (len > _currentStr.Length)
+                throw new ArgumentOutOfRangeException(nameof(len), $"{nameof(GetStringChunk)}: Длина искомой строки больше исходной строки ({len}).");
+            for (int k = 0, max = _currentStr.Length - len; k <= max; k++)
             {
-                FindString fs = new FindString(_currentStr.Substring(k, sl), k, _currentStr);
+                FindString fs = new FindString(_currentStr.Substring(k, len), k, _currentStr);
                 yield return fs;
             }
         }

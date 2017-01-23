@@ -241,13 +241,12 @@
             <param name="length">Максимальное количество символов в строке названия карты.</param>
             <returns>Возвращает строку, представляющую подстроку поля <see cref="P:DynamicParser.Processor.Tag"/> текущей карты.</returns>
         </member>
-        <member name="M:DynamicParser.Processor.IsProcessorName(System.String,System.Int32,System.Int32)">
+        <member name="M:DynamicParser.Processor.IsProcessorName(System.String,System.Int32)">
             <summary>
             Проверяет, является ли заданное имя именем текущей карты. Проверка производится без учёта регистра.
             </summary>
             <param name="name">Проверяемое имя.</param>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-            <param name="length">Максимальное количество символов в строке названия карты.</param>
             <returns>Возвращает значение true, если указанное имя соответствует имени карты, в противном случае - false.</returns>
         </member>
         <member name="M:DynamicParser.Processor.ToString">
@@ -255,6 +254,12 @@
             Получает строковое представление текущего экземпляра, которое является значением свойства <see cref="P:DynamicParser.Processor.Tag"/>.
             </summary>
             <returns>Возвращает строковое представление текущего экземпляра, которое является значением свойства <see cref="P:DynamicParser.Processor.Tag"/>.</returns>
+        </member>
+        <member name="M:DynamicParser.Processor.GetHashCode">
+            <summary>
+            Получает хеш-код текущего экземпляра.
+            </summary>
+            <returns>Возвращает хеш-код текущего экземпляра.</returns>
         </member>
         <member name="M:DynamicParser.Processor.GetMinIndex(System.Collections.Generic.IDictionary{System.Int32,DynamicProcessor.SignValue[0:,0:]},System.Int32,System.Int32,System.Int32)">
             <summary>
@@ -655,7 +660,7 @@
         <member name="M:DynamicParser.SearchResults.FindRelation(System.String[])">
             <summary>
             Ищет возможность связывания указанных слов с полями <see cref="P:DynamicParser.Processor.Tag"/> найденных карт.
-            Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова при условии отсутствия пересечений между ними?".
+            Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова?".
             Если хотя бы одно слово отсутствует, возвращается значение false.
             </summary>
             <param name="words">Искомые слова.</param>
@@ -664,7 +669,7 @@
         <member name="M:DynamicParser.SearchResults.FindRelation(System.Collections.Generic.IList{System.String})">
             <summary>
             Ищет возможность связывания указанных слов с полями <see cref="P:DynamicParser.Processor.Tag"/> найденных карт.
-            Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова при условии отсутствия пересечений между ними?".
+            Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова?".
             Если хотя бы одно слово отсутствует, возвращается значение false.
             </summary>
             <param name="words">Искомые слова.</param>
@@ -707,14 +712,12 @@
             <param name="length">Максимальное количество символов в строке названия карты.</param>
             <returns>Возвращает <see cref="T:DynamicParser.WordSearcher"/> из первых букв названия (<see cref="P:DynamicParser.Processor.Tag"/>) объектов региона.</returns>
         </member>
-        <member name="M:DynamicParser.SearchResults.FindSymbols(System.String,System.Collections.Generic.List{DynamicParser.Processor}[0:,0:],System.Int32,System.Int32)">
+        <member name="M:DynamicParser.SearchResults.FindSymbols(System.String,System.Int32)">
             <summary>
             Находит объекты в результатах поиска, поля <see cref="P:DynamicParser.Processor.Tag"/> которых по указанной позиции соответствуют указанной строке.
             </summary>
             <param name="procName">Искомая строка.</param>
-            <param name="points">Массив данных, содержащий информацию об обработанных объектах.</param>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-            <param name="length">Максимальное количество символов в строке названия карты.</param>
             <returns>Возвращает информацию о найденных объектах.</returns>
         </member>
         <member name="M:DynamicParser.SearchResults.ChangeCount(System.Collections.Generic.IList{System.Int32},System.Collections.Generic.IList{System.Collections.Generic.List{DynamicParser.Reg}})">
@@ -762,28 +765,6 @@
             </summary>
             <param name="region">Регион для заполнения.</param>
             <returns>Возвращает OK в случае отсутствия конфликтов. Если результат не равен OK, то состояние region не изменяется.</returns>
-        </member>
-        <member name="M:DynamicParser.SearchResults.Combine(System.Collections.Generic.IList{DynamicParser.SearchResults})">
-            <summary>
-            Накладывает одни результаты поиска карт на другие и вычисляет, какие карты соответствуют друг другу в конкретной точке более всего.
-            Карты должны быть одного размера.
-            </summary>
-            <param name="srs">Результаты поиска.</param>
-            <returns>Возвращает обобщённые результаты поиска.</returns>
-        </member>
-        <member name="M:DynamicParser.SearchResults.Combine(DynamicParser.SearchResults[])">
-            <summary>
-            Накладывает одни результаты поиска карт на другие и вычисляет, какие карты соответствуют друг другу в конкретной точке более всего.
-            Карты должны быть одного размера.
-            </summary>
-            <param name="srs">Результаты поиска.</param>
-            <returns>Возвращает обобщённые результаты поиска.</returns>
-        </member>
-        <member name="M:DynamicParser.SearchResults.InOneSize(System.Collections.Generic.IList{DynamicParser.SearchResults})">
-            <summary>
-            Проверяет, соответствуют ли все результаты поиска одному размеру, включая размеры поисковых карт.
-            </summary>
-            <returns>Возвращает true в случае соответствия, иначе false.</returns>
         </member>
         <member name="T:DynamicParser.FindString">
             <summary>
@@ -870,12 +851,12 @@
             <param name="tag">Строка, поиск которой необходимо выполнить.</param>
             <returns>Возвращает <see cref="T:DynamicParser.FindString" /> в случае соответствия строк.</returns>
         </member>
-        <member name="M:DynamicParser.TagSearcher.GetStringChunk(System.String)">
+        <member name="M:DynamicParser.TagSearcher.GetStringChunk(System.Int32)">
             <summary>
             Получает части строки, равные по длине искомой строки.
             </summary>
-            <param name="str">Искомая строка.</param>
-            <returns>Возвращает <see cref="T:DynamicParser.FindString" /> для строк, которые равны по длине искомой строке.</returns>
+            <param name="len">Длина искомой строки.</param>
+            <returns>Возвращает <see cref="T:DynamicParser.FindString" /> для строк, которые равны по длине искомой строки.</returns>
         </member>
         <member name="T:DynamicParser.WordSearcher">
             <summary>

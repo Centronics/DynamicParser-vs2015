@@ -291,8 +291,7 @@ namespace DynamicParser
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)
                 {
-                    Processor[] procs = this[x, y].Procs;
-                    Processor[] processors = procs?.Where(pr => pr != null && pr.IsProcessorName(procName, startIndex)).ToArray();
+                    Processor[] processors = this[x, y].Procs?.Where(pr => pr != null && pr.IsProcessorName(procName, startIndex)).ToArray();
                     if (processors?.Length > 0)
                         lstRegs.Add(new Reg
                         {

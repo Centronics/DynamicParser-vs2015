@@ -5,52 +5,31 @@ using System.Linq;
 namespace DynamicParser
 {
     /// <summary>
-    /// Представляет найденную подстроку и позицию её местонахождения.
+    /// Сравнивает две строки по количеству встречающихся букв в каждой строке.
     /// </summary>
-    public sealed class FindString
+    public sealed class TagSearcher
     {
-        /// <summary>
-        /// Найденная подстрока.
-        /// </summary>
-        public string CurrentString { get; }
-
-        /// <summary>
-        /// Позиция, на которой находится подстрока.
-        /// </summary>
-        public int Position { get; }
-
         /// <summary>
         /// Исходная строка.
         /// </summary>
         public string SourceString { get; }
 
         /// <summary>
-        /// Счётчик количества каждой буквы в сравниваемой строке.
+        /// Счётчик количества каждой буквы в исходной строке.
         /// </summary>
         readonly Dictionary<char, int> _dicCurrent;
 
         /// <summary>
-        /// Инициализирует структуру <see cref="FindString" /> исходными значениями.
+        /// Инициализирует класс <see cref="TagSearcher" /> исходной строкой.
         /// </summary>
-        /// <param name="str">Подстрока.</param>
-        /// <param name="position">Позиция подстроки.</param>
-        /// <param name="source">Исходная строка.</param>
-        public FindString(string str, int position, string source)
+        /// <param name="str">Строка, с которой будет производиться сравнение.</param>
+        public TagSearcher(string str)
         {
             if (str == null)
-                throw new ArgumentNullException(nameof(str), $"{nameof(FindString)}: Подстрока пустая (null).");
+                throw new ArgumentNullException(nameof(str), $"{nameof(TagSearcher)}: Подстрока пустая (null).");
             if (str == string.Empty)
-                throw new ArgumentException($"{nameof(FindString)}: Подстрока не может быть пустой.", nameof(str));
-            if (position < 0)
-                throw new ArgumentException($"{nameof(FindString)}: Позиция подстроки меньше ноля ({position}).", nameof(position));
-            if (source == null)
-                throw new ArgumentException($"{nameof(FindString)}: Исходная строка пустая (null).", nameof(source));
-            if (source == string.Empty)
-                throw new ArgumentException($"{nameof(FindString)}: Исходная строка пустая.", nameof(source));
-            SourceString = source;
-            CurrentString = str.ToUpper();
-            Position = position;
-            _dicCurrent = GetCount(CurrentString);
+                throw new ArgumentException($"{nameof(TagSearcher)}: Подстрока не может быть пустой.", nameof(str));
+            _dicCurrent = GetCount(SourceString = str.ToUpper());
         }
 
         /// <summary>
@@ -58,11 +37,11 @@ namespace DynamicParser
         /// </summary>
         /// <param name="str">Сравниваемая строка.</param>
         /// <returns>Возвращает значение true в случае сходства строк, false в противном случае.</returns>
-        public bool GetStringEqual(string str)
+        public bool IsEqual(string str)
         {
             if (string.IsNullOrEmpty(str))
                 return false;
-            if (str.Length != CurrentString.Length)
+            if (str.Length != SourceString.Length)
                 return false;
             Dictionary<char, int> dicCompare = GetCount(str);
             foreach (char ch in _dicCurrent.Keys)
@@ -105,79 +84,7 @@ namespace DynamicParser
         /// <returns>Возвращает количество раз, которое встречается искомый символ в строке или ноль в случае отсутствия такового.</returns>
         int GetCount(char ch)
         {
-            return CurrentString.Count(c => c == ch);
-        }
-    }
-
-    /// <summary>
-    /// Производит поиск заданного Tag в строке и возвращает варианты возможных соответствий.
-    /// </summary>
-    public class TagSearcher
-    {
-        /// <summary>
-        /// Исходная строка.
-        /// </summary>
-        readonly string _currentStr;
-
-        /// <summary>
-        /// Задаёт анализируемую строку.
-        /// </summary>
-        /// <param name="str">Анализируемая строка.</param>
-        public TagSearcher(string str)
-        {
-            if (str == null)
-                throw new ArgumentNullException(nameof(str), $"{nameof(TagSearcher)}: Задана пустая строка (null).");
-            if (str == string.Empty)
-                throw new ArgumentException($"{nameof(TagSearcher)}: Задана пустая строка.", nameof(str));
-            _currentStr = str;
-        }
-
-        /// <summary>
-        /// Проверяет, является эквивалентом указанная строка по отношению к текущей или нет.
-        /// </summary>
-        /// <param name="tag">Проверяемая строка.</param>
-        /// <returns>Возвращает значение true в случае, когда указанная подстрока найдена, в противном случае false.</returns>
-        public bool IsEqual(string tag)
-        {
-            if (tag == null)
-                throw new ArgumentNullException(nameof(tag), $"{nameof(IsEqual)}: Задана пустая строка (null).");
-            if (tag == string.Empty)
-                throw new ArgumentException($"{nameof(IsEqual)}: Задана пустая строка.", nameof(tag));
-            return FindEqual(tag).Any();
-        }
-
-        /// <summary>
-        /// Выполняет поиск подстроки в строке и возвращает <see cref="FindString" /> в случае соответствия строк.
-        /// </summary>
-        /// <param name="tag">Строка, поиск которой необходимо выполнить.</param>
-        /// <returns>Возвращает <see cref="FindString" /> в случае соответствия строк.</returns>
-        public IEnumerable<FindString> FindEqual(string tag)
-        {
-            if (tag == null)
-                throw new ArgumentNullException(nameof(tag), $"{nameof(FindEqual)}: Задана пустая строка (null).");
-            if (tag == string.Empty)
-                throw new ArgumentException($"{nameof(FindEqual)}: Задана пустая строка.", nameof(tag));
-            foreach (FindString fs in GetStringChunk(tag.Length))
-                if (fs.GetStringEqual(tag))
-                    yield return fs;
-        }
-
-        /// <summary>
-        /// Получает части строки, равные по длине искомой строки.
-        /// </summary>
-        /// <param name="len">Длина искомой строки.</param>
-        /// <returns>Возвращает <see cref="FindString" /> для строк, которые равны по длине искомой строки.</returns>
-        IEnumerable<FindString> GetStringChunk(int len)
-        {
-            if (len < 0)
-                throw new ArgumentOutOfRangeException(nameof(len), $"{nameof(GetStringChunk)}: Длина искомой строки меньше ноля ({len}).");
-            if (len > _currentStr.Length)
-                throw new ArgumentOutOfRangeException(nameof(len), $"{nameof(GetStringChunk)}: Длина искомой строки больше исходной строки ({len}).");
-            for (int k = 0, max = _currentStr.Length - len; k <= max; k++)
-            {
-                FindString fs = new FindString(_currentStr.Substring(k, len), k, _currentStr);
-                yield return fs;
-            }
+            return SourceString.Count(c => c == ch);
         }
     }
 }

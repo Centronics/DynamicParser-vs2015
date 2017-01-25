@@ -238,7 +238,7 @@
             Отрицательные значения свидетельствуют о необходимости использовать содержимое свойства <see cref="P:DynamicParser.Processor.Tag"/> целиком.
             </summary>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-            <param name="length">Максимальное количество символов в строке названия карты.</param>
+            <param name="count">Количество символов в строке названия карты.</param>
             <returns>Возвращает строку, представляющую подстроку поля <see cref="P:DynamicParser.Processor.Tag"/> текущей карты.</returns>
         </member>
         <member name="M:DynamicParser.Processor.IsProcessorName(System.String,System.Int32)">
@@ -680,10 +680,11 @@
             Ищет возможность связывания указанного слова с полями <see cref="P:DynamicParser.Processor.Tag"/> найденных карт.
             Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомое слово?".
             Возвращает значение true в случае нахождения слова, в противном случае - false.
+            Параметр "startIndex" может быть меньше ноля.
             </summary>
             <param name="word">Искомое слово.</param>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-            <param name="length">Максимальное количество символов в строке названия карты.</param>
+            <param name="count">Количество символов для выборки из названия карты, оно должно быть кратно длине искомого слова.</param>
             <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
         </member>
         <member name="M:DynamicParser.SearchResults.GetWord(System.String,System.Int32)">
@@ -700,7 +701,7 @@
             </summary>
             <param name="regs">Список обрабатываемых карт.</param>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-            <param name="length">Максимальное количество символов в строке названия карты.</param>
+            <param name="count">Количество символов в строке названия карты.</param>
             <returns>Возвращает <see cref="T:DynamicParser.WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
         </member>
         <member name="M:DynamicParser.SearchResults.GetStringFromRegion(DynamicParser.Region,System.Int32,System.Int32)">
@@ -709,7 +710,7 @@
             </summary>
             <param name="region">Регион, из которого требуется получить <see cref="T:DynamicParser.WordSearcher"/>.</param>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-            <param name="length">Максимальное количество символов в строке названия карты.</param>
+            <param name="count">Количество символов в строке названия карты.</param>
             <returns>Возвращает <see cref="T:DynamicParser.WordSearcher"/> из первых букв названия (<see cref="P:DynamicParser.Processor.Tag"/>) объектов региона.</returns>
         </member>
         <member name="M:DynamicParser.SearchResults.FindSymbols(System.String,System.Int32)">
@@ -766,47 +767,35 @@
             <param name="region">Регион для заполнения.</param>
             <returns>Возвращает OK в случае отсутствия конфликтов. Если результат не равен OK, то состояние region не изменяется.</returns>
         </member>
-        <member name="T:DynamicParser.FindString">
+        <member name="T:DynamicParser.TagSearcher">
             <summary>
-            Представляет найденную подстроку и позицию её местонахождения.
+            Сравнивает две строки по количеству встречающихся букв в каждой строке.
             </summary>
         </member>
-        <member name="P:DynamicParser.FindString.CurrentString">
-            <summary>
-            Найденная подстрока.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.FindString.Position">
-            <summary>
-            Позиция, на которой находится подстрока.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.FindString.SourceString">
+        <member name="P:DynamicParser.TagSearcher.SourceString">
             <summary>
             Исходная строка.
             </summary>
         </member>
-        <member name="F:DynamicParser.FindString._dicCurrent">
+        <member name="F:DynamicParser.TagSearcher._dicCurrent">
             <summary>
-            Счётчик количества каждой буквы в сравниваемой строке.
+            Счётчик количества каждой буквы в исходной строке.
             </summary>
         </member>
-        <member name="M:DynamicParser.FindString.#ctor(System.String,System.Int32,System.String)">
+        <member name="M:DynamicParser.TagSearcher.#ctor(System.String)">
             <summary>
-            Инициализирует структуру <see cref="T:DynamicParser.FindString" /> исходными значениями.
+            Инициализирует класс <see cref="T:DynamicParser.TagSearcher" /> исходной строкой.
             </summary>
-            <param name="str">Подстрока.</param>
-            <param name="position">Позиция подстроки.</param>
-            <param name="source">Исходная строка.</param>
+            <param name="str">Строка, с которой будет производиться сравнение.</param>
         </member>
-        <member name="M:DynamicParser.FindString.GetStringEqual(System.String)">
+        <member name="M:DynamicParser.TagSearcher.IsEqual(System.String)">
             <summary>
             Получает значение, определяющее сходство между указанной строкой и текущей.
             </summary>
             <param name="str">Сравниваемая строка.</param>
             <returns>Возвращает значение true в случае сходства строк, false в противном случае.</returns>
         </member>
-        <member name="M:DynamicParser.FindString.GetCount(System.String)">
+        <member name="M:DynamicParser.TagSearcher.GetCount(System.String)">
             <summary>
             Получает счётчики количества попаданий каждой буквы.
             Буква является ключом в словаре, значение является количеством попаданий буквы, находящейся на этой позиции.
@@ -814,49 +803,12 @@
             <param name="str">Проверяемая строка.</param>
             <returns>Возвращает счётчики количества попаданий каждой буквы.</returns>
         </member>
-        <member name="M:DynamicParser.FindString.GetCount(System.Char)">
+        <member name="M:DynamicParser.TagSearcher.GetCount(System.Char)">
             <summary>
             Возвращает количество раз, которое встречается искомый символ в строке или ноль в случае отсутствия такового.
             </summary>
             <param name="ch">Искомый символ.</param>
             <returns>Возвращает количество раз, которое встречается искомый символ в строке или ноль в случае отсутствия такового.</returns>
-        </member>
-        <member name="T:DynamicParser.TagSearcher">
-            <summary>
-            Производит поиск заданного Tag в строке и возвращает варианты возможных соответствий.
-            </summary>
-        </member>
-        <member name="F:DynamicParser.TagSearcher._currentStr">
-            <summary>
-            Исходная строка.
-            </summary>
-        </member>
-        <member name="M:DynamicParser.TagSearcher.#ctor(System.String)">
-            <summary>
-            Задаёт анализируемую строку.
-            </summary>
-            <param name="str">Анализируемая строка.</param>
-        </member>
-        <member name="M:DynamicParser.TagSearcher.IsEqual(System.String)">
-            <summary>
-            Проверяет, является эквивалентом указанная строка по отношению к текущей или нет.
-            </summary>
-            <param name="tag">Проверяемая строка.</param>
-            <returns>Возвращает значение true в случае, когда указанная подстрока найдена, в противном случае false.</returns>
-        </member>
-        <member name="M:DynamicParser.TagSearcher.FindEqual(System.String)">
-            <summary>
-            Выполняет поиск подстроки в строке и возвращает <see cref="T:DynamicParser.FindString" /> в случае соответствия строк.
-            </summary>
-            <param name="tag">Строка, поиск которой необходимо выполнить.</param>
-            <returns>Возвращает <see cref="T:DynamicParser.FindString" /> в случае соответствия строк.</returns>
-        </member>
-        <member name="M:DynamicParser.TagSearcher.GetStringChunk(System.Int32)">
-            <summary>
-            Получает части строки, равные по длине искомой строки.
-            </summary>
-            <param name="len">Длина искомой строки.</param>
-            <returns>Возвращает <see cref="T:DynamicParser.FindString" /> для строк, которые равны по длине искомой строки.</returns>
         </member>
         <member name="T:DynamicParser.WordSearcher">
             <summary>

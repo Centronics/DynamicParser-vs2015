@@ -175,26 +175,34 @@ namespace DynamicParser
         /// Ищет возможность связывания указанного слова с полями <see cref="Processor.Tag"/> найденных карт.
         /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомое слово?".
         /// Возвращает значение true в случае нахождения слова, в противном случае - false.
+        /// Параметр "startIndex" может быть меньше ноля.
         /// </summary>
         /// <param name="word">Искомое слово.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
+        /// <param name="count">Количество символов для выборки из названия карты, оно должно быть кратно длине искомого слова.</param>
         /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
-        public bool FindRelation(string word, int startIndex = 0, int length = 1)
+        public bool FindRelation(string word, int startIndex = 0, int count = 1)
         {
             if (word == null)
-                throw new ArgumentNullException(nameof(word), $"{nameof(FindRelation)}: Искомые слова отсутствуют (null).");
+                throw new ArgumentNullException(nameof(word), $"{nameof(FindRelation)}: Искомое слово отсутствует (null).");
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count),
+                    $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (word.Length <= 0)
                 return false;
+            if (word.Length % count != 0)
+                throw new ArgumentException($"{nameof(FindRelation)}: Количество символов для выборки должно быть кратно длине искомого слова.", nameof(count));
             List<List<Reg>> lst = new List<List<Reg>>();
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (FindString ch in GetWord(word, length))
+            foreach (string str in GetWord(word, count))
             {
-                List<Reg> lstReg = FindSymbols(ch.CurrentString, startIndex);
+                List<Reg> lstReg = FindSymbols(str, startIndex);
                 if (lstReg != null && lstReg.Count > 0)
                     lst.Add(lstReg);
             }
-            WordSearcher ws = GetWordSearcher(lst, startIndex, length);
+            WordSearcher ws = GetWordSearcher(lst, startIndex, word.Length);
             return ws != null && ws.IsEqual(word);
         }
 
@@ -204,13 +212,10 @@ namespace DynamicParser
         /// <param name="word">Искомое слово.</param>
         /// <param name="length">Требуемое количество букв в подстроке.</param>
         /// <returns>Возвращает части слова указанной длины.</returns>
-        static IEnumerable<FindString> GetWord(string word, int length)
+        static IEnumerable<string> GetWord(string word, int length)
         {
             for (int k = 0, max = word.Length - length; k <= max; k++)
-            {
-                FindString fs = new FindString(word.Substring(k, length), k, word);
-                yield return fs;
-            }
+                yield return word.Substring(k, length);
         }
 
         /// <summary>
@@ -218,19 +223,24 @@ namespace DynamicParser
         /// </summary>
         /// <param name="regs">Список обрабатываемых карт.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
+        /// <param name="count">Количество символов в строке названия карты.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
-        WordSearcher GetWordSearcher(IList<List<Reg>> regs, int startIndex, int length)
+        WordSearcher GetWordSearcher(IList<List<Reg>> regs, int startIndex, int count)
         {
             if (regs == null)
                 throw new ArgumentNullException(nameof(regs), $"{nameof(GetWordSearcher)}: Список обрабатываемых карт равен null.");
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count),
+                    $@"{nameof(GetWordSearcher)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetWordSearcher)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (regs.Count <= 0)
                 return null;
-            int[] count = new int[regs.Count];
+            int[] counting = new int[regs.Count];
             Region region = new Region(Width, Height);
             for (int counter = regs.Count - 1; counter >= 0;)
             {
-                List<Reg> lstReg = GetWord(count, regs);
+                List<Reg> lstReg = GetWord(counting, regs);
                 bool result = true;
                 foreach (Reg reg in lstReg)
                 {
@@ -244,8 +254,8 @@ namespace DynamicParser
                     region[reg.Position].Register = new List<Reg> { reg };
                 }
                 if (result)
-                    return GetStringFromRegion(region, startIndex, length);
-                if ((counter = ChangeCount(count, regs)) < 0)
+                    return GetStringFromRegion(region, startIndex, count);
+                if ((counter = ChangeCount(counting, regs)) < 0)
                     return null;
             }
             return null;
@@ -256,12 +266,17 @@ namespace DynamicParser
         /// </summary>
         /// <param name="region">Регион, из которого требуется получить <see cref="WordSearcher"/>.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
+        /// <param name="count">Количество символов в строке названия карты.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/> из первых букв названия (<see cref="Processor.Tag"/>) объектов региона.</returns>
-        WordSearcher GetStringFromRegion(Region region, int startIndex, int length)
+        WordSearcher GetStringFromRegion(Region region, int startIndex, int count)
         {
             if (region == null)
                 throw new ArgumentNullException(nameof(region), $"{nameof(GetStringFromRegion)}: Регион равен null.");
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count),
+                    $@"{nameof(GetStringFromRegion)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetStringFromRegion)}: Индекс вышел за допустимые пределы ({startIndex}).");
             List<List<string>> lstWords = new List<List<string>>();
             foreach (Registered registered in region.Elements)
                 foreach (Reg reg in registered.Register)
@@ -269,7 +284,7 @@ namespace DynamicParser
                     List<string> lst = new List<string>();
                     // ReSharper disable once LoopCanBeConvertedToQuery
                     foreach (Processor pr in reg.Procs)
-                        lst.Add(pr.GetProcessorName(startIndex, length));
+                        lst.Add(pr.GetProcessorName(startIndex, count));
                     lstWords.Add(lst);
                 }
             return new WordSearcher(lstWords);
@@ -287,6 +302,8 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(procName), $"{nameof(FindSymbols)}: Искомая строка равна null.");
             if (procName == string.Empty)
                 throw new ArgumentException($"{nameof(FindSymbols)}: Искомая строка должна состоять хотя бы из одиного символа.", nameof(procName));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindSymbols)}: Индекс вышел за допустимые пределы ({startIndex}).");
             List<Reg> lstRegs = new List<Reg>();
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)

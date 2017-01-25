@@ -137,13 +137,16 @@ namespace DynamicParser
         /// Отрицательные значения свидетельствуют о необходимости использовать содержимое свойства <see cref="Tag"/> целиком.
         /// </summary>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <param name="length">Максимальное количество символов в строке названия карты.</param>
+        /// <param name="count">Количество символов в строке названия карты.</param>
         /// <returns>Возвращает строку, представляющую подстроку поля <see cref="Tag"/> текущей карты.</returns>
-        public string GetProcessorName(int startIndex, int length)
+        public string GetProcessorName(int startIndex, int count)
         {
-            if (startIndex < 0 || startIndex >= Tag.Length || length <= 0 || startIndex + length > Tag.Length || length > Tag.Length)
-                return Tag;
-            return startIndex + length >= Tag.Length ? Tag.Substring(startIndex) : Tag.Substring(startIndex, length);
+            if (startIndex < 0 || startIndex >= Tag.Length)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetProcessorName)}: Индекс вышел за допустимые пределы ({startIndex}).");
+            if (startIndex + count > Tag.Length || count <= 0)
+                throw new ArgumentOutOfRangeException(nameof(count), $@"{nameof(GetProcessorName)
+                    }: Максимальное количество символов вышло за допустимые пределы ({count}).");
+            return startIndex + count >= Tag.Length ? Tag.Substring(startIndex) : Tag.Substring(startIndex, count);
         }
 
         /// <summary>

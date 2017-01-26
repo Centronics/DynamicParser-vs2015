@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace DynamicParser
 {
@@ -135,47 +137,100 @@ namespace DynamicParser
 
         /// <summary>
         /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова?".
-        /// Если хотя бы одно слово отсутствует, возвращается значение false.
+        /// Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+        /// Возвращает список слов, с которыми удалось установить связь или null в случае ошибки или пустого исходного массива.
         /// </summary>
         /// <param name="words">Искомые слова.</param>
-        /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
-        public bool FindRelation(params string[] words)
+        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+        /// <param name="count">Количество символов для выборки из названия карты, оно должно быть кратно длине искомого слова.</param>
+        /// <returns>Возвращает список слов, с которыми удалось установить связь.</returns>
+        public ConcurrentBag<string> FindRelation(int startIndex, int count, params string[] words)
         {
-            return FindRelation((IList<string>)words);
+            return FindRelation((IList<string>)words, startIndex, count);
         }
 
         /// <summary>
         /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова?".
-        /// Если хотя бы одно слово отсутствует, возвращается значение false.
+        /// Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+        /// Возвращает список слов, с которыми удалось установить связь или null в случае ошибки или пустого исходного массива.
         /// </summary>
         /// <param name="words">Искомые слова.</param>
-        /// <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
-        public bool FindRelation(IList<string> words)
+        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+        /// <param name="count">Количество символов для выборки из названия карты, оно должно быть кратно длине искомого слова.</param>
+        /// <returns>Возвращает список слов, с которыми удалось установить связь.</returns>
+        public ConcurrentBag<string> FindRelation(ICollection words, int startIndex = 0, int count = 1)
+        {
+            if (words == null)
+                throw new ArgumentNullException(nameof(words), $@"{nameof(FindRelation)}: Коллекция отсутствует (null).");
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count),
+                    $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
+            if (words.Count <= 0)
+                return null;
+            List<string> lst = new List<string>(words.Count);
+            lst.AddRange(from string s in words where !string.IsNullOrWhiteSpace(s) select s);
+            return FindRelation((IList<string>)lst, startIndex, count);
+        }
+
+        /// <summary>
+        /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
+        /// Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+        /// Возвращает список слов, с которыми удалось установить связь или null в случае ошибки или пустого исходного массива.
+        /// </summary>
+        /// <param name="words">Искомые слова.</param>
+        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+        /// <param name="count">Количество символов для выборки из названия карты, оно должно быть кратно длине искомого слова.</param>
+        /// <returns>Возвращает список слов, с которыми удалось установить связь.</returns>
+        public ConcurrentBag<string> FindRelation(IList<string> words, int startIndex = 0, int count = 1)
         {
             if (words == null)
                 throw new ArgumentNullException(nameof(words), $"{nameof(FindRelation)}: Искомые слова отсутствуют (null).");
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count),
+                    $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
             if (words.Count <= 0)
-                return false;
+                return null;
+            ConcurrentBag<string> result = new ConcurrentBag<string>();
             if (words.Count == 1)
-                return FindRelation(words[0]);
-            StringBuilder sb = new StringBuilder();
-            foreach (string s in words)
             {
-                if (string.IsNullOrEmpty(s))
-                    continue;
-                sb.Append(s);
+                string str = words[0];
+                if (string.IsNullOrEmpty(str)) return null;
+                if (!FindRelation(str)) return null;
+                result.Add(str);
+                return result;
             }
-            string str = sb.ToString();
-            return !string.IsNullOrEmpty(str) && FindRelation(str);
+            bool exThrown = false;
+            string exString = string.Empty;
+            Parallel.For(0, words.Count, (i, state) =>
+            {
+                try
+                {
+                    string str = words[i];
+                    if (string.IsNullOrEmpty(str))
+                        return;
+                    if (FindRelation(str))
+                        result.Add(str);
+                }
+                catch (Exception ex)
+                {
+                    exThrown = true;
+                    exString = ex.Message;
+                    state.Stop();
+                }
+            });
+            if (exThrown)
+                throw new Exception(exString);
+            return result;
         }
 
         /// <summary>
         /// Ищет возможность связывания указанного слова с полями <see cref="Processor.Tag"/> найденных карт.
         /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомое слово?".
         /// Возвращает значение true в случае нахождения слова, в противном случае - false.
-        /// Параметр "startIndex" может быть меньше ноля.
         /// </summary>
         /// <param name="word">Искомое слово.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
@@ -185,11 +240,11 @@ namespace DynamicParser
         {
             if (word == null)
                 throw new ArgumentNullException(nameof(word), $"{nameof(FindRelation)}: Искомое слово отсутствует (null).");
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
-            if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (word.Length <= 0)
                 return false;
             if (word.Length % count != 0)
@@ -268,7 +323,7 @@ namespace DynamicParser
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
         /// <param name="count">Количество символов в строке названия карты.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/> из первых букв названия (<see cref="Processor.Tag"/>) объектов региона.</returns>
-        WordSearcher GetStringFromRegion(Region region, int startIndex, int count)
+        static WordSearcher GetStringFromRegion(Region region, int startIndex, int count)
         {
             if (region == null)
                 throw new ArgumentNullException(nameof(region), $"{nameof(GetStringFromRegion)}: Регион равен null.");
@@ -327,7 +382,7 @@ namespace DynamicParser
         /// <param name="count">Массив-счётчик.</param>
         /// <param name="lstReg">Список найденных карт.</param>
         /// <returns>Возвращается номер позиции, на которой произошло изменение, в противном случае -1.</returns>
-        int ChangeCount(IList<int> count, IList<List<Reg>> lstReg)
+        static int ChangeCount(IList<int> count, IList<List<Reg>> lstReg)
         {
             if (lstReg == null)
                 throw new ArgumentNullException(nameof(lstReg), $"{nameof(ChangeCount)}:Список найденных карт равен (null).");
@@ -350,7 +405,7 @@ namespace DynamicParser
         /// <param name="count">Данные счётчиков по каждому слову.</param>
         /// <param name="lstReg">Список найденных карт.</param>
         /// <returns>Возвращает слово из частей, содержащихся в коллекции.</returns>
-        List<Reg> GetWord(IList<int> count, IList<List<Reg>> lstReg)
+        static List<Reg> GetWord(IList<int> count, IList<List<Reg>> lstReg)
         {
             if (lstReg == null)
                 throw new ArgumentNullException(nameof(lstReg), $"{nameof(GetWord)}:Список найденных карт равен (null).");

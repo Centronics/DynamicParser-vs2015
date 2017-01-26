@@ -657,30 +657,44 @@
             <param name="mapWidth">Ширина карт, которые проходили обработку.</param>
             <param name="mapHeight">Высота карт, которые проходили обработку.</param>
         </member>
-        <member name="M:DynamicParser.SearchResults.FindRelation(System.String[])">
+        <member name="M:DynamicParser.SearchResults.FindRelation(System.Int32,System.Int32,System.String[])">
             <summary>
             Ищет возможность связывания указанных слов с полями <see cref="P:DynamicParser.Processor.Tag"/> найденных карт.
-            Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова?".
-            Если хотя бы одно слово отсутствует, возвращается значение false.
+            Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+            Возвращает список слов, с которыми удалось установить связь или null в случае ошибки или пустого исходного массива.
             </summary>
             <param name="words">Искомые слова.</param>
-            <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
+            <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+            <param name="count">Количество символов для выборки из названия карты, оно должно быть кратно длине искомого слова.</param>
+            <returns>Возвращает список слов, с которыми удалось установить связь.</returns>
         </member>
-        <member name="M:DynamicParser.SearchResults.FindRelation(System.Collections.Generic.IList{System.String})">
+        <member name="M:DynamicParser.SearchResults.FindRelation(System.Collections.ICollection,System.Int32,System.Int32)">
             <summary>
             Ищет возможность связывания указанных слов с полями <see cref="P:DynamicParser.Processor.Tag"/> найденных карт.
-            Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомые слова?".
-            Если хотя бы одно слово отсутствует, возвращается значение false.
+            Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+            Возвращает список слов, с которыми удалось установить связь или null в случае ошибки или пустого исходного массива.
             </summary>
             <param name="words">Искомые слова.</param>
-            <returns>Возвращает значение true в случае нахождения связи, в противном случае - false.</returns>
+            <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+            <param name="count">Количество символов для выборки из названия карты, оно должно быть кратно длине искомого слова.</param>
+            <returns>Возвращает список слов, с которыми удалось установить связь.</returns>
+        </member>
+        <member name="M:DynamicParser.SearchResults.FindRelation(System.Collections.Generic.IList{System.String},System.Int32,System.Int32)">
+            <summary>
+            Ищет возможность связывания указанных слов с полями <see cref="P:DynamicParser.Processor.Tag"/> найденных карт.
+            Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+            Возвращает список слов, с которыми удалось установить связь или null в случае ошибки или пустого исходного массива.
+            </summary>
+            <param name="words">Искомые слова.</param>
+            <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+            <param name="count">Количество символов для выборки из названия карты, оно должно быть кратно длине искомого слова.</param>
+            <returns>Возвращает список слов, с которыми удалось установить связь.</returns>
         </member>
         <member name="M:DynamicParser.SearchResults.FindRelation(System.String,System.Int32,System.Int32)">
             <summary>
             Ищет возможность связывания указанного слова с полями <see cref="P:DynamicParser.Processor.Tag"/> найденных карт.
             Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомое слово?".
             Возвращает значение true в случае нахождения слова, в противном случае - false.
-            Параметр "startIndex" может быть меньше ноля.
             </summary>
             <param name="word">Искомое слово.</param>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>

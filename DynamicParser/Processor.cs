@@ -146,7 +146,7 @@ namespace DynamicParser
             if (startIndex + count > Tag.Length || count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count), $@"{nameof(GetProcessorName)
                     }: Максимальное количество символов вышло за допустимые пределы ({count}).");
-            return startIndex + count >= Tag.Length ? Tag.Substring(startIndex) : Tag.Substring(startIndex, count);
+            return Tag.Substring(startIndex, count);
         }
 
         /// <summary>

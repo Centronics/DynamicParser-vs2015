@@ -234,8 +234,7 @@
         </member>
         <member name="M:DynamicParser.Processor.GetProcessorName(System.Int32,System.Int32)">
             <summary>
-            Получает строку, представляющую подстроку поля <see cref="P:DynamicParser.Processor.Tag"/> текущей карты.
-            Отрицательные значения свидетельствуют о необходимости использовать содержимое свойства <see cref="P:DynamicParser.Processor.Tag"/> целиком.
+            Получает строку, представляющую подстроку поля <see cref="P:DynamicParser.Processor.Tag"/> текущей карты или null в случае недопустимых значений для названия текущей карты.
             </summary>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
             <param name="count">Количество символов в строке названия карты.</param>

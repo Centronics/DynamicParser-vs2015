@@ -133,19 +133,15 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Получает строку, представляющую подстроку поля <see cref="Tag"/> текущей карты.
-        /// Отрицательные значения свидетельствуют о необходимости использовать содержимое свойства <see cref="Tag"/> целиком.
+        /// Получает строку, представляющую подстроку поля <see cref="Tag"/> текущей карты или null в случае недопустимых значений для названия текущей карты.
         /// </summary>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
         /// <param name="count">Количество символов в строке названия карты.</param>
         /// <returns>Возвращает строку, представляющую подстроку поля <see cref="Tag"/> текущей карты.</returns>
         public string GetProcessorName(int startIndex, int count)
         {
-            if (startIndex < 0 || startIndex >= Tag.Length)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetProcessorName)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            if (startIndex + count > Tag.Length || count <= 0)
-                throw new ArgumentOutOfRangeException(nameof(count), $@"{nameof(GetProcessorName)
-                    }: Максимальное количество символов вышло за допустимые пределы ({count}).");
+            if (startIndex < 0 || startIndex >= Tag.Length || startIndex + count > Tag.Length || count <= 0)
+                return null;
             return Tag.Substring(startIndex, count);
         }
 
@@ -159,7 +155,10 @@ namespace DynamicParser
         {
             if (string.IsNullOrWhiteSpace(name))
                 return false;
-            return string.Compare(name, GetProcessorName(startIndex, name.Length), StringComparison.OrdinalIgnoreCase) == 0;
+            string str = GetProcessorName(startIndex, name.Length);
+            if (string.IsNullOrWhiteSpace(str))
+                return false;
+            return string.Compare(name, str, StringComparison.OrdinalIgnoreCase) == 0;
         }
 
         /// <summary>

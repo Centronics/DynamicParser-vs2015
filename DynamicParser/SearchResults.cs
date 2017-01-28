@@ -339,7 +339,11 @@ namespace DynamicParser
                     List<string> lst = new List<string>();
                     // ReSharper disable once LoopCanBeConvertedToQuery
                     foreach (Processor pr in reg.Procs)
-                        lst.Add(pr.GetProcessorName(startIndex, count));
+                    {
+                        string str = pr.GetProcessorName(startIndex, count);
+                        if (!string.IsNullOrEmpty(str))
+                            lst.Add(str);
+                    }
                     lstWords.Add(lst);
                 }
             return new WordSearcher(lstWords);

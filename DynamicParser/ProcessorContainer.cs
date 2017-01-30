@@ -42,6 +42,39 @@ namespace DynamicParser
         /// <param name="processors">Добавляемые карты.</param>
         public ProcessorContainer(IList<Processor> processors)
         {
+            AgrumentAssertions(processors);
+            Width = processors[0].Width;
+            Height = processors[0].Height;
+            AddProcessors(processors);
+        }
+
+        /// <summary>
+        /// Инициализирует новый экземпляр хранилища, добавляя в него указанные карты и проверяя их на то, чтобы они были одного размера.
+        /// </summary>
+        /// <param name="processors">Добавляемые карты.</param>
+        public ProcessorContainer(params Processor[] processors)
+        {
+            AgrumentAssertions(processors);
+            Width = processors[0].Width;
+            Height = processors[0].Height;
+            AddProcessors(processors);
+        }
+
+        /// <summary>
+        /// Добавляет карты в коллекцию.
+        /// </summary>
+        /// <param name="processors">Добавляемые карты.</param>
+        void AddProcessors(IEnumerable<Processor> processors)
+        {
+            _lstProcs.AddRange(processors.Where(proc => proc != null));
+        }
+
+        /// <summary>
+        /// Выдаёт исключения в случае обнаружения каких-либо ошибок.
+        /// </summary>
+        /// <param name="processors">Добавляемые карты.</param>
+        void AgrumentAssertions(IList<Processor> processors)
+        {
             if (processors == null)
                 throw new ArgumentNullException(nameof(processors), $"{nameof(ProcessorContainer)}: Коллекция карт не может быть равна null.");
             if (processors.Count <= 0)
@@ -54,14 +87,6 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(ProcessorContainer)}: Обнаружены карты различных размеров.", nameof(processors));
             if (!InOneTag(processors))
                 throw new ArgumentException($"{nameof(ProcessorContainer)}: Карты с одинаковыми Tag не могут быть в одном списке.", nameof(processors));
-            Width = processors[0].Width;
-            Height = processors[0].Height;
-            foreach (Processor proc in processors)
-            {
-                if (proc == null)
-                    continue;
-                _lstProcs.Add(proc);
-            }
         }
 
         /// <summary>

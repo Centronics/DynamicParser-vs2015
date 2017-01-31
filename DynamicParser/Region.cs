@@ -205,5 +205,13 @@ namespace DynamicParser
         {
             _rects.Remove(GetIndex(x, y));
         }
+
+        /// <summary>
+        /// Удаляет все области из текущего объекта.
+        /// </summary>
+        public void Clear()
+        {
+            _rects.Clear();
+        }
     }
 }

@@ -21,7 +21,7 @@ namespace DynamicParserTest
 
                 Assert.AreEqual(false, ws.IsEqual("030"));
                 Assert.AreEqual(false, ws.IsEqual("014"));
-                Assert.AreEqual(false, ws.IsEqual("112"));
+                Assert.AreEqual(true, ws.IsEqual("112"));
             }
 
             {
@@ -40,7 +40,7 @@ namespace DynamicParserTest
                 Assert.AreEqual(true, ws.IsEqual("54"));
                 Assert.AreEqual(true, ws.IsEqual("94"));
 
-                Assert.AreEqual(false, ws.IsEqual("99"));
+                Assert.AreEqual(true, ws.IsEqual("99"));
                 Assert.AreEqual(false, ws.IsEqual("88"));
                 Assert.AreEqual(false, ws.IsEqual("74"));
             }

@@ -10,7 +10,6 @@ namespace DynamicParserTest
         [TestMethod]
         public void TagSearcherTest1()
         {
-            //ДОБАВИТЬ БУКВЫ
             TagSearcher ts = new TagSearcher("000");
             Assert.AreEqual(true, ts.IsEqual("000"));
             ts = new TagSearcher("100");
@@ -25,6 +24,25 @@ namespace DynamicParserTest
             ts = new TagSearcher("5");
             Assert.AreEqual(true, ts.IsEqual("5"));
             Assert.AreEqual(false, ts.IsEqual("0"));
+            ts = new TagSearcher("Aab1");
+            Assert.AreEqual(true, ts.IsEqual("AaB1"));
+            Assert.AreEqual(true, ts.IsEqual("aab1"));
+            Assert.AreEqual(true, ts.IsEqual("b1aa"));
+            Assert.AreEqual(true, ts.IsEqual("1aba"));
+            Assert.AreEqual(true, ts.IsEqual("ab1a"));
+            Assert.AreEqual(true, ts.IsEqual("AB1a"));
+            Assert.AreEqual(true, ts.IsEqual("B1aa"));
+            Assert.AreEqual(true, ts.IsEqual("1baa"));
+            Assert.AreEqual(true, ts.IsEqual("1bAA"));
+            Assert.AreEqual(true, ts.IsEqual("1bAa"));
+            Assert.AreEqual(false, ts.IsEqual("aab1a"));
+            Assert.AreEqual(false, ts.IsEqual("ba1c"));
+            Assert.AreEqual(false, ts.IsEqual("hab1a"));
+            Assert.AreEqual(false, ts.IsEqual("ba"));
+            Assert.AreEqual(false, ts.IsEqual("bb1a"));
+            Assert.AreEqual(false, ts.IsEqual("bb1aa"));
+            Assert.AreEqual(ts.SourceString, "AAB1");
+            Assert.AreNotEqual(ts.SourceString, "aab1");
         }
 
         [TestMethod]

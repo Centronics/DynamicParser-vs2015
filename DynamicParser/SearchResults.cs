@@ -257,7 +257,7 @@ namespace DynamicParser
                 if (lstReg != null && lstReg.Count > 0)
                     lst.Add(lstReg);
             }
-            WordSearcher ws = GetWordSearcher(lst, startIndex, word.Length);
+            WordSearcher ws = GetWordSearcher(lst, startIndex, count);
             return ws != null && ws.IsEqual(word);
         }
 
@@ -312,6 +312,7 @@ namespace DynamicParser
                     return GetStringFromRegion(region, startIndex, count);
                 if ((counter = ChangeCount(counting, regs)) < 0)
                     return null;
+                region.Clear();
             }
             return null;
         }
@@ -332,21 +333,11 @@ namespace DynamicParser
                     $@"{nameof(GetStringFromRegion)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetStringFromRegion)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            List<List<string>> lstWords = new List<List<string>>();
+            List<string> lstWords = new List<string>();
             foreach (Registered registered in region.Elements)
                 foreach (Reg reg in registered.Register)
-                {
-                    List<string> lst = new List<string>();
-                    // ReSharper disable once LoopCanBeConvertedToQuery
-                    foreach (Processor pr in reg.Procs)
-                    {
-                        string str = pr.GetProcessorName(startIndex, count);
-                        if (!string.IsNullOrEmpty(str))
-                            lst.Add(str);
-                    }
-                    lstWords.Add(lst);
-                }
-            return new WordSearcher(lstWords);
+                    lstWords.AddRange(reg.Procs.Select(pr => pr.GetProcessorName(startIndex, count)).Where(str => !string.IsNullOrEmpty(str)));
+            return lstWords.Count <= 0 ? null : new WordSearcher(lstWords);
         }
 
         /// <summary>
@@ -389,7 +380,7 @@ namespace DynamicParser
         static int ChangeCount(IList<int> count, IList<List<Reg>> lstReg)
         {
             if (lstReg == null)
-                throw new ArgumentNullException(nameof(lstReg), $"{nameof(ChangeCount)}:Список найденных карт равен (null).");
+                throw new ArgumentNullException(nameof(lstReg), $"{nameof(ChangeCount)}:Список найденных карт равен null.");
             if (count == null || count.Count != lstReg.Count)
                 throw new ArgumentException($"{nameof(ChangeCount)}: Массив-счётчик не указан или его длина некорректна ({count?.Count}).", nameof(count));
             for (int k = count.Count - 1; k >= 0; k--)
@@ -412,7 +403,7 @@ namespace DynamicParser
         static List<Reg> GetWord(IList<int> count, IList<List<Reg>> lstReg)
         {
             if (lstReg == null)
-                throw new ArgumentNullException(nameof(lstReg), $"{nameof(GetWord)}:Список найденных карт равен (null).");
+                throw new ArgumentNullException(nameof(lstReg), $"{nameof(GetWord)}:Список найденных карт равен null.");
             if (count == null)
                 throw new ArgumentNullException(nameof(count), $"{nameof(GetWord)}: Массив данных равен null.");
             if (count.Count != lstReg.Count)

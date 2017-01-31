@@ -27,25 +27,18 @@ namespace DynamicParser
         /// Отсев производится без учёта регистра.
         /// </summary>
         /// <param name="strs">Коллекция слов.</param>
-        public WordSearcher(IEnumerable<IList<string>> strs)
+        public WordSearcher(IList<string> strs)
         {
             if (strs == null)
                 throw new ArgumentNullException(nameof(strs), $"{nameof(WordSearcher)}: Массив слов равен null.");
-            foreach (IList<string> lst in strs)
+            foreach (string str in strs)
             {
-                if (lst == null || lst.Count <= 0)
+                if (string.IsNullOrEmpty(str))
                     continue;
-                foreach (string str in lst)
-                {
-                    if (string.IsNullOrEmpty(str))
-                        continue;
-                    if (_words.Any(s => string.Compare(s, str, StringComparison.OrdinalIgnoreCase) == 0))
-                        continue;
-                    _words.Add(str);
-                }
+                if (_words.Any(s => string.Compare(s, str, StringComparison.OrdinalIgnoreCase) == 0))
+                    continue;
+                _words.Add(str);
             }
-            if (Count <= 0)
-                throw new ArgumentException($"{nameof(WordSearcher)}: Массив слов пустой ({Count}).", nameof(strs));
         }
 
         /// <summary>
@@ -55,7 +48,7 @@ namespace DynamicParser
         /// <returns>Возвращает значение true в случае, если соответствие обнаружено, в противном случае - false.</returns>
         public bool IsEqual(string word)
         {
-            if (string.IsNullOrEmpty(word) || word.Length != Count)
+            if (string.IsNullOrEmpty(word) || word.Length <= 0 || Count <= 0)
                 return false;
             TagSearcher ts = new TagSearcher(word);
             int[] count = new int[word.Length];
@@ -77,9 +70,9 @@ namespace DynamicParser
         /// <returns>Возвращается номер позиции, на которой произошло изменение, в противном случае -1.</returns>
         int ChangeCount(int[] count)
         {
-            if (count == null || count.Length != Count)
+            if (count == null || count.Length <= 0)
                 throw new ArgumentException($"{nameof(ChangeCount)}: Массив-счётчик не указан или его длина некорректна ({count?.Length}).", nameof(count));
-            for (int k = Count - 1; k >= 0; k--)
+            for (int k = count.Length - 1; k >= 0; k--)
             {
                 if (count[k] >= _words.Count - 1) continue;
                 count[k]++;
@@ -99,11 +92,11 @@ namespace DynamicParser
         {
             if (count == null)
                 throw new ArgumentNullException(nameof(count), $"{nameof(GetWord)}: Массив данных равен null.");
-            if (count.Count != Count)
+            if (count.Count <= 0)
                 throw new ArgumentException($"{nameof(GetWord)}: Длина массива данных должна совпадать с количеством хранимых слов.", nameof(count));
             StringBuilder sb = new StringBuilder();
-            for (int k = 0; k < Count; k++)
-                sb.Append(_words[count[k]][0]);
+            foreach (int c in count)
+                sb.Append(_words[c]);
             return sb.ToString();
         }
     }

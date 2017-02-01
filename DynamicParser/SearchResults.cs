@@ -164,7 +164,7 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(words), $@"{nameof(FindRelation)}: Коллекция отсутствует (null).");
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            if (count < 0)
+            if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
             if (words.Count <= 0)
@@ -189,7 +189,7 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(words), $"{nameof(FindRelation)}: Искомые слова отсутствуют (null).");
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            if (count < 0)
+            if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
             if (words.Count <= 0)
@@ -242,20 +242,19 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(word), $"{nameof(FindRelation)}: Искомое слово отсутствует (null).");
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            if (count < 0)
+            if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
             if (word.Length <= 0)
                 return false;
             if (word.Length % count != 0)
                 throw new ArgumentException($"{nameof(FindRelation)}: Количество символов для выборки должно быть кратно длине искомого слова.", nameof(count));
-            List<List<Reg>> lst = new List<List<Reg>>();
-            // ReSharper disable once LoopCanBeConvertedToQuery
+            List<Reg> lst = new List<Reg>();
             foreach (string str in GetWord(word, count))
             {
                 List<Reg> lstReg = FindSymbols(str, startIndex);
                 if (lstReg != null && lstReg.Count > 0)
-                    lst.Add(lstReg);
+                    lst.AddRange(lstReg);
             }
             WordSearcher ws = GetWordSearcher(lst, startIndex, count);
             return ws != null && ws.IsEqual(word);
@@ -280,24 +279,23 @@ namespace DynamicParser
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
         /// <param name="count">Количество символов в строке названия карты.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
-        WordSearcher GetWordSearcher(IList<List<Reg>> regs, int startIndex, int count)
+        WordSearcher GetWordSearcher(IList<Reg> regs, int startIndex, int count)
         {
             if (regs == null)
                 throw new ArgumentNullException(nameof(regs), $"{nameof(GetWordSearcher)}: Список обрабатываемых карт равен null.");
-            if (count < 0)
+            if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(GetWordSearcher)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetWordSearcher)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (regs.Count <= 0)
                 return null;
-            int[] counting = new int[regs.Count];
+            int[] counting = new int[count];
             Region region = new Region(Width, Height);
-            for (int counter = regs.Count - 1; counter >= 0;)
+            for (int counter = count - 1; counter >= 0;)
             {
-                List<Reg> lstReg = GetWord(counting, regs);
                 bool result = true;
-                foreach (Reg reg in lstReg)
+                foreach (Reg reg in GetWord(counting, regs))
                 {
                     Rectangle rect = new Rectangle(reg.Position, MapSize);
                     if (region.IsConflict(rect))
@@ -328,7 +326,7 @@ namespace DynamicParser
         {
             if (region == null)
                 throw new ArgumentNullException(nameof(region), $"{nameof(GetStringFromRegion)}: Регион равен null.");
-            if (count < 0)
+            if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(GetStringFromRegion)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
             if (startIndex < 0)
@@ -377,7 +375,7 @@ namespace DynamicParser
         /// <param name="count">Массив-счётчик.</param>
         /// <param name="lstReg">Список найденных карт.</param>
         /// <returns>Возвращается номер позиции, на которой произошло изменение, в противном случае -1.</returns>
-        static int ChangeCount(IList<int> count, IList<List<Reg>> lstReg)
+        static int ChangeCount(IList<int> count, IList<Reg> lstReg)
         {
             if (lstReg == null)
                 throw new ArgumentNullException(nameof(lstReg), $"{nameof(ChangeCount)}:Список найденных карт равен null.");
@@ -385,7 +383,7 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(ChangeCount)}: Массив-счётчик не указан или его длина некорректна ({count?.Count}).", nameof(count));
             for (int k = count.Count - 1; k >= 0; k--)
             {
-                if (count[k] >= lstReg[k].Count - 1) continue;
+                if (count[k] >= lstReg.Count - 1) continue;
                 count[k]++;
                 for (int x = k + 1; x < count.Count; x++)
                     count[x] = 0;
@@ -400,19 +398,13 @@ namespace DynamicParser
         /// <param name="count">Данные счётчиков по каждому слову.</param>
         /// <param name="lstReg">Список найденных карт.</param>
         /// <returns>Возвращает слово из частей, содержащихся в коллекции.</returns>
-        static List<Reg> GetWord(IList<int> count, IList<List<Reg>> lstReg)
+        static List<Reg> GetWord(IList<int> count, IList<Reg> lstReg)
         {
             if (lstReg == null)
                 throw new ArgumentNullException(nameof(lstReg), $"{nameof(GetWord)}:Список найденных карт равен null.");
             if (count == null)
                 throw new ArgumentNullException(nameof(count), $"{nameof(GetWord)}: Массив данных равен null.");
-            if (count.Count != lstReg.Count)
-                throw new ArgumentException($"{nameof(GetWord)}: Длина массива данных должна совпадать с количеством хранимых слов.", nameof(count));
-            List<Reg> lst = new List<Reg>();
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            for (int k = 0; k < lstReg.Count; k++)
-                lst.Add(lstReg[k][count[k]]);
-            return lst;
+            return lstReg.Select((t, k) => lstReg[count[k]]).ToList();
         }
 
         /// <summary>

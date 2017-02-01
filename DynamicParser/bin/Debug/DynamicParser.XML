@@ -731,13 +731,14 @@
             <param name="length">Требуемое количество букв в подстроке.</param>
             <returns>Возвращает части слова указанной длины.</returns>
         </member>
-        <member name="M:DynamicParser.SearchResults.GetWordSearcher(System.Collections.Generic.IList{System.Collections.Generic.List{DynamicParser.Reg}},System.Int32,System.Int32)">
+        <member name="M:DynamicParser.SearchResults.GetWordSearcher(System.Collections.Generic.IList{DynamicParser.Reg},System.Int32,System.Int32,System.Int32)">
             <summary>
             Получает <see cref="T:DynamicParser.WordSearcher"/>, который позволяет выполнить поиск требуемого слова.
             </summary>
             <param name="regs">Список обрабатываемых карт.</param>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
             <param name="count">Количество символов в строке названия карты.</param>
+            <param name="selectCount">Количество символов, которое необходимо выбрать из названия карты для поиска требуемого слова.</param>
             <returns>Возвращает <see cref="T:DynamicParser.WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
         </member>
         <member name="M:DynamicParser.SearchResults.GetStringFromRegion(DynamicParser.Region,System.Int32,System.Int32)">
@@ -757,22 +758,14 @@
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
             <returns>Возвращает информацию о найденных объектах.</returns>
         </member>
-        <member name="M:DynamicParser.SearchResults.ChangeCount(System.Collections.Generic.IList{System.Int32},System.Collections.Generic.IList{System.Collections.Generic.List{DynamicParser.Reg}})">
+        <member name="M:DynamicParser.SearchResults.ChangeCount(System.Collections.Generic.IList{System.Int32},System.Int32)">
             <summary>
             Увеличивает значение старших разрядов счётчика букв, если это возможно.
             Если увеличение было произведено, возвращается номер позиции, на которой произошло изменение, в противном случае -1.
             </summary>
             <param name="count">Массив-счётчик.</param>
-            <param name="lstReg">Список найденных карт.</param>
+            <param name="maxCount">Максимальное значение счётчика.</param>
             <returns>Возвращается номер позиции, на которой произошло изменение, в противном случае -1.</returns>
-        </member>
-        <member name="M:DynamicParser.SearchResults.GetWord(System.Collections.Generic.IList{System.Int32},System.Collections.Generic.IList{System.Collections.Generic.List{DynamicParser.Reg}})">
-            <summary>
-            Генерирует слово из частей, содержащихся в коллекции, основываясь на данных счётчиков.
-            </summary>
-            <param name="count">Данные счётчиков по каждому слову.</param>
-            <param name="lstReg">Список найденных карт.</param>
-            <returns>Возвращает слово из частей, содержащихся в коллекции.</returns>
         </member>
         <member name="P:DynamicParser.SearchResults.Item(System.Int32,System.Int32)">
             <summary>
@@ -861,7 +854,7 @@
             Получает количество слов в коллекции.
             </summary>
         </member>
-        <member name="M:DynamicParser.WordSearcher.#ctor(System.Collections.Generic.IEnumerable{System.Collections.Generic.IList{System.String}})">
+        <member name="M:DynamicParser.WordSearcher.#ctor(System.Collections.Generic.IList{System.String})">
             <summary>
             Инициализирует текущий экземпляр коллекцией слов.
             Выравнивает (синхронизирует) наличие всех слов в указанных коллекциях, в одной коллекции.

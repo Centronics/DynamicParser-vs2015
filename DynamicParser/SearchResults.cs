@@ -256,7 +256,7 @@ namespace DynamicParser
                 if (lstReg != null && lstReg.Count > 0)
                     lst.AddRange(lstReg);
             }
-            WordSearcher ws = GetWordSearcher(lst, startIndex, count);
+            WordSearcher ws = GetWordSearcher(lst, startIndex, word.Length, count);
             return ws != null && ws.IsEqual(word);
         }
 
@@ -278,24 +278,31 @@ namespace DynamicParser
         /// <param name="regs">Список обрабатываемых карт.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
         /// <param name="count">Количество символов в строке названия карты.</param>
+        /// <param name="selectCount">Количество символов, которое необходимо выбрать из названия карты для поиска требуемого слова.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
-        WordSearcher GetWordSearcher(IList<Reg> regs, int startIndex, int count)
+        WordSearcher GetWordSearcher(IList<Reg> regs, int startIndex, int count, int selectCount)
         {
             if (regs == null)
                 throw new ArgumentNullException(nameof(regs), $"{nameof(GetWordSearcher)}: Список обрабатываемых карт равен null.");
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetWordSearcher)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(GetWordSearcher)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
-            if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetWordSearcher)}: Индекс вышел за допустимые пределы ({startIndex}).");
+            if (selectCount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(selectCount), $@"{nameof(GetWordSearcher)
+                    }: Количество символов, которое необходимо выбрать из названия карты, должно быть больше ноля ({selectCount}).");
             if (regs.Count <= 0)
                 return null;
             int[] counting = new int[count];
+            Reg[] regsCounting = new Reg[count];
             Region region = new Region(Width, Height);
             for (int counter = count - 1; counter >= 0;)
             {
                 bool result = true;
-                foreach (Reg reg in GetWord(counting, regs))
+                for (int k = 0; k < counting.Length; k++)
+                    regsCounting[k] = regs[counting[k]];
+                foreach (Reg reg in regsCounting)
                 {
                     Rectangle rect = new Rectangle(reg.Position, MapSize);
                     if (region.IsConflict(rect))
@@ -307,8 +314,8 @@ namespace DynamicParser
                     region[reg.Position].Register = new List<Reg> { reg };
                 }
                 if (result)
-                    return GetStringFromRegion(region, startIndex, count);
-                if ((counter = ChangeCount(counting, regs)) < 0)
+                    return GetStringFromRegion(region, startIndex, selectCount);
+                if ((counter = ChangeCount(counting, regs.Count)) < 0)
                     return null;
                 region.Clear();
             }
@@ -373,38 +380,26 @@ namespace DynamicParser
         /// Если увеличение было произведено, возвращается номер позиции, на которой произошло изменение, в противном случае -1.
         /// </summary>
         /// <param name="count">Массив-счётчик.</param>
-        /// <param name="lstReg">Список найденных карт.</param>
+        /// <param name="maxCount">Максимальное значение счётчика.</param>
         /// <returns>Возвращается номер позиции, на которой произошло изменение, в противном случае -1.</returns>
-        static int ChangeCount(IList<int> count, IList<Reg> lstReg)
+        static int ChangeCount(IList<int> count, int maxCount)
         {
-            if (lstReg == null)
-                throw new ArgumentNullException(nameof(lstReg), $"{nameof(ChangeCount)}:Список найденных карт равен null.");
-            if (count == null || count.Count != lstReg.Count)
-                throw new ArgumentException($"{nameof(ChangeCount)}: Массив-счётчик не указан или его длина некорректна ({count?.Count}).", nameof(count));
-            for (int k = count.Count - 1; k >= 0; k--)
+            if (count == null)
+                throw new ArgumentNullException(nameof(count), $"{nameof(ChangeCount)}: Массив-счётчик не указан или его длина некорректна (null).");
+            if (count.Count <= 0)
+                throw new ArgumentException($"{nameof(ChangeCount)}: Длина массива-счётчика должна быть больше ноля ({count.Count}).", nameof(count));
+            if (maxCount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(maxCount), $@"{nameof(ChangeCount)}: Максимальное значение счётчика меньше или равно нолю ({maxCount
+                    }).");
+            for (int k = count.Count - 1, mc = maxCount - 1; k >= 0; k--)
             {
-                if (count[k] >= lstReg.Count - 1) continue;
+                if (count[k] >= mc) continue;
                 count[k]++;
                 for (int x = k + 1; x < count.Count; x++)
                     count[x] = 0;
                 return k;
             }
             return -1;
-        }
-
-        /// <summary>
-        /// Генерирует слово из частей, содержащихся в коллекции, основываясь на данных счётчиков.
-        /// </summary>
-        /// <param name="count">Данные счётчиков по каждому слову.</param>
-        /// <param name="lstReg">Список найденных карт.</param>
-        /// <returns>Возвращает слово из частей, содержащихся в коллекции.</returns>
-        static List<Reg> GetWord(IList<int> count, IList<Reg> lstReg)
-        {
-            if (lstReg == null)
-                throw new ArgumentNullException(nameof(lstReg), $"{nameof(GetWord)}:Список найденных карт равен null.");
-            if (count == null)
-                throw new ArgumentNullException(nameof(count), $"{nameof(GetWord)}: Массив данных равен null.");
-            return lstReg.Select((t, k) => lstReg[count[k]]).ToList();
         }
 
         /// <summary>

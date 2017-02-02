@@ -94,10 +94,19 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(count), $"{nameof(GetWord)}: Массив данных равен null.");
             if (count.Count <= 0)
                 throw new ArgumentException($"{nameof(GetWord)}: Длина массива данных должна совпадать с количеством хранимых слов.", nameof(count));
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(count.Count);
             foreach (int c in count)
+            {
+                if (sb.Length >= count.Count)
+                    break;
                 sb.Append(_words[c]);
-            return sb.ToString();
+            }
+            if (sb.Length < count.Count)
+                return null;
+            string result = sb.ToString();
+            if (sb.Length > count.Count)
+                result = result.Substring(0, count.Count);
+            return result;
         }
     }
 }

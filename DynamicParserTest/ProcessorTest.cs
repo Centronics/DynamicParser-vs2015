@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Xml.Serialization;
 using System.Linq;
 using DynamicParser;
 using DynamicProcessor;
@@ -13,6 +15,26 @@ namespace DynamicParserTest
     [TestClass]
     public class ProcessorTest
     {
+        [TestMethod]
+        public void ProcessorTestSerialization()
+        {
+            Bitmap btm = new Bitmap(2, 2);
+            btm.SetPixel(0, 0, Color.Black);
+            btm.SetPixel(0, 1, Color.Red);
+            btm.SetPixel(1, 0, Color.Orange);
+            btm.SetPixel(1, 1, Color.White);
+            //MemoryStream ms = new MemoryStream(100);
+            using (FileStream ms = new FileStream("file.xml", FileMode.Create, FileAccess.Write))
+            {
+                new Processor(btm, "t").SaveToStream(ms);
+            }
+            //Processor pr = (Processor) new XmlSerializer(typeof(Processor)).Deserialize(ms);
+            using (FileStream ms = new FileStream("file.xml", FileMode.Open, FileAccess.Read))
+            {
+                Processor pr = new Processor(ms);
+            }
+        }
+
         [TestMethod]
         public void ProcessorTest1()
         {
@@ -73,7 +95,7 @@ namespace DynamicParserTest
             {
                 Processor proc = new Processor(btm, "Main");
                 SearchResults sr1 = proc.GetEqual(new Processor(btm1, "1"), new Processor(btm2, "2"));
-                ProcessorContainer pc = new ProcessorContainer(new[] { new Processor(btm1, "1"), new Processor(btm2, "2") });
+                ProcessorContainer pc = new ProcessorContainer(new Processor(btm1, "1"), new Processor(btm2, "2"));
                 SearchResults sr2 = proc.GetEqual(pc);
 
                 Assert.AreEqual(sr1.Width * sr1.Height, sr2.Width * sr2.Height);

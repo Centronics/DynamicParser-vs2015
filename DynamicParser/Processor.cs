@@ -2,7 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using DynamicProcessor;
 
@@ -130,6 +132,69 @@ namespace DynamicParser
             for (int x = 0; x < btm.Length; x++)
                 _bitmap[x, 0] = btm[x];
             Tag = tag.Trim();
+        }
+
+        /// <summary>
+        /// Десериализует экземпляр класса из указанного потока.
+        /// </summary>
+        /// <param name="stream">Поток для десериализации.</param>
+        public Processor(Stream stream)
+        {
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream), $@"{nameof(Processor)}: Поток не указан (null).");
+            if (stream.Length < 21)
+                throw new ArgumentException($@"{nameof(Processor)}: Входной поток короче 21 байт: {stream.Length} байт.", nameof(stream));
+            byte[] bts = new byte[4];
+            int read = stream.Read(bts, 0, 4);
+            if (read != 4)
+                throw new Exception($"{nameof(Processor)}: Количество считанных байт ({read}) не соответствует требуемому (4).");
+            int width = BitConverter.ToInt32(bts, 0);
+            read = stream.Read(bts, 0, 4);
+            if (read != 4)
+                throw new Exception($"{nameof(Processor)}: Количество считанных байт ({read}) не соответствует требуемому (4).");
+            int height = BitConverter.ToInt32(bts, 0);
+            read = stream.Read(bts, 0, 4);
+            if (read != 4)
+                throw new Exception($"{nameof(Processor)}: Количество считанных байт ({read}) не соответствует требуемому (4).");
+            int tagLength = BitConverter.ToInt32(bts, 0);
+            byte[] btsTag = new byte[tagLength];
+            read = stream.Read(btsTag, 0, tagLength);
+            if (read != tagLength)
+                throw new Exception($"{nameof(Processor)}: Количество считанных байт ({read}) не соответствует требуемому ({tagLength}).");
+            Tag = Encoding.UTF8.GetString(btsTag);
+            _bitmap = new SignValue[width, height];
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
+                {
+                    read = stream.Read(bts, 0, 4);
+                    if (read != 4)
+                        throw new Exception($"{nameof(Processor)}: Количество считанных байт ({read}) не соответствует требуемому (4).");
+                    _bitmap[x, y] = new SignValue(BitConverter.ToInt32(bts, 0));
+                }
+        }
+
+        /// <summary>
+        /// Сериализует текущий экземпляр в указанный поток.
+        /// </summary>
+        /// <param name="stream">Поток для сериализации.</param>
+        public void Serialize(Stream stream)
+        {
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream), $@"{nameof(Serialize)}: Поток не указан (null).");
+            byte[] btsWidth = BitConverter.GetBytes(Width);
+            stream.Write(btsWidth, 0, 4);
+            byte[] btsHeight = BitConverter.GetBytes(Height);
+            stream.Write(btsHeight, 0, 4);
+            byte[] btsTagLen = BitConverter.GetBytes(Tag.Length);
+            stream.Write(btsTagLen, 0, btsTagLen.Length);
+            byte[] btsTag = Encoding.UTF8.GetBytes(Tag);
+            stream.Write(btsTag, 0, btsTag.Length);
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
+                {
+                    byte[] svBytes = BitConverter.GetBytes(_bitmap[x, y].Value);
+                    stream.Write(svBytes, 0, svBytes.Length);
+                }
         }
 
         /// <summary>

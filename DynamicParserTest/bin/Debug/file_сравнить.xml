@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<ProcessorSerialize xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Bitmap>
+    <SignValue>
+      <Value>0</Value>
+    </SignValue>
+    <SignValue>
+      <Value>16753920</Value>
+    </SignValue>
+    <SignValue>
+      <Value>16711680</Value>
+    </SignValue>
+    <SignValue>
+      <Value>16777215</Value>
+    </SignValue>
+  </Bitmap>
+  <Tag>t</Tag>
+  <Width>2</Width>
+  <Height>2</Height>
+</ProcessorSerialize>

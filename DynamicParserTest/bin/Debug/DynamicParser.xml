@@ -232,6 +232,18 @@
             <param name="btm">Загружаемый массив.</param>
             <param name="tag">Название карты.</param>
         </member>
+        <member name="M:DynamicParser.Processor.#ctor(System.IO.Stream)">
+            <summary>
+            Десериализует экземпляр класса из указанного потока.
+            </summary>
+            <param name="stream">Поток для десериализации.</param>
+        </member>
+        <member name="M:DynamicParser.Processor.Serialize(System.IO.Stream)">
+            <summary>
+            Сериализует текущий экземпляр в указанный поток.
+            </summary>
+            <param name="stream">Поток для сериализации.</param>
+        </member>
         <member name="M:DynamicParser.Processor.GetProcessorName(System.Int32,System.Int32)">
             <summary>
             Получает строку, представляющую подстроку поля <see cref="P:DynamicParser.Processor.Tag"/> текущей карты или null в случае недопустимых значений для названия текущей карты.

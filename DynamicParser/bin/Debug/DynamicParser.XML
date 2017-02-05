@@ -298,7 +298,7 @@
             <param name="processors">Все остальные карты. Может быть null.</param>
             <returns>Возвращает SearchResults, содержащий поле с результатами поиска.</returns>
         </member>
-        <member name="M:DynamicParser.Processor.GetEqual(System.Collections.Generic.ICollection{DynamicParser.ProcessorContainer})">
+        <member name="M:DynamicParser.Processor.GetEqual(System.Collections.Generic.IList{DynamicParser.ProcessorContainer})">
             <summary>
             Находит соответствие между заданным массивом карт и рабочей областью в многопоточном режиме.
             </summary>

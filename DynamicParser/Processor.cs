@@ -329,12 +329,12 @@ namespace DynamicParser
         /// </summary>
         /// <param name="processors">Массив искомых карт.</param>
         /// <returns>Возвращает массив SearchResults, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
-        public SearchResults[] GetEqual(ICollection<ProcessorContainer> processors)
+        public SearchResults[] GetEqual(IList<ProcessorContainer> processors)
         {
             if (processors == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(processors), $@"{nameof(GetEqual)}: Массив искомых карт не указан.");
             if (processors.Count <= 0)
-                throw new ArgumentException();
+                throw new ArgumentException($@"{nameof(GetEqual)}: Массив искомых карт пустой.", nameof(processors));
             SearchResults[] sr = new SearchResults[processors.Count];
             string errString = string.Empty;
             bool exThrown = false;
@@ -342,7 +342,7 @@ namespace DynamicParser
             {
                 try
                 {
-                    sr[k] = GetEqual(processors.ElementAt(k));
+                    sr[k] = GetEqual(processors[k]);
                 }
                 catch (Exception ex)
                 {
@@ -370,7 +370,7 @@ namespace DynamicParser
         /// <returns>Возвращает массив SearchResults, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
         public SearchResults[] GetEqual(params ProcessorContainer[] pc)
         {
-            return GetEqual((ICollection<ProcessorContainer>)pc);
+            return GetEqual((IList<ProcessorContainer>)pc);
         }
 
         /// <summary>

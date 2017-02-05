@@ -260,25 +260,33 @@ namespace DynamicParserTest
             btm2.SetPixel(0, 1, Color.Aquamarine);
             btm2.SetPixel(1, 1, Color.DarkSeaGreen);
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 Processor proc = new Processor(btm, "Main");
                 SearchResults sr1 = proc.GetEqual(new Processor(btm1, "1"), new Processor(btm2, "2"));
                 ProcessorContainer pc = new ProcessorContainer(new Processor(btm1, "1"), new Processor(btm2, "2"));
                 SearchResults sr2 = proc.GetEqual(pc);
-                SearchResults srp3 = proc.GetEqual(new ProcessorContainer(new Processor(btm1, "1"), new Processor(btm2, "2")));
-                SearchResults srp4 = proc.GetEqual(new Processor(btm1, "1"), new Processor(btm2, "2"));
-
+                SearchResults[] srp3 = proc.GetEqual(new ProcessorContainer(new Processor(btm1, "1")), new ProcessorContainer(new Processor(btm2, "2")));
+                SearchResults[] srp4 = proc.GetEqual(new List<ProcessorContainer>
+                {
+                    new ProcessorContainer(new Processor(btm1, "1")),
+                    new ProcessorContainer(new Processor(btm2, "2"))
+                });
                 Assert.AreEqual(sr1.Width * sr1.Height, sr2.Width * sr2.Height);
-                Assert.AreEqual(srp3.Width * srp3.Height, srp4.Width * srp4.Height);
                 Assert.AreEqual(proc.Width, sr1.Width);
                 Assert.AreEqual(proc.Height, sr1.Height);
                 Assert.AreEqual(proc.Width, sr2.Width);
                 Assert.AreEqual(proc.Height, sr2.Height);
-                Assert.AreEqual(proc.Width, srp3.Width);
-                Assert.AreEqual(proc.Height, srp3.Height);
-                Assert.AreEqual(proc.Width, srp4.Width);
-                Assert.AreEqual(proc.Height, srp4.Height);
+                foreach (SearchResults srs in srp3)
+                {
+                    Assert.AreEqual(proc.Width, srs.Width);
+                    Assert.AreEqual(proc.Height, srs.Height);
+                }
+                foreach (SearchResults srs in srp4)
+                {
+                    Assert.AreEqual(proc.Width, srs.Width);
+                    Assert.AreEqual(proc.Height, srs.Height);
+                }
 
                 Assert.AreEqual(1, sr1[0, 0].Percent);
                 Assert.AreEqual("1", sr1[0, 0].Procs[0].Tag);
@@ -286,71 +294,103 @@ namespace DynamicParserTest
                 Assert.AreEqual(1, sr2[0, 0].Percent);
                 Assert.AreEqual("1", sr2[0, 0].Procs[0].Tag);
 
-                Assert.AreEqual(1, srp3[0, 0].Percent);
-                Assert.AreEqual("1", srp3[0, 0].Procs[0].Tag);
+                foreach (SearchResults srs in srp3)
+                {
+                    Assert.AreEqual(1, srs[0, 0].Percent);
+                    string name = srs[0, 0].Procs[0].Tag;
+                    Assert.AreEqual(true, name == "1" || name == "2");
+                }
 
-                Assert.AreEqual(1, srp4[0, 0].Percent);
-                Assert.AreEqual("1", srp4[0, 0].Procs[0].Tag);
+                foreach (SearchResults srs in srp4)
+                {
+                    Assert.AreEqual(1, srs[0, 0].Percent);
+                    string name = srs[0, 0].Procs[0].Tag;
+                    Assert.AreEqual(true, name == "1" || name == "2");
+                }
 
                 Assert.AreNotEqual(null, sr1[0, 1].Procs);
                 Assert.AreNotEqual(null, sr2[0, 1].Procs);
-                Assert.AreNotEqual(null, srp3[0, 1].Procs);
-                Assert.AreNotEqual(null, srp4[0, 1].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[0, 1].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[0, 1].Procs);
 
                 Assert.AreNotEqual(null, sr1[0, 2].Procs);
                 Assert.AreNotEqual(null, sr2[0, 2].Procs);
-                Assert.AreNotEqual(null, srp3[0, 2].Procs);
-                Assert.AreNotEqual(null, srp4[0, 2].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[0, 2].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[0, 2].Procs);
 
                 Assert.AreNotEqual(null, sr1[0, 3].Procs);
                 Assert.AreNotEqual(null, sr2[0, 3].Procs);
-                Assert.AreNotEqual(null, srp3[0, 3].Procs);
-                Assert.AreNotEqual(null, srp4[0, 3].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[0, 3].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[0, 3].Procs);
 
                 Assert.AreEqual(null, sr1[0, 4].Procs);
                 Assert.AreEqual(null, sr2[0, 4].Procs);
-                Assert.AreEqual(null, srp3[0, 4].Procs);
-                Assert.AreEqual(null, srp4[0, 4].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreEqual(null, srs[0, 4].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreEqual(null, srs[0, 4].Procs);
 
                 Assert.AreNotEqual(null, sr1[1, 0].Procs);
                 Assert.AreNotEqual(null, sr2[1, 0].Procs);
-                Assert.AreNotEqual(null, srp3[1, 0].Procs);
-                Assert.AreNotEqual(null, srp4[1, 0].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[1, 0].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[1, 0].Procs);
 
                 Assert.AreNotEqual(null, sr1[1, 1].Procs);
                 Assert.AreNotEqual(null, sr2[1, 1].Procs);
-                Assert.AreNotEqual(null, srp3[1, 1].Procs);
-                Assert.AreNotEqual(null, srp4[1, 1].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[1, 1].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[1, 1].Procs);
 
                 Assert.AreNotEqual(null, sr1[1, 2].Procs);
                 Assert.AreNotEqual(null, sr2[1, 2].Procs);
-                Assert.AreNotEqual(null, srp3[1, 2].Procs);
-                Assert.AreNotEqual(null, srp4[1, 2].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[1, 2].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[1, 2].Procs);
 
                 Assert.AreNotEqual(null, sr1[1, 3].Procs);
                 Assert.AreNotEqual(null, sr2[1, 3].Procs);
-                Assert.AreNotEqual(null, srp3[1, 3].Procs);
-                Assert.AreNotEqual(null, srp4[1, 3].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[1, 3].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[1, 3].Procs);
 
                 Assert.AreEqual(null, sr1[1, 4].Procs);
                 Assert.AreEqual(null, sr2[1, 4].Procs);
-                Assert.AreEqual(null, srp3[1, 4].Procs);
-                Assert.AreEqual(null, srp4[1, 4].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreEqual(null, srs[1, 4].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreEqual(null, srs[1, 4].Procs);
 
                 Assert.AreNotEqual(null, sr1[2, 0].Procs);
                 Assert.AreNotEqual(null, sr2[2, 0].Procs);
-                Assert.AreNotEqual(null, srp3[2, 0].Procs);
-                Assert.AreNotEqual(null, srp4[2, 0].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[2, 0].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[2, 0].Procs);
 
                 Assert.AreNotEqual(null, sr1[2, 1].Procs);
                 Assert.AreNotEqual(null, sr2[2, 1].Procs);
-                Assert.AreNotEqual(null, srp3[2, 1].Procs);
-                Assert.AreNotEqual(null, srp4[2, 1].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[2, 1].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[2, 1].Procs);
 
                 Assert.AreNotEqual(null, sr1[2, 2].Procs);
                 Assert.AreNotEqual(null, sr2[2, 2].Procs);
-                Assert.AreNotEqual(null, srp3[2, 2].Procs);
-                Assert.AreNotEqual(null, srp4[2, 2].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[2, 2].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[2, 2].Procs);
 
                 Assert.AreEqual(1, sr1[2, 3].Percent);
                 Assert.AreEqual("2", sr1[2, 3].Procs[0].Tag);
@@ -360,78 +400,118 @@ namespace DynamicParserTest
                 Assert.AreEqual("2", sr2[2, 3].Procs[0].Tag);
                 Assert.AreNotEqual(null, sr2[2, 3].Procs);
 
-                Assert.AreEqual(1, srp3[2, 3].Percent);
-                Assert.AreEqual("2", srp3[2, 3].Procs[0].Tag);
-                Assert.AreNotEqual(null, srp3[2, 3].Procs);
+                foreach (SearchResults srs in srp3)
+                {
+                    Assert.AreEqual(1, srs[2, 3].Percent);
+                    Assert.AreNotEqual(null, srs[2, 3].Procs);
+                    string name = srs[2, 3].Procs[0].Tag;
+                    Assert.AreEqual(true, name == "2" || name == "1");
+                }
 
-                Assert.AreEqual(1, srp4[2, 3].Percent);
-                Assert.AreEqual("2", srp4[2, 3].Procs[0].Tag);
-                Assert.AreNotEqual(null, srp4[2, 3].Procs);
+                foreach (SearchResults srs in srp4)
+                {
+                    Assert.AreEqual(1, srs[2, 3].Percent);
+                    Assert.AreNotEqual(null, srs[2, 3].Procs);
+                    string name = srs[2, 3].Procs[0].Tag;
+                    Assert.AreEqual(true, name == "2" || name == "1");
+                }
 
                 Assert.AreEqual(null, sr1[2, 4].Procs);
                 Assert.AreEqual(null, sr2[2, 4].Procs);
-                Assert.AreEqual(null, srp3[2, 4].Procs);
-                Assert.AreEqual(null, srp4[2, 4].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreEqual(null, srs[2, 4].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreEqual(null, srs[2, 4].Procs);
 
                 Assert.AreNotEqual(null, sr1[3, 0].Procs);
                 Assert.AreNotEqual(null, sr2[3, 0].Procs);
-                Assert.AreNotEqual(null, srp3[3, 0].Procs);
-                Assert.AreNotEqual(null, srp4[3, 0].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[3, 0].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[3, 0].Procs);
 
                 Assert.AreNotEqual(null, sr1[3, 1].Procs);
                 Assert.AreNotEqual(null, sr2[3, 1].Procs);
-                Assert.AreNotEqual(null, srp3[3, 1].Procs);
-                Assert.AreNotEqual(null, srp4[3, 1].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[3, 1].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[3, 1].Procs);
 
                 Assert.AreNotEqual(null, sr1[3, 2].Procs);
                 Assert.AreNotEqual(null, sr2[3, 2].Procs);
-                Assert.AreNotEqual(null, srp3[3, 2].Procs);
-                Assert.AreNotEqual(null, srp4[3, 2].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[3, 2].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[3, 2].Procs);
 
                 Assert.AreNotEqual(null, sr1[3, 3].Procs);
                 Assert.AreNotEqual(null, sr2[3, 3].Procs);
-                Assert.AreNotEqual(null, srp3[3, 3].Procs);
-                Assert.AreNotEqual(null, srp4[3, 3].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[3, 3].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[3, 3].Procs);
 
                 Assert.AreEqual(null, sr1[3, 4].Procs);
                 Assert.AreEqual(null, sr2[3, 4].Procs);
-                Assert.AreEqual(null, srp3[3, 4].Procs);
-                Assert.AreEqual(null, srp4[3, 4].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreEqual(null, srs[3, 4].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreEqual(null, srs[3, 4].Procs);
 
                 Assert.AreEqual(null, sr1[4, 0].Procs);
                 Assert.AreEqual(null, sr2[4, 0].Procs);
-                Assert.AreEqual(null, srp3[4, 0].Procs);
-                Assert.AreEqual(null, srp4[4, 0].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreEqual(null, srs[4, 0].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreEqual(null, srs[4, 0].Procs);
 
                 Assert.AreEqual(null, sr1[4, 1].Procs);
                 Assert.AreEqual(null, sr2[4, 1].Procs);
-                Assert.AreEqual(null, srp3[4, 1].Procs);
-                Assert.AreEqual(null, srp4[4, 1].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreEqual(null, srs[4, 1].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreEqual(null, srs[4, 1].Procs);
 
                 Assert.AreEqual(null, sr1[4, 2].Procs);
                 Assert.AreEqual(null, sr2[4, 2].Procs);
-                Assert.AreEqual(null, srp3[4, 2].Procs);
-                Assert.AreEqual(null, srp4[4, 2].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreEqual(null, srs[4, 2].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreEqual(null, srs[4, 2].Procs);
 
                 Assert.AreEqual(null, sr1[4, 3].Procs);
                 Assert.AreEqual(null, sr2[4, 3].Procs);
-                Assert.AreEqual(null, srp3[4, 3].Procs);
-                Assert.AreEqual(null, srp4[4, 3].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreEqual(null, srs[4, 3].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreEqual(null, srs[4, 3].Procs);
 
                 Assert.AreEqual(null, sr1[4, 4].Procs);
                 Assert.AreEqual(null, sr2[4, 4].Procs);
-                Assert.AreEqual(null, srp3[4, 4].Procs);
-                Assert.AreEqual(null, srp4[4, 4].Procs);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreEqual(null, srs[4, 4].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreEqual(null, srs[4, 4].Procs);
+
+                Assert.AreEqual(srp3.Length, srp4.Length);
 
                 for (int y = 0; y < proc.Height; y++)
                     for (int x = 0; x < proc.Width; x++)
                     {
                         Assert.AreEqual(sr1[x, y].Percent, sr2[x, y].Percent);
-                        Assert.AreEqual(srp3[x, y].Percent, srp4[x, y].Percent);
+                        for (int k = 0; k < srp3.Length; k++)
+                            Assert.AreEqual(srp3[k][x, y].Percent, srp4[k][x, y].Percent);
                         for (int k = 0; k < (sr1[x, y].Procs?.Length ?? 0); k++)
+                            Assert.AreEqual(sr1[x, y].Procs?[k].Tag, sr2[x, y].Procs?[k].Tag);
+                        if (x > 3 || y > 3)
+                            break;
+                        for (int j = 0; j < srp3.Length; j++)
                         {
-                            Assert.AreEqual(sr1[x, y].Procs?[k].Tag, sr2[x, y].Procs[k].Tag);
-                            Assert.AreEqual(srp3[x, y].Procs?[k].Tag, srp4[x, y].Procs[k].Tag);
+                            Assert.AreNotEqual(null, srp3[j][x, y].Procs);
+                            Assert.AreNotEqual(null, srp4[j][x, y].Procs);
+                            Assert.AreEqual(srp3[j][x, y].Procs.Length, srp4[j][x, y].Procs.Length);
+                            for (int k = 0; k < srp3[j][x, y].Procs.Length; k++)
+                                Assert.AreEqual(srp3[j][x, y].Procs?[k].Tag, srp4[j][x, y].Procs?[k].Tag);
                         }
                     }
 
@@ -464,7 +544,8 @@ namespace DynamicParserTest
                     Region region1 = proc.CurrentRegion;
                     region1.Add(new Rectangle(0, 0, 2, 2));
                     region1.Add(new Rectangle(2, 3, 1, 1));
-                    Assert.AreEqual(RegionStatus.Ok, srp3.FindRegion(region1));
+                    foreach (SearchResults srs in srp3)
+                        Assert.AreEqual(RegionStatus.Ok, srs.FindRegion(region1));
                     attacher2 = proc.CurrentAttacher;
                     attacher2.Add(0, 0);
                     attacher2.Add(2, 3);
@@ -476,7 +557,8 @@ namespace DynamicParserTest
                     Region region1 = proc.CurrentRegion;
                     region1.Add(new Rectangle(0, 0, 2, 2));
                     region1.Add(new Rectangle(2, 3, 1, 1));
-                    Assert.AreEqual(RegionStatus.Ok, srp4.FindRegion(region1));
+                    foreach (SearchResults srs in srp4)
+                        Assert.AreEqual(RegionStatus.Ok, srs.FindRegion(region1));
                     attacher3 = proc.CurrentAttacher;
                     attacher3.Add(0, 0);
                     attacher3.Add(2, 3);
@@ -494,6 +576,7 @@ namespace DynamicParserTest
                 Assert.AreEqual(2, lst4.Count);
                 Assert.AreEqual(lst.Count, lst1.Count);
                 Assert.AreEqual(lst3.Count, lst4.Count);
+                Assert.AreEqual(lst.Count, lst4.Count);
 
                 for (int k = 0; k < lst.Count; k++)
                 {

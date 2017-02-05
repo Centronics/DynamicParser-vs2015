@@ -260,17 +260,17 @@ namespace DynamicParserTest
             btm2.SetPixel(0, 1, Color.Aquamarine);
             btm2.SetPixel(1, 1, Color.DarkSeaGreen);
 
-            for (int i = 0; i < 1000; i++)
+            Processor proc = new Processor(btm, "Main"), prt1 = new Processor(btm1, "1"), prt2 = new Processor(btm2, "2");
+            for (int i = 0; i < 10000; i++)
             {
-                Processor proc = new Processor(btm, "Main");
-                SearchResults sr1 = proc.GetEqual(new Processor(btm1, "1"), new Processor(btm2, "2"));
-                ProcessorContainer pc = new ProcessorContainer(new Processor(btm1, "1"), new Processor(btm2, "2"));
+                SearchResults sr1 = proc.GetEqual(prt1, prt2);
+                ProcessorContainer pc = new ProcessorContainer(prt1, prt2);
                 SearchResults sr2 = proc.GetEqual(pc);
-                SearchResults[] srp3 = proc.GetEqual(new ProcessorContainer(new Processor(btm1, "1")), new ProcessorContainer(new Processor(btm2, "2")));
+                SearchResults[] srp3 = proc.GetEqual(new ProcessorContainer(prt1), new ProcessorContainer(prt2));
                 SearchResults[] srp4 = proc.GetEqual(new List<ProcessorContainer>
                 {
-                    new ProcessorContainer(new Processor(btm1, "1")),
-                    new ProcessorContainer(new Processor(btm2, "2"))
+                    new ProcessorContainer(prt1),
+                    new ProcessorContainer(prt2)
                 });
                 Assert.AreEqual(sr1.Width * sr1.Height, sr2.Width * sr2.Height);
                 Assert.AreEqual(proc.Width, sr1.Width);
@@ -294,19 +294,16 @@ namespace DynamicParserTest
                 Assert.AreEqual(1, sr2[0, 0].Percent);
                 Assert.AreEqual("1", sr2[0, 0].Procs[0].Tag);
 
-                foreach (SearchResults srs in srp3)
-                {
-                    Assert.AreEqual(1, srs[0, 0].Percent);
-                    string name = srs[0, 0].Procs[0].Tag;
-                    Assert.AreEqual(true, name == "1" || name == "2");
-                }
-
-                foreach (SearchResults srs in srp4)
-                {
-                    Assert.AreEqual(1, srs[0, 0].Percent);
-                    string name = srs[0, 0].Procs[0].Tag;
-                    Assert.AreEqual(true, name == "1" || name == "2");
-                }
+                Assert.AreEqual(2, srp3.Length);
+                Assert.AreEqual(2, srp4.Length);
+                Assert.AreEqual(1, srp3[0][0, 0].Percent);
+                Assert.AreEqual(1, srp3[1][0, 0].Percent);
+                Assert.AreEqual("1", srp3[0][0, 0].Procs[0].Tag);
+                Assert.AreEqual("2", srp3[1][0, 0].Procs[0].Tag);
+                Assert.AreEqual(1, srp4[0][0, 0].Percent);
+                Assert.AreEqual(1, srp4[1][0, 0].Percent);
+                Assert.AreEqual("1", srp4[0][0, 0].Procs[0].Tag);
+                Assert.AreEqual("2", srp4[1][0, 0].Procs[0].Tag);
 
                 Assert.AreNotEqual(null, sr1[0, 1].Procs);
                 Assert.AreNotEqual(null, sr2[0, 1].Procs);
@@ -400,21 +397,22 @@ namespace DynamicParserTest
                 Assert.AreEqual("2", sr2[2, 3].Procs[0].Tag);
                 Assert.AreNotEqual(null, sr2[2, 3].Procs);
 
-                foreach (SearchResults srs in srp3)
-                {
-                    Assert.AreEqual(1, srs[2, 3].Percent);
-                    Assert.AreNotEqual(null, srs[2, 3].Procs);
-                    string name = srs[2, 3].Procs[0].Tag;
-                    Assert.AreEqual(true, name == "2" || name == "1");
-                }
-
-                foreach (SearchResults srs in srp4)
-                {
-                    Assert.AreEqual(1, srs[2, 3].Percent);
-                    Assert.AreNotEqual(null, srs[2, 3].Procs);
-                    string name = srs[2, 3].Procs[0].Tag;
-                    Assert.AreEqual(true, name == "2" || name == "1");
-                }
+                Assert.AreEqual(2, srp3.Length);
+                Assert.AreEqual(2, srp4.Length);
+                Assert.AreEqual(1, srp3[0][2, 3].Percent);
+                Assert.AreEqual(1, srp3[1][2, 3].Percent);
+                Assert.AreNotEqual(null, srp3[0][2, 3].Procs);
+                Assert.AreNotEqual(null, srp3[1][2, 3].Procs);
+                Assert.AreNotEqual(null, srp4[0][2, 3].Procs);
+                Assert.AreNotEqual(null, srp4[1][2, 3].Procs);
+                Assert.AreEqual(1, srp3[0][2, 3].Procs.Length);
+                Assert.AreEqual(1, srp3[1][2, 3].Procs.Length);
+                Assert.AreEqual(1, srp4[0][2, 3].Procs.Length);
+                Assert.AreEqual(1, srp4[1][2, 3].Procs.Length);
+                Assert.AreEqual("1", srp3[0][2, 3].Procs[0].Tag);
+                Assert.AreEqual("2", srp3[1][2, 3].Procs[0].Tag);
+                Assert.AreEqual("1", srp4[0][2, 3].Procs[0].Tag);
+                Assert.AreEqual("2", srp4[1][2, 3].Procs[0].Tag);
 
                 Assert.AreEqual(null, sr1[2, 4].Procs);
                 Assert.AreEqual(null, sr2[2, 4].Procs);

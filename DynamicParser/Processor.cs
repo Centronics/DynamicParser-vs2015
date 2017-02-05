@@ -348,9 +348,9 @@ namespace DynamicParser
                 {
                     try
                     {
-                        state.Stop();
                         errString = ex.Message;
                         exThrown = true;
+                        state.Stop();
                     }
                     catch
                     {

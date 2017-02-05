@@ -264,8 +264,7 @@ namespace DynamicParserTest
             for (int i = 0; i < 10000; i++)
             {
                 SearchResults sr1 = proc.GetEqual(prt1, prt2);
-                ProcessorContainer pc = new ProcessorContainer(prt1, prt2);
-                SearchResults sr2 = proc.GetEqual(pc);
+                SearchResults sr2 = proc.GetEqual(new ProcessorContainer(prt1, prt2));
                 SearchResults[] srp3 = proc.GetEqual(new ProcessorContainer(prt1), new ProcessorContainer(prt2));
                 SearchResults[] srp4 = proc.GetEqual(new List<ProcessorContainer>
                 {

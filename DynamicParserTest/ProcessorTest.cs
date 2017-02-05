@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using DynamicParser;
 using DynamicProcessor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -40,6 +41,167 @@ namespace DynamicParserTest
                 Assert.AreEqual(pr2.Height, pr1.Height);
                 Assert.AreEqual(pr2.Tag, pr1.Tag);
             }
+        }
+
+        [TestMethod]
+        public void ProcessorTestSerialization1()
+        {
+            Bitmap btm = new Bitmap(1, 1);
+            btm.SetPixel(0, 0, Color.White);
+            using (MemoryStream ms = new MemoryStream(100))
+            {
+                Processor pr1 = new Processor(btm, "T");
+                pr1.Serialize(ms);
+                Assert.AreEqual(17, ms.Length);
+                ms.Position = 0;
+                Processor pr2 = new Processor(ms);
+                Assert.AreEqual(17, ms.Position);
+                Assert.AreEqual(pr2[0, 0], pr1[0, 0]);
+                Assert.AreEqual(pr2.Width, pr1.Width);
+                Assert.AreEqual(pr2.Height, pr1.Height);
+                Assert.AreEqual(pr2.Tag, pr1.Tag);
+            }
+        }
+
+        static MemoryStream GetStream(int width, int height, int taglen, string tag, params int[] signs)
+        {
+            MemoryStream ms = new MemoryStream(100);
+            byte[] bw = BitConverter.GetBytes(width);
+            byte[] bh = BitConverter.GetBytes(height);
+            byte[] bl = BitConverter.GetBytes(taglen);
+            byte[] ta = Encoding.UTF8.GetBytes(tag);
+            ms.Write(bw, 0, bw.Length);
+            ms.Write(bh, 0, bh.Length);
+            ms.Write(bl, 0, bl.Length);
+            ms.Write(ta, 0, ta.Length);
+            foreach (int sign in signs)
+            {
+                byte[] sBytes = BitConverter.GetBytes(sign);
+                ms.Write(sBytes, 0, sBytes.Length);
+            }
+            ms.Position = 0;
+            return ms;
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void ProcessorTestSerializationEx0()
+        {
+            using (Stream s = GetStream(1, 5, 1, "t", 999))
+            {
+                // ReSharper disable once UnusedVariable
+                Processor pr = new Processor(s);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void ProcessorTestSerializationEx1()
+        {
+            using (Stream s = GetStream(5, 1, 1, "t", 999))
+            {
+                // ReSharper disable once UnusedVariable
+                Processor pr = new Processor(s);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void ProcessorTestSerializationEx2()
+        {
+            using (Stream ms = GetStream(1, 1, 10, "t", 999))
+            {
+                // ReSharper disable once UnusedVariable
+                Processor pr = new Processor(ms);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorTestSerializationEx3()
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                ms.WriteByte(5);
+                ms.WriteByte(0);
+                ms.Position = 0;
+                // ReSharper disable once UnusedVariable
+                Processor pr = new Processor(ms);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ProcessorTestSerializationEx4()
+        {
+            using (Stream ms = GetStream(-567, 1, 1, "t", 999))
+            {
+                // ReSharper disable once UnusedVariable
+                Processor pr = new Processor(ms);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ProcessorTestSerializationEx5()
+        {
+            using (Stream ms = GetStream(1, -567, 1, "t", 999))
+            {
+                // ReSharper disable once UnusedVariable
+                Processor pr = new Processor(ms);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ProcessorTestSerializationEx6()
+        {
+            using (Stream ms = GetStream(1, 1, -2, "t", 999))
+            {
+                // ReSharper disable once UnusedVariable
+                Processor pr = new Processor(ms);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ProcessorTestSerializationEx7()
+        {
+            using (Stream ms = GetStream(1, 1, 1, "t", -1))
+            {
+                // ReSharper disable once UnusedVariable
+                Processor pr = new Processor(ms);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ProcessorTestSerializationEx8()
+        {
+            using (Stream ms = GetStream(1, 2, 1, "t", 999, -888))
+            {
+                // ReSharper disable once UnusedVariable
+                Processor pr = new Processor(ms);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ProcessorTestSerializationEx9()
+        {
+            using (Stream ms = GetStream(2, 1, 1, "t", 999, -888))
+            {
+                // ReSharper disable once UnusedVariable
+                Processor pr = new Processor(ms);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ProcessorTestSerializationEx10()
+        {
+            // ReSharper disable once UnusedVariable
+            Processor pr = new Processor(null);
         }
 
         [TestMethod]

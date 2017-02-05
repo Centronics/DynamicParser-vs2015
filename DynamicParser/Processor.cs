@@ -83,13 +83,14 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(Processor)}: Ширина изображения не может быть меньше или равна нолю ({btm.Width}).", nameof(btm));
             if (btm.Height <= 0)
                 throw new ArgumentException($"{nameof(Processor)}: Высота изображения не может быть меньше или равна нолю ({btm.Height}).", nameof(btm));
+            tag = tag?.Trim();
             if (string.IsNullOrWhiteSpace(tag))
                 throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть пустым.");
             _bitmap = new SignValue[btm.Width, btm.Height];
             for (int y = 0; y < btm.Height; y++)
                 for (int x = 0; x < btm.Width; x++)
                     _bitmap[x, y] = new SignValue(btm.GetPixel(x, y));
-            Tag = tag.Trim();
+            Tag = tag;
         }
 
         /// <summary>
@@ -106,13 +107,14 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(Processor)}: Ширина загружаемой карты не может быть меньше или равна нолю ({w}).", nameof(btm));
             if (h <= 0)
                 throw new ArgumentException($"{nameof(Processor)}: Высота загружаемой карты не может быть меньше или равна нолю ({h}).", nameof(btm));
+            tag = tag?.Trim();
             if (string.IsNullOrWhiteSpace(tag))
                 throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть пустым.");
             _bitmap = new SignValue[w, h];
             for (int y = 0; y < h; y++)
                 for (int x = 0; x < w; x++)
                     _bitmap[x, y] = btm[x, y];
-            Tag = tag.Trim();
+            Tag = tag;
         }
 
         /// <summary>
@@ -126,12 +128,13 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(btm), $"{nameof(Processor)}: Загружаемая карта не может быть равна null.");
             if (btm.Length <= 0)
                 throw new ArgumentException($"{nameof(Processor)}: Ширина загружаемой карты не может быть меньше или равна нолю ({btm.Length}).", nameof(btm));
+            tag = tag?.Trim();
             if (string.IsNullOrWhiteSpace(tag))
                 throw new ArgumentNullException(nameof(tag), $"{nameof(Processor)}: {nameof(tag)} не может быть пустым.");
             _bitmap = new SignValue[btm.Length, 1];
             for (int x = 0; x < btm.Length; x++)
                 _bitmap[x, 0] = btm[x];
-            Tag = tag.Trim();
+            Tag = tag;
         }
 
         /// <summary>
@@ -142,26 +145,34 @@ namespace DynamicParser
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream), $@"{nameof(Processor)}: Поток не указан (null).");
-            if (stream.Length < 21)
-                throw new ArgumentException($@"{nameof(Processor)}: Входной поток короче 21 байт: {stream.Length} байт.", nameof(stream));
+            if (stream.Length < 17)
+                throw new ArgumentException($@"{nameof(Processor)}: Входной поток короче 17 байт: {stream.Length} байт.", nameof(stream));
             byte[] bts = new byte[4];
             int read = stream.Read(bts, 0, 4);
             if (read != 4)
                 throw new Exception($"{nameof(Processor)}: Количество считанных байт ({read}) не соответствует требуемому (4).");
             int width = BitConverter.ToInt32(bts, 0);
+            if (width <= 0)
+                throw new ArgumentOutOfRangeException(nameof(width), $@"{nameof(Processor)}: Ширина меньше или равна нолю: ({width}).");
             read = stream.Read(bts, 0, 4);
             if (read != 4)
                 throw new Exception($"{nameof(Processor)}: Количество считанных байт ({read}) не соответствует требуемому (4).");
             int height = BitConverter.ToInt32(bts, 0);
+            if (height <= 0)
+                throw new ArgumentOutOfRangeException(nameof(height), $@"{nameof(Processor)}: Высота меньше или равна нолю: ({height}).");
             read = stream.Read(bts, 0, 4);
             if (read != 4)
                 throw new Exception($"{nameof(Processor)}: Количество считанных байт ({read}) не соответствует требуемому (4).");
             int tagLength = BitConverter.ToInt32(bts, 0);
+            if (tagLength <= 0)
+                throw new ArgumentOutOfRangeException(nameof(tagLength), $@"{nameof(Processor)}: Длина свойства Tag некорректна: {tagLength}.");
             byte[] btsTag = new byte[tagLength];
             read = stream.Read(btsTag, 0, tagLength);
             if (read != tagLength)
                 throw new Exception($"{nameof(Processor)}: Количество считанных байт ({read}) не соответствует требуемому ({tagLength}).");
-            Tag = Encoding.UTF8.GetString(btsTag);
+            Tag = Encoding.UTF8.GetString(btsTag).Trim();
+            if (string.IsNullOrWhiteSpace(Tag))
+                throw new ArgumentNullException(nameof(Tag), $@"{nameof(Processor)}: Поле {nameof(Tag)} пустое.");
             _bitmap = new SignValue[width, height];
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
@@ -185,9 +196,9 @@ namespace DynamicParser
             stream.Write(btsWidth, 0, 4);
             byte[] btsHeight = BitConverter.GetBytes(Height);
             stream.Write(btsHeight, 0, 4);
-            byte[] btsTagLen = BitConverter.GetBytes(Tag.Length);
-            stream.Write(btsTagLen, 0, btsTagLen.Length);
             byte[] btsTag = Encoding.UTF8.GetBytes(Tag);
+            byte[] btsTagLen = BitConverter.GetBytes(btsTag.Length);
+            stream.Write(btsTagLen, 0, btsTagLen.Length);
             stream.Write(btsTag, 0, btsTag.Length);
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)

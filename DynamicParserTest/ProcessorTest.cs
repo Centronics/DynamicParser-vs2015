@@ -261,7 +261,7 @@ namespace DynamicParserTest
             btm2.SetPixel(1, 1, Color.DarkSeaGreen);
 
             Processor proc = new Processor(btm, "Main"), prt1 = new Processor(btm1, "1"), prt2 = new Processor(btm2, "2");
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 20000; i++)
             {
                 SearchResults sr1 = proc.GetEqual(prt1, prt2);
                 SearchResults sr2 = proc.GetEqual(new ProcessorContainer(prt1, prt2));

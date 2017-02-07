@@ -272,14 +272,14 @@
             </summary>
             <returns>Возвращает хеш-код текущего экземпляра.</returns>
         </member>
-        <member name="M:DynamicParser.Processor.GetMinIndex(System.Collections.Generic.IDictionary{System.Int32,DynamicProcessor.SignValue[0:,0:]},System.Int32,System.Int32,System.Int32)">
+        <member name="M:DynamicParser.Processor.GetMinIndex(DynamicProcessor.SignValue[0:,0:][],System.Int32,System.Int32,System.Int32)">
             <summary>
             Подтверждает, является ли карта с указанным индексом наиболее подходящей в данной точке.
             </summary>
             <param name="db">Массив карт для поиска.</param>
             <param name="x">Координата X.</param>
             <param name="y">Координата Y.</param>
-            <param name="number">Индекс карты, которую требуется проверить.</param>
+            <param name="number">Индекс карты, который требуется проверить.</param>
             <returns>Возвращает true в случае, если number входит в список наиболее подходящих карт.</returns>
         </member>
         <member name="M:DynamicParser.Processor.GetMaxIndex(System.Collections.Generic.IList{System.Double},System.Double)">

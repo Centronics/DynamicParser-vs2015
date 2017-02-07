@@ -255,13 +255,13 @@ namespace DynamicParserTest
             btm1.SetPixel(0, 1, Color.Wheat);
             btm1.SetPixel(1, 1, Color.Yellow);
             Bitmap btm2 = new Bitmap(2, 2);
-            btm2.SetPixel(0, 0, Color.IndianRed);
-            btm2.SetPixel(1, 0, Color.Chocolate);
+            btm2.SetPixel(0, 0, Color.Chocolate);
+            btm2.SetPixel(1, 0, Color.Chartreuse);
             btm2.SetPixel(0, 1, Color.Aquamarine);
             btm2.SetPixel(1, 1, Color.DarkSeaGreen);
 
             Processor proc = new Processor(btm, "Main"), prt1 = new Processor(btm1, "1"), prt2 = new Processor(btm2, "2");
-            for (int i = 0; i < 20000; i++)
+            for (int i = 0; i < 50000; i++)
             {
                 SearchResults sr1 = proc.GetEqual(prt1, prt2);
                 SearchResults sr2 = proc.GetEqual(new ProcessorContainer(prt1, prt2));
@@ -388,30 +388,12 @@ namespace DynamicParserTest
                 foreach (SearchResults srs in srp4)
                     Assert.AreNotEqual(null, srs[2, 2].Procs);
 
-                Assert.AreEqual(1, sr1[2, 3].Percent);
-                Assert.AreEqual("2", sr1[2, 3].Procs[0].Tag);
                 Assert.AreNotEqual(null, sr1[2, 3].Procs);
-
-                Assert.AreEqual(1, sr2[2, 3].Percent);
-                Assert.AreEqual("2", sr2[2, 3].Procs[0].Tag);
                 Assert.AreNotEqual(null, sr2[2, 3].Procs);
-
-                Assert.AreEqual(2, srp3.Length);
-                Assert.AreEqual(2, srp4.Length);
-                Assert.AreEqual(1, srp3[0][2, 3].Percent);
-                Assert.AreEqual(1, srp3[1][2, 3].Percent);
-                Assert.AreNotEqual(null, srp3[0][2, 3].Procs);
-                Assert.AreNotEqual(null, srp3[1][2, 3].Procs);
-                Assert.AreNotEqual(null, srp4[0][2, 3].Procs);
-                Assert.AreNotEqual(null, srp4[1][2, 3].Procs);
-                Assert.AreEqual(1, srp3[0][2, 3].Procs.Length);
-                Assert.AreEqual(1, srp3[1][2, 3].Procs.Length);
-                Assert.AreEqual(1, srp4[0][2, 3].Procs.Length);
-                Assert.AreEqual(1, srp4[1][2, 3].Procs.Length);
-                Assert.AreEqual("1", srp3[0][2, 3].Procs[0].Tag);
-                Assert.AreEqual("2", srp3[1][2, 3].Procs[0].Tag);
-                Assert.AreEqual("1", srp4[0][2, 3].Procs[0].Tag);
-                Assert.AreEqual("2", srp4[1][2, 3].Procs[0].Tag);
+                foreach (SearchResults srs in srp3)
+                    Assert.AreNotEqual(null, srs[2, 3].Procs);
+                foreach (SearchResults srs in srp4)
+                    Assert.AreNotEqual(null, srs[2, 3].Procs);
 
                 Assert.AreEqual(null, sr1[2, 4].Procs);
                 Assert.AreEqual(null, sr2[2, 4].Procs);
@@ -441,12 +423,30 @@ namespace DynamicParserTest
                 foreach (SearchResults srs in srp4)
                     Assert.AreNotEqual(null, srs[3, 2].Procs);
 
+                Assert.AreEqual(1, sr1[3, 3].Percent);
+                Assert.AreEqual("2", sr1[3, 3].Procs[0].Tag);
                 Assert.AreNotEqual(null, sr1[3, 3].Procs);
+
+                Assert.AreEqual(1, sr2[3, 3].Percent);
+                Assert.AreEqual("2", sr2[3, 3].Procs[0].Tag);
                 Assert.AreNotEqual(null, sr2[3, 3].Procs);
-                foreach (SearchResults srs in srp3)
-                    Assert.AreNotEqual(null, srs[3, 3].Procs);
-                foreach (SearchResults srs in srp4)
-                    Assert.AreNotEqual(null, srs[3, 3].Procs);
+
+                Assert.AreEqual(2, srp3.Length);
+                Assert.AreEqual(2, srp4.Length);
+                Assert.AreEqual(1, srp3[0][3, 3].Percent);
+                Assert.AreEqual(1, srp3[1][3, 3].Percent);
+                Assert.AreNotEqual(null, srp3[0][3, 3].Procs);
+                Assert.AreNotEqual(null, srp3[1][3, 3].Procs);
+                Assert.AreNotEqual(null, srp4[0][3, 3].Procs);
+                Assert.AreNotEqual(null, srp4[1][3, 3].Procs);
+                Assert.AreEqual(1, srp3[0][3, 3].Procs.Length);
+                Assert.AreEqual(1, srp3[1][3, 3].Procs.Length);
+                Assert.AreEqual(1, srp4[0][3, 3].Procs.Length);
+                Assert.AreEqual(1, srp4[1][3, 3].Procs.Length);
+                Assert.AreEqual("1", srp3[0][3, 3].Procs[0].Tag);
+                Assert.AreEqual("2", srp3[1][3, 3].Procs[0].Tag);
+                Assert.AreEqual("1", srp4[0][3, 3].Procs[0].Tag);
+                Assert.AreEqual("2", srp4[1][3, 3].Procs[0].Tag);
 
                 Assert.AreEqual(null, sr1[3, 4].Procs);
                 Assert.AreEqual(null, sr2[3, 4].Procs);
@@ -516,51 +516,75 @@ namespace DynamicParserTest
                 {
                     Region region = proc.CurrentRegion;
                     region.Add(new Rectangle(0, 0, 2, 2));
-                    region.Add(new Rectangle(2, 3, 1, 1));
+                    region.Add(new Rectangle(3, 3, 1, 1));
                     Assert.AreEqual(RegionStatus.Ok, sr1.FindRegion(region));
                     attacher = proc.CurrentAttacher;
                     attacher.Add(0, 0);
-                    attacher.Add(2, 3);
+                    attacher.Add(3, 3);
                     attacher.SetMask(region);
                 }
 
                 Attacher attacher1;
                 {
-                    Region region1 = proc.CurrentRegion;
-                    region1.Add(new Rectangle(0, 0, 2, 2));
-                    region1.Add(new Rectangle(2, 3, 1, 1));
-                    Assert.AreEqual(RegionStatus.Ok, sr2.FindRegion(region1));
+                    Region region = proc.CurrentRegion;
+                    region.Add(new Rectangle(0, 0, 2, 2));
+                    region.Add(new Rectangle(3, 3, 1, 1));
+                    Assert.AreEqual(RegionStatus.Ok, sr2.FindRegion(region));
                     attacher1 = proc.CurrentAttacher;
                     attacher1.Add(0, 0);
-                    attacher1.Add(2, 3);
-                    attacher1.SetMask(region1);
+                    attacher1.Add(3, 3);
+                    attacher1.SetMask(region);
                 }
 
-                Attacher attacher2;
+                Attacher attacher2, attacher21;
                 {
+                    Region region = proc.CurrentRegion;
+                    region.Add(new Rectangle(0, 0, 2, 2));
+                    region.Add(new Rectangle(3, 3, 1, 1));
                     Region region1 = proc.CurrentRegion;
                     region1.Add(new Rectangle(0, 0, 2, 2));
-                    region1.Add(new Rectangle(2, 3, 1, 1));
-                    foreach (SearchResults srs in srp3)
-                        Assert.AreEqual(RegionStatus.Ok, srs.FindRegion(region1));
+                    region1.Add(new Rectangle(3, 3, 1, 1));
+                    Assert.AreEqual(RegionStatus.Ok, srp3[0].FindRegion(region));
+                    Assert.AreEqual(RegionStatus.Ok, srp3[1].FindRegion(region1));
                     attacher2 = proc.CurrentAttacher;
                     attacher2.Add(0, 0);
-                    attacher2.Add(2, 3);
-                    attacher2.SetMask(region1);
+                    attacher2.SetMask(region);
+                    attacher21 = proc.CurrentAttacher;
+                    attacher21.Add(3, 3);
+                    attacher21.SetMask(region1);
                 }
 
-                Attacher attacher3;
+                Attacher attacher3, attacher4;
                 {
+                    Region region = proc.CurrentRegion;
+                    region.Add(new Rectangle(0, 0, 2, 2));
+                    region.Add(new Rectangle(3, 3, 1, 1));
                     Region region1 = proc.CurrentRegion;
                     region1.Add(new Rectangle(0, 0, 2, 2));
-                    region1.Add(new Rectangle(2, 3, 1, 1));
-                    foreach (SearchResults srs in srp4)
-                        Assert.AreEqual(RegionStatus.Ok, srs.FindRegion(region1));
+                    region1.Add(new Rectangle(3, 3, 1, 1));
+                    Assert.AreEqual(RegionStatus.Ok, srp4[0].FindRegion(region));
+                    Assert.AreEqual(RegionStatus.Ok, srp4[1].FindRegion(region1));
                     attacher3 = proc.CurrentAttacher;
                     attacher3.Add(0, 0);
-                    attacher3.Add(2, 3);
-                    attacher3.SetMask(region1);
+                    attacher3.SetMask(region);
+                    attacher4 = proc.CurrentAttacher;
+                    attacher4.Add(3, 3);
+                    attacher4.SetMask(region1);
                 }
+
+                Assert.AreEqual(2, attacher.Attaches.Count());
+                Assert.AreEqual(2, attacher1.Attaches.Count());
+                Assert.AreEqual(1, attacher2.Attaches.Count());
+                Assert.AreEqual(1, attacher3.Attaches.Count());
+                Assert.AreEqual(1, attacher4.Attaches.Count());
+                Assert.AreEqual(1, attacher21.Attaches.Count());
+
+                AttacherTest(attacher);
+                AttacherTest(attacher1);
+                AttacherTest(attacher2);
+                AttacherTest(attacher3);
+                AttacherTest(attacher4);
+                AttacherTest(attacher21);
 
                 List<Attach.Proc> lst = attacher.Attaches.Select(att => att.Unique).ToList();
                 List<Attach.Proc> lst1 = attacher1.Attaches.Select(att => att.Unique).ToList();
@@ -610,6 +634,41 @@ namespace DynamicParserTest
                             Assert.AreSame(pr3, sr3[x, y].Procs[0]);
                         }
                 }
+            }
+        }
+
+        static void AttacherTest(Attacher attacher)
+        {
+            foreach (Attach att in attacher.Attaches)
+                Assert.AreNotEqual(null, att);
+            foreach (Attach att in attacher.Attaches)
+                Assert.AreNotEqual(null, att.Regs);
+            foreach (Attach att in attacher.Attaches)
+                Assert.AreNotEqual(null, att.Regs.Where(r => r.Position == new Point(0, 0)));
+            foreach (Attach att in attacher.Attaches)
+                Assert.AreNotEqual(null, att.Regs.Where(r => r.Position == new Point(3, 3)));
+            foreach (Attach att in attacher.Attaches)
+                Assert.AreEqual(true, att.Regs.Count(r => r.Position == new Point(0, 0)) == 1 || att.Regs.Count(r => r.Position == new Point(3, 3)) == 1);
+            foreach (Attach att in attacher.Attaches)
+                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(0, 0)).Count(r => r.Procs == null));
+            foreach (Attach att in attacher.Attaches)
+                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.Procs == null));
+            foreach (Attach att in attacher.Attaches)
+                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(0, 0)).Count(r => r.Procs.Length != 1));
+            foreach (Attach att in attacher.Attaches)
+                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.Procs.Length != 1));
+            foreach (Attach att in attacher.Attaches)
+            {
+                List<Reg> r00 = new List<Reg>(att.Regs.Where(r => r.Position == new Point(0, 0) || r.Position == new Point(1, 0) ||
+                    r.Position == new Point(0, 1) || r.Position == new Point(1, 1)));
+                if (!r00.Any()) continue;
+                Assert.AreEqual(r00.Count, r00.Count(r => r.Procs[0].Tag == "1"));//ВЫЯСНИТЬ, ПОЧЕМУ КОЛИЧЕСТВО РАЗЛИЧАЕТСЯ
+            }
+            foreach (Attach att in attacher.Attaches)
+            {
+                List<Reg> r33 = new List<Reg>(att.Regs.Where(r => r.Position == new Point(3, 3)));
+                if (!r33.Any()) continue;
+                Assert.AreEqual(r33.Count, r33.Count(r => r.Procs[0].Tag == "2"));
             }
         }
 

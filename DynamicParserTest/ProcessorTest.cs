@@ -287,6 +287,13 @@ namespace DynamicParserTest
                     Assert.AreEqual(proc.Height, srs.Height);
                 }
 
+                Assert.AreEqual(1, sr1[0, 0].Procs.Length);
+                Assert.AreEqual(1, sr2[0, 0].Procs.Length);
+                Assert.AreEqual(1, srp3[0][0, 0].Procs.Length);
+                Assert.AreEqual(1, srp3[1][0, 0].Procs.Length);
+                Assert.AreEqual(1, srp4[0][0, 0].Procs.Length);
+                Assert.AreEqual(1, srp4[1][0, 0].Procs.Length);
+
                 Assert.AreEqual(1, sr1[0, 0].Percent);
                 Assert.AreEqual("1", sr1[0, 0].Procs[0].Tag);
 
@@ -424,10 +431,12 @@ namespace DynamicParserTest
                     Assert.AreNotEqual(null, srs[3, 2].Procs);
 
                 Assert.AreEqual(1, sr1[3, 3].Percent);
+                Assert.AreEqual(1, sr1[3, 3].Procs.Length);
                 Assert.AreEqual("2", sr1[3, 3].Procs[0].Tag);
                 Assert.AreNotEqual(null, sr1[3, 3].Procs);
 
                 Assert.AreEqual(1, sr2[3, 3].Percent);
+                Assert.AreEqual(1, sr2[3, 3].Procs.Length);
                 Assert.AreEqual("2", sr2[3, 3].Procs[0].Tag);
                 Assert.AreNotEqual(null, sr2[3, 3].Procs);
 
@@ -593,24 +602,27 @@ namespace DynamicParserTest
 
                 Assert.AreEqual(2, lst.Count);
                 Assert.AreEqual(2, lst1.Count);
-                Assert.AreEqual(2, lst3.Count);
-                Assert.AreEqual(2, lst4.Count);
+                Assert.AreEqual(1, lst3.Count);
+                Assert.AreEqual(1, lst4.Count);
                 Assert.AreEqual(lst.Count, lst1.Count);
                 Assert.AreEqual(lst3.Count, lst4.Count);
-                Assert.AreEqual(lst.Count, lst4.Count);
 
                 for (int k = 0; k < lst.Count; k++)
                 {
-                    Attach.Proc pr = lst[k], pr1 = lst1[k], pr3 = lst3[k], pr4 = lst4[k];
+                    Attach.Proc pr = lst[k], pr1 = lst1[k];
                     Assert.AreEqual(true, pr.Place == pr1.Place);
                     Assert.AreEqual(true, pr.Procs.Count() == pr1.Procs.Count());
+                    for (int j = 0; j < pr.Procs.Count(); j++)
+                        Assert.AreEqual(pr.Procs.ElementAt(j).Tag, pr1.Procs.ElementAt(j).Tag);
+                }
+
+                for (int k = 0; k < lst3.Count; k++)
+                {
+                    Attach.Proc pr3 = lst3[k], pr4 = lst4[k];
                     Assert.AreEqual(true, pr3.Place == pr4.Place);
                     Assert.AreEqual(true, pr3.Procs.Count() == pr4.Procs.Count());
-                    for (int j = 0; j < pr.Procs.Count(); j++)
-                    {
-                        Assert.AreEqual(pr.Procs.ElementAt(j).Tag, pr1.Procs.ElementAt(j).Tag);
+                    for (int j = 0; j < pr3.Procs.Count(); j++)
                         Assert.AreEqual(pr3.Procs.ElementAt(j).Tag, pr4.Procs.ElementAt(j).Tag);
-                    }
                 }
 
                 {
@@ -662,7 +674,7 @@ namespace DynamicParserTest
                 List<Reg> r00 = new List<Reg>(att.Regs.Where(r => r.Position == new Point(0, 0) || r.Position == new Point(1, 0) ||
                     r.Position == new Point(0, 1) || r.Position == new Point(1, 1)));
                 if (!r00.Any()) continue;
-                Assert.AreEqual(r00.Count, r00.Count(r => r.Procs[0].Tag == "1"));//ВЫЯСНИТЬ, ПОЧЕМУ КОЛИЧЕСТВО РАЗЛИЧАЕТСЯ
+                Assert.AreEqual(r00.Count, r00.Count(r => r.Procs[0].Tag == "1"));
             }
             foreach (Attach att in attacher.Attaches)
             {

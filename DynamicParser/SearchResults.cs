@@ -203,8 +203,8 @@ namespace DynamicParser
                 result.Add(str);
                 return result;
             }
-            bool exThrown = false;
-            string exString = string.Empty;
+            bool exThrown = false, exStopping = false;
+            string exString = string.Empty, exStoppingString = string.Empty;
             Parallel.For(0, words.Count, (i, state) =>
             {
                 try
@@ -217,13 +217,21 @@ namespace DynamicParser
                 }
                 catch (Exception ex)
                 {
-                    exThrown = true;
-                    exString = ex.Message;
-                    state.Stop();
+                    try
+                    {
+                        exThrown = true;
+                        exString = ex.Message;
+                        state.Stop();
+                    }
+                    catch (Exception ex1)
+                    {
+                        exStopping = true;
+                        exStoppingString = ex1.Message;
+                    }
                 }
             });
             if (exThrown)
-                throw new Exception(exString);
+                throw new Exception(exStopping ? $"{exString}{Environment.NewLine}{exStoppingString}" : exString);
             return result;
         }
 

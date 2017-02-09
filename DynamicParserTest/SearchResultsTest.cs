@@ -2,7 +2,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using DynamicParser;
+using DynamicProcessor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Processor = DynamicParser.Processor;
 using Region = DynamicParser.Region;
 
 namespace DynamicParserTest
@@ -10,6 +12,57 @@ namespace DynamicParserTest
     [TestClass]
     public class SearchResultsTest
     {
+        [TestMethod]
+        public void FindRelationTest()
+        {
+            Processor pr1 = new Processor(new[] { SignValue.MaxValue }, "1234");
+            Processor pr2 = new Processor(new[] { SignValue.MinValue }, "4567");
+            Processor pr3 = new Processor(new[] { SignValue.MinValue }, "4589");
+            Processor pr4 = new Processor(new[] { SignValue.MaxValue.Average(SignValue.MinValue) }, "1289");
+            Processor pr5 = new Processor(new[] { SignValue.MaxValue }, "adbg");
+            Processor pr6 = new Processor(new[] { SignValue.MinValue }, "adbf");
+            Processor pr7 = new Processor(new[] { SignValue.MinValue }, "yuio");
+            Processor pr8 = new Processor(new[] { SignValue.MinValue.Average(SignValue.MaxValue) }, "yukl");
+
+            {
+                //Присутствуют все
+                SearchResults sr = new SearchResults(5, 5, 2, 1)
+                {
+                    [4, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { pr1, pr2 } },
+                    [4, 1] = new ProcPerc { Percent = 0.55, Procs = new[] { pr2 } },
+                    [4, 2] = new ProcPerc { Percent = 0.65, Procs = new[] { pr7 } },
+                    [4, 3] = new ProcPerc { Percent = 0.75, Procs = new[] { pr7, pr8 } },
+                    [0, 2] = new ProcPerc { Percent = 0.85, Procs = new[] { pr5, pr6 } },
+                    [1, 1] = new ProcPerc { Percent = 0.95, Procs = new[] { pr3, pr4 } }
+                };
+                Assert.AreEqual(true, sr.FindRelation("12", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("1245", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("12", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("1245"));
+                Assert.AreEqual(true, sr.FindRelation("12456", 0, 5));
+                Assert.AreEqual(true, sr.FindRelation("4215"));
+            }
+
+            {
+                //Отсутствуют 4 и 8
+                SearchResults sr = new SearchResults(5, 5, 2, 1)
+                {
+                    [0, 0] = new ProcPerc { Percent = 0.25, Procs = new[] { pr7, pr6 } },
+                    [3, 0] = new ProcPerc { Percent = 0.35, Procs = new[] { pr3 } },
+                    [4, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { pr6 } },
+                    [3, 1] = new ProcPerc { Percent = 0.55, Procs = new[] { pr5, pr2 } },
+                    [3, 2] = new ProcPerc { Percent = 0.65, Procs = new[] { pr3, pr7 } },
+                    [1, 2] = new ProcPerc { Percent = 0.75, Procs = new[] { pr7, pr6 } },
+                    [4, 4] = new ProcPerc { Percent = 0.85, Procs = new[] { pr5, pr2 } },
+                    [0, 4] = new ProcPerc { Percent = 0.95, Procs = new[] { pr2, pr3 } }
+                };
+                Assert.AreEqual(true, sr.FindRelation("12", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("1245", 0, 2));
+                Assert.AreEqual(false, sr.FindRelation("1", 0, 3));
+                Assert.AreEqual(false, sr.FindRelation("14", 0, 2));
+            }
+        }
+
         [TestMethod]
         [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
         public void SearchTest()

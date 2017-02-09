@@ -16,6 +16,31 @@ namespace DynamicParserTest
     public class ProcessorTest
     {
         [TestMethod]
+        public void ProcessorTestGetName()
+        {
+            Processor proc = new Processor(new[] { SignValue.MaxValue }, "123456789");
+            Assert.AreEqual("567", proc.GetProcessorName(4, 3));
+            Assert.AreEqual(null, proc.GetProcessorName(4, 19));
+            Assert.AreEqual(null, proc.GetProcessorName(-1, 1));
+            Assert.AreEqual("1", proc.GetProcessorName(0, 1));
+            Assert.AreEqual(null, proc.GetProcessorName(0, -1));
+            Assert.AreEqual(null, proc.GetProcessorName(0, 0));
+            Assert.AreEqual(null, proc.GetProcessorName(4, 19));
+            Assert.AreEqual(null, proc.GetProcessorName(0, 10));
+            Assert.AreEqual("123456789", proc.GetProcessorName(0, 9));
+
+            Assert.AreEqual(true, proc.IsProcessorName("567", 4));
+            Assert.AreEqual(false, proc.IsProcessorName(null, 4));
+            Assert.AreEqual(false, proc.IsProcessorName(null, -4));
+            Assert.AreEqual(false, proc.IsProcessorName(string.Empty, 4));
+            Assert.AreEqual(false, proc.IsProcessorName(null, -1));
+            Assert.AreEqual(false, proc.IsProcessorName(null, 9));
+            Assert.AreEqual(false, proc.IsProcessorName("123", 9));
+            Assert.AreEqual(false, proc.IsProcessorName("123", -4));
+            Assert.AreEqual(true, proc.IsProcessorName("123456789", 0));
+        }
+
+        [TestMethod]
         public void ProcessorTestSerialization()
         {
             Bitmap btm = new Bitmap(2, 3);

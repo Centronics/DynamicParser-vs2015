@@ -266,12 +266,6 @@
             </summary>
             <returns>Возвращает строковое представление текущего экземпляра, которое является значением свойства <see cref="P:DynamicParser.Processor.Tag"/>.</returns>
         </member>
-        <member name="M:DynamicParser.Processor.GetHashCode">
-            <summary>
-            Получает хеш-код текущего экземпляра.
-            </summary>
-            <returns>Возвращает хеш-код текущего экземпляра.</returns>
-        </member>
         <member name="M:DynamicParser.Processor.GetMinIndex(DynamicProcessor.SignValue[0:,0:][],System.Int32,System.Int32,System.Int32)">
             <summary>
             Подтверждает, является ли карта с указанным индексом наиболее подходящей в данной точке.

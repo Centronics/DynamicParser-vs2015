@@ -247,24 +247,6 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Получает хеш-код текущего экземпляра.
-        /// </summary>
-        /// <returns>Возвращает хеш-код текущего экземпляра.</returns>
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int result = 0;
-                foreach (char ch in Tag)
-                {
-                    result *= 31;
-                    result += ch;
-                }
-                return result;
-            }
-        }
-
-        /// <summary>
         /// Подтверждает, является ли карта с указанным индексом наиболее подходящей в данной точке.
         /// </summary>
         /// <param name="db">Массив карт для поиска.</param>

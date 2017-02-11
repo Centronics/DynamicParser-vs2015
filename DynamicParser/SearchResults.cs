@@ -264,8 +264,7 @@ namespace DynamicParser
                 if (lstReg != null && lstReg.Count > 0)
                     lst.AddRange(lstReg);
             }
-            WordSearcher ws = GetWordSearcher(lst, startIndex, word.Length, count);
-            return ws != null && ws.IsEqual(word);
+            return GetWordSearcher(lst, startIndex, word, count);
         }
 
         /// <summary>
@@ -281,31 +280,31 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Получает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.
+        /// Получает значение true в случае нахождения искомого слова, в противном случае - false.
         /// </summary>
         /// <param name="regs">Список обрабатываемых карт.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <param name="count">Количество символов в строке названия карты.</param>
+        /// <param name="word">Искомое слово.</param>
         /// <param name="selectCount">Количество символов, которое необходимо выбрать из названия карты для поиска требуемого слова.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
-        WordSearcher GetWordSearcher(IList<Reg> regs, int startIndex, int count, int selectCount)
+        bool GetWordSearcher(IList<Reg> regs, int startIndex, string word, int selectCount)
         {
             if (regs == null)
                 throw new ArgumentNullException(nameof(regs), $"{nameof(GetWordSearcher)}: Список обрабатываемых карт равен null.");
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetWordSearcher)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            if (count <= 0)
-                throw new ArgumentOutOfRangeException(nameof(count),
-                    $@"{nameof(GetWordSearcher)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
+            if (word.Length <= 0)
+                throw new ArgumentOutOfRangeException(nameof(word),
+                    $@"{nameof(GetWordSearcher)}: Количество символов для выборки из названия карты меньше ноля ({word.Length}).");
             if (selectCount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(selectCount), $@"{nameof(GetWordSearcher)
                     }: Количество символов, которое необходимо выбрать из названия карты, должно быть больше ноля ({selectCount}).");
             if (regs.Count <= 0)
-                return null;
-            int[] counting = new int[count];
-            Reg[] regsCounting = new Reg[count];
+                return false;
+            int[] counting = new int[word.Length];
+            Reg[] regsCounting = new Reg[word.Length];
             Region region = new Region(Width, Height);
-            for (int counter = count - 1; counter >= 0;)
+            for (int counter = word.Length - 1; counter >= 0;)
             {
                 bool result = true;
                 for (int k = 0; k < counting.Length; k++)
@@ -322,12 +321,13 @@ namespace DynamicParser
                     region[reg.Position].Register = new List<Reg> { reg };
                 }
                 if (result)
-                    return GetStringFromRegion(region, startIndex, selectCount);
+                    if (GetStringFromRegion(region, startIndex, selectCount)?.IsEqual(word) ?? false)
+                        return true;
                 if ((counter = ChangeCount(counting, regs.Count)) < 0)
-                    return null;
+                    return false;
                 region.Clear();
             }
-            return null;
+            return false;
         }
 
         /// <summary>

@@ -544,6 +544,14 @@
             <param name="rect">Проверяемая область.</param>
             <returns>В случае, если перекрываются, возвращает true, в противном случае false.</returns>
         </member>
+        <member name="M:DynamicParser.Region.Contains(System.String,System.Int32)">
+            <summary>
+            Уточняет, присутствует карта с указанным названием в текущем регионе или нет.
+            </summary>
+            <param name="processorName">Проверяемая карта.</param>
+            <param name="index">Индекс, с которого необходимо начать выбор подстроки названия указанной карты.</param>
+            <returns>Возвращает значение true в случае, если указанная карта присутствует в текущем регионе, в противном случае - false.</returns>
+        </member>
         <member name="M:DynamicParser.Region.Add(System.Drawing.Rectangle)">
             <summary>
             Вставляет указанную область в коллекцию.
@@ -737,7 +745,7 @@
             <param name="length">Требуемое количество букв в подстроке.</param>
             <returns>Возвращает части слова указанной длины.</returns>
         </member>
-        <member name="M:DynamicParser.SearchResults.GetWordSearcher(System.Collections.Generic.IList{DynamicParser.Reg},System.Int32,System.String,System.Int32)">
+        <member name="M:DynamicParser.SearchResults.FindWord(System.Collections.Generic.IList{DynamicParser.Reg},System.Int32,System.String,System.Int32)">
             <summary>
             Получает значение true в случае нахождения искомого слова, в противном случае - false.
             </summary>

@@ -264,7 +264,7 @@ namespace DynamicParser
                 if (lstReg != null && lstReg.Count > 0)
                     lst.AddRange(lstReg);
             }
-            return GetWordSearcher(lst, startIndex, word, count);
+            return FindWord(lst, startIndex, word, count);
         }
 
         /// <summary>
@@ -287,17 +287,17 @@ namespace DynamicParser
         /// <param name="word">Искомое слово.</param>
         /// <param name="selectCount">Количество символов, которое необходимо выбрать из названия карты для поиска требуемого слова.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
-        bool GetWordSearcher(IList<Reg> regs, int startIndex, string word, int selectCount)
+        bool FindWord(IList<Reg> regs, int startIndex, string word, int selectCount)
         {
             if (regs == null)
-                throw new ArgumentNullException(nameof(regs), $"{nameof(GetWordSearcher)}: Список обрабатываемых карт равен null.");
+                throw new ArgumentNullException(nameof(regs), $"{nameof(FindWord)}: Список обрабатываемых карт равен null.");
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetWordSearcher)}: Индекс вышел за допустимые пределы ({startIndex}).");
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindWord)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (word.Length <= 0)
                 throw new ArgumentOutOfRangeException(nameof(word),
-                    $@"{nameof(GetWordSearcher)}: Количество символов для выборки из названия карты меньше ноля ({word.Length}).");
+                    $@"{nameof(FindWord)}: Количество символов для выборки из названия карты меньше ноля ({word.Length}).");
             if (selectCount <= 0)
-                throw new ArgumentOutOfRangeException(nameof(selectCount), $@"{nameof(GetWordSearcher)
+                throw new ArgumentOutOfRangeException(nameof(selectCount), $@"{nameof(FindWord)
                     }: Количество символов, которое необходимо выбрать из названия карты, должно быть больше ноля ({selectCount}).");
             if (regs.Count <= 0)
                 return false;
@@ -311,6 +311,10 @@ namespace DynamicParser
                     regsCounting[k] = regs[counting[k]];
                 foreach (Reg reg in regsCounting)
                 {
+                    if (reg.Procs == null)
+                        continue;
+                    if (reg.Procs.Any(pr => pr != null && region.Contains(pr.GetProcessorName(startIndex, selectCount), startIndex)))
+                        continue;
                     Rectangle rect = new Rectangle(reg.Position, MapSize);
                     if (region.IsConflict(rect))
                     {

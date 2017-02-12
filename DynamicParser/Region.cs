@@ -168,6 +168,26 @@ namespace DynamicParser
         }
 
         /// <summary>
+        /// Уточняет, присутствует карта с указанным названием в текущем регионе или нет.
+        /// </summary>
+        /// <param name="processorName">Проверяемая карта.</param>
+        /// <param name="index">Индекс, с которого необходимо начать выбор подстроки названия указанной карты.</param>
+        /// <returns>Возвращает значение true в случае, если указанная карта присутствует в текущем регионе, в противном случае - false.</returns>
+        public bool Contains(string processorName, int index)
+        {
+            if (processorName == null)
+                throw new ArgumentNullException(nameof(processorName), $@"{nameof(Contains)}: Проверяемая карта отсутствует (null).");
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), $@"{nameof(Contains)}: Индекс подстроки названия карты недопустим: ({index}).");
+            if (processorName == null)
+                throw new ArgumentNullException(nameof(processorName), $@"{nameof(Contains)}: Имя проверяемой карты пустое (null).");
+            if (processorName == string.Empty)
+                throw new ArgumentException($"{nameof(Contains)}: Имя проверяемой карты пустое (\"\").", nameof(processorName));
+            return Elements.Where(registered => registered != null && !registered.IsEmpty).Any(registered => registered.Register.Where(reg => reg.Procs != null).
+                Any(reg => reg.Procs.Where(proc => proc != null).Any(proc => proc.IsProcessorName(processorName, index))));
+        }
+
+        /// <summary>
         /// Вставляет указанную область в коллекцию.
         /// </summary>
         /// <param name="rect">Вставляемая область.</param>

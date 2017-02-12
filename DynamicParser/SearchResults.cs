@@ -46,6 +46,27 @@ namespace DynamicParser
     }
 
     /// <summary>
+    /// Предоставляет информацию о состоянии карты в конкретной точке.
+    /// </summary>
+    public struct ProcPoint
+    {
+        /// <summary>
+        /// Координаты карты.
+        /// </summary>
+        public Point Position;
+
+        /// <summary>
+        /// Карта.
+        /// </summary>
+        public Processor CurrentProcessor;
+
+        /// <summary>
+        /// Процент соответствия.
+        /// </summary>
+        public double Percent;
+    }
+
+    /// <summary>
     /// Отражает статус конкретного региона при проверке на совместимость с другим.
     /// </summary>
     public enum RegionStatus
@@ -257,10 +278,10 @@ namespace DynamicParser
                 return false;
             if (word.Length % count != 0)
                 throw new ArgumentException($"{nameof(FindRelation)}: Количество символов для выборки должно быть кратно длине искомого слова.", nameof(count));
-            List<Reg> lst = new List<Reg>();
+            List<ProcPoint> lst = new List<ProcPoint>();
             foreach (string str in GetWord(word, count))
             {
-                List<Reg> lstReg = FindSymbols(str, startIndex);
+                List<ProcPoint> lstReg = FindSymbols(str, startIndex);
                 if (lstReg != null && lstReg.Count > 0)
                     lst.AddRange(lstReg);
             }
@@ -280,6 +301,42 @@ namespace DynamicParser
         }
 
         /// <summary>
+        /// Удаляет карты с одинаковыми названиями из массива.
+        /// </summary>
+        /// <param name="regs">Массив карт для очистки.</param>
+        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
+        /// <param name="selectCount">Количество символов, которое необходимо выбрать из названия карты.</param>
+        static void RemoveProcPointClones(IList<ProcPoint> regs, int startIndex, int selectCount)
+        {
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(RemoveProcPointClones)}: Индекс вышел за допустимые пределы ({startIndex}).");
+            if (selectCount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(selectCount), $@"{nameof(RemoveProcPointClones)
+                    }: Количество символов, которое необходимо выбрать из названия карты, должно быть больше ноля ({selectCount}).");
+            if (regs == null || regs.Count <= 0)
+                return;
+            for (int k = 0; k < regs.Count; k++)
+            {
+                Processor processor = regs[k].CurrentProcessor;
+                if (processor == null)
+                {
+                    regs.RemoveAt(k--);
+                    continue;
+                }
+                string name = processor.GetProcessorName(startIndex, selectCount);
+                if (string.IsNullOrEmpty(name))
+                    continue;
+                for (int j = 0; j < regs.Count; j++)
+                {
+                    if (j == k)
+                        continue;
+                    if (regs[j].CurrentProcessor.IsProcessorName(name, startIndex))
+                        regs.RemoveAt(j--);
+                }
+            }
+        }
+
+        /// <summary>
         /// Получает значение true в случае нахождения искомого слова, в противном случае - false.
         /// </summary>
         /// <param name="regs">Список обрабатываемых карт.</param>
@@ -287,7 +344,7 @@ namespace DynamicParser
         /// <param name="word">Искомое слово.</param>
         /// <param name="selectCount">Количество символов, которое необходимо выбрать из названия карты для поиска требуемого слова.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
-        bool FindWord(IList<Reg> regs, int startIndex, string word, int selectCount)
+        bool FindWord(IList<ProcPoint> regs, int startIndex, string word, int selectCount)
         {
             if (regs == null)
                 throw new ArgumentNullException(nameof(regs), $"{nameof(FindWord)}: Список обрабатываемых карт равен null.");
@@ -301,28 +358,35 @@ namespace DynamicParser
                     }: Количество символов, которое необходимо выбрать из названия карты, должно быть больше ноля ({selectCount}).");
             if (regs.Count <= 0)
                 return false;
+            RemoveProcPointClones(regs, startIndex, selectCount);
             int[] counting = new int[word.Length];
-            Reg[] regsCounting = new Reg[word.Length];
+            ProcPoint[] regsCounting = new ProcPoint[word.Length];
             Region region = new Region(Width, Height);
             for (int counter = word.Length - 1; counter >= 0;)
             {
                 bool result = true;
                 for (int k = 0; k < counting.Length; k++)
                     regsCounting[k] = regs[counting[k]];
-                foreach (Reg reg in regsCounting)
+                foreach (ProcPoint pp in regsCounting)
                 {
-                    if (reg.Procs == null)
+                    if (region.Contains(pp.CurrentProcessor.GetProcessorName(startIndex, selectCount), startIndex))
                         continue;
-                    if (reg.Procs.Any(pr => pr != null && region.Contains(pr.GetProcessorName(startIndex, selectCount), startIndex)))
-                        continue;
-                    Rectangle rect = new Rectangle(reg.Position, MapSize);
+                    Rectangle rect = new Rectangle(pp.Position, MapSize);
                     if (region.IsConflict(rect))
                     {
                         result = false;
                         break;
                     }
                     region.Add(rect);
-                    region[reg.Position].Register = new List<Reg> { reg };
+                    region[pp.Position].Register = new List<Reg>
+                    {
+                        new Reg
+                        {
+                            Percent = pp.Percent,
+                            Position = pp.Position,
+                            Procs = new[] { pp.CurrentProcessor }
+                        }
+                    };
                 }
                 if (result)
                     if (GetStringFromRegion(region, startIndex, selectCount)?.IsEqual(word) ?? false)
@@ -363,26 +427,31 @@ namespace DynamicParser
         /// <param name="procName">Искомая строка.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
         /// <returns>Возвращает информацию о найденных объектах.</returns>
-        List<Reg> FindSymbols(string procName, int startIndex)
+        List<ProcPoint> FindSymbols(string procName, int startIndex)
         {
             if (procName == null)
                 throw new ArgumentNullException(nameof(procName), $"{nameof(FindSymbols)}: Искомая строка равна null.");
             if (procName == string.Empty)
-                throw new ArgumentException($"{nameof(FindSymbols)}: Искомая строка должна состоять хотя бы из одиного символа.", nameof(procName));
+                throw new ArgumentException($"{nameof(FindSymbols)}: Искомая строка должна состоять хотя бы из одного символа.", nameof(procName));
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindSymbols)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            List<Reg> lstRegs = new List<Reg>();
+            List<ProcPoint> lstRegs = new List<ProcPoint>();
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)
                 {
                     Processor[] processors = this[x, y].Procs?.Where(pr => pr != null && pr.IsProcessorName(procName, startIndex)).ToArray();
-                    if (processors?.Length > 0)
-                        lstRegs.Add(new Reg
-                        {
-                            Percent = this[x, y].Percent,
-                            Position = new Point(x, y),
-                            Procs = processors
-                        });
+                    if ((processors?.Length ?? 0) <= 0)
+                        continue;
+                    double percent = this[x, y].Percent;
+                    Point point = new Point(x, y);
+                    lstRegs.AddRange(from pr in processors
+                                     where pr != null
+                                     select new ProcPoint
+                                     {
+                                         CurrentProcessor = pr,
+                                         Position = point,
+                                         Percent = percent
+                                     });
                 }
             return lstRegs;
         }

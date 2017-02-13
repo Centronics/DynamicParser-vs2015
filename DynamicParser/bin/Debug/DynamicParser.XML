@@ -765,14 +765,6 @@
             <param name="length">Требуемое количество букв в подстроке.</param>
             <returns>Возвращает части слова указанной длины.</returns>
         </member>
-        <member name="M:DynamicParser.SearchResults.RemoveProcPointClones(System.Collections.Generic.IList{DynamicParser.ProcPoint},System.Int32,System.Int32)">
-            <summary>
-            Удаляет карты с одинаковыми названиями из массива.
-            </summary>
-            <param name="regs">Массив карт для очистки.</param>
-            <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-            <param name="selectCount">Количество символов, которое необходимо выбрать из названия карты.</param>
-        </member>
         <member name="M:DynamicParser.SearchResults.FindWord(System.Collections.Generic.IList{DynamicParser.ProcPoint},System.Int32,System.String,System.Int32)">
             <summary>
             Получает значение true в случае нахождения искомого слова, в противном случае - false.

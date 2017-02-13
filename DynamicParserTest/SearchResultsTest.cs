@@ -190,7 +190,7 @@ namespace DynamicParserTest
                 [1, 1] = new ProcPerc { Percent = 0.65, Procs = new[] { pr3 } }
             };
 
-            for (int k = 0; k < 1000; k++)
+            //for (int k = 0; k < 1000; k++)
             {
                 Assert.AreEqual(null, sr.FindRelation(0, 1));
                 Assert.AreEqual(false, sr.FindRelation(string.Empty));
@@ -208,10 +208,10 @@ namespace DynamicParserTest
                 Assert.AreEqual(true, sr.FindRelation("2", 2));
                 Assert.AreEqual(true, sr.FindRelation("3", 2));
 
-                Assert.AreEqual(true, sr.FindRelation("1212121212", 0, 2));
-                Assert.AreEqual(true, sr.FindRelation("12555568685512", 0, 2));
-                Assert.AreEqual(true, sr.FindRelation("21212121215283", 0, 2));
-                Assert.AreEqual(true, sr.FindRelation("83835221", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("121212", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("1255", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("125568", 0, 2));
+                Assert.AreEqual(false, sr.FindRelation("83835221", 0, 2));
 
                 Assert.AreEqual(true, sr.FindRelation("1212", 0, 2));
                 Assert.AreEqual(true, sr.FindRelation("1255", 0, 2));

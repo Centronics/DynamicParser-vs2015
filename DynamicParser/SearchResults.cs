@@ -296,44 +296,8 @@ namespace DynamicParser
         /// <returns>Возвращает части слова указанной длины.</returns>
         static IEnumerable<string> GetWord(string word, int length)
         {
-            for (int k = 0, max = word.Length - length; k <= max; k++)
+            for (int k = 0, max = word.Length - length; k <= max; k += length)
                 yield return word.Substring(k, length);
-        }
-
-        /// <summary>
-        /// Удаляет карты с одинаковыми названиями из массива.
-        /// </summary>
-        /// <param name="regs">Массив карт для очистки.</param>
-        /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <param name="selectCount">Количество символов, которое необходимо выбрать из названия карты.</param>
-        static void RemoveProcPointClones(IList<ProcPoint> regs, int startIndex, int selectCount)
-        {
-            if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(RemoveProcPointClones)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            if (selectCount <= 0)
-                throw new ArgumentOutOfRangeException(nameof(selectCount), $@"{nameof(RemoveProcPointClones)
-                    }: Количество символов, которое необходимо выбрать из названия карты, должно быть больше ноля ({selectCount}).");
-            if (regs == null || regs.Count <= 0)
-                return;
-            for (int k = 0; k < regs.Count; k++)
-            {
-                Processor processor = regs[k].CurrentProcessor;
-                if (processor == null)
-                {
-                    regs.RemoveAt(k--);
-                    continue;
-                }
-                string name = processor.GetProcessorName(startIndex, selectCount);
-                if (string.IsNullOrEmpty(name))
-                    continue;
-                for (int j = 0; j < regs.Count; j++)
-                {
-                    if (j == k)
-                        continue;
-                    if (regs[j].CurrentProcessor.IsProcessorName(name, startIndex))
-                        regs.RemoveAt(j--);
-                }
-            }
         }
 
         /// <summary>
@@ -350,19 +314,19 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(regs), $"{nameof(FindWord)}: Список обрабатываемых карт равен null.");
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindWord)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            if (word.Length <= 0)
+            int sCount = word.Length / selectCount;
+            if (sCount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(word),
-                    $@"{nameof(FindWord)}: Количество символов для выборки из названия карты меньше ноля ({word.Length}).");
+                    $@"{nameof(FindWord)}: Количество символов для выборки из названия карты меньше или равно нолю ({sCount}).");
             if (selectCount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(selectCount), $@"{nameof(FindWord)
                     }: Количество символов, которое необходимо выбрать из названия карты, должно быть больше ноля ({selectCount}).");
             if (regs.Count <= 0)
                 return false;
-            RemoveProcPointClones(regs, startIndex, selectCount);
-            int[] counting = new int[word.Length];
-            ProcPoint[] regsCounting = new ProcPoint[word.Length];
+            int[] counting = new int[sCount];
+            ProcPoint[] regsCounting = new ProcPoint[sCount];
             Region region = new Region(Width, Height);
-            for (int counter = word.Length - 1; counter >= 0;)
+            for (int counter = sCount - 1; counter >= 0;)
             {
                 bool result = true;
                 for (int k = 0; k < counting.Length; k++)

@@ -220,7 +220,7 @@ namespace DynamicParser
             {
                 string str = words[0];
                 if (string.IsNullOrEmpty(str)) return null;
-                if (!FindRelation(str)) return null;
+                if (!FindRelation(str, startIndex, count)) return null;
                 result.Add(str);
                 return result;
             }
@@ -233,7 +233,7 @@ namespace DynamicParser
                     string str = words[i];
                     if (string.IsNullOrEmpty(str))
                         return;
-                    if (FindRelation(str))
+                    if (FindRelation(str, startIndex, count))
                         result.Add(str);
                 }
                 catch (Exception ex)

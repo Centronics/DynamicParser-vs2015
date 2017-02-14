@@ -178,6 +178,35 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
+        public void FindRelationTest1()
+        {
+            Processor pr1 = new Processor(new[] { SignValue.MaxValue }, "121");
+            Processor pr2 = new Processor(new[] { SignValue.MinValue }, "552hjfgh");
+            Processor pr3 = new Processor(new[] { SignValue.MinValue }, "683A");
+            SearchResults sr = new SearchResults(1, 1, 1, 1)
+            {
+                [0, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { pr1, pr3, pr2 } }
+            };
+            Assert.AreEqual(true, sr.FindRelation("1"));
+            Assert.AreEqual(true, sr.FindRelation("5"));
+            Assert.AreEqual(true, sr.FindRelation("6"));
+            Assert.AreEqual(false, sr.FindRelation("7"));
+            Assert.AreEqual(true, sr.FindRelation("1", 2));
+            Assert.AreEqual(true, sr.FindRelation("2", 2));
+            Assert.AreEqual(true, sr.FindRelation("3", 2));
+            Assert.AreEqual(false, sr.FindRelation("7", 2));
+            Assert.AreEqual(true, sr.FindRelation("121212", 0, 2));
+            Assert.AreEqual(true, sr.FindRelation("55555555", 0, 2));
+            Assert.AreEqual(false, sr.FindRelation("55555555", 0, 8));
+            Assert.AreEqual(false, sr.FindRelation("55555555", 0, 4));
+            Assert.AreEqual(true, sr.FindRelation("686868", 0, 2));
+            Assert.AreEqual(false, sr.FindRelation("696868", 0, 2));
+            Assert.AreEqual(true, sr.FindRelation("6868", 0, 2));
+            Assert.AreEqual(true, sr.FindRelation("68", 0, 2));
+            //добавить параллельный
+        }
+
+        [TestMethod]
         public void FindRelationTest()
         {
             Processor pr1 = new Processor(new[] { SignValue.MaxValue }, "121");
@@ -189,8 +218,7 @@ namespace DynamicParserTest
                 [1, 0] = new ProcPerc { Percent = 0.55, Procs = new[] { pr2 } },
                 [1, 1] = new ProcPerc { Percent = 0.65, Procs = new[] { pr3 } }
             };
-
-            //for (int k = 0; k < 1000; k++)
+            for (int k = 0; k < 1000; k++)
             {
                 Assert.AreEqual(null, sr.FindRelation(0, 1));
                 Assert.AreEqual(false, sr.FindRelation(string.Empty));

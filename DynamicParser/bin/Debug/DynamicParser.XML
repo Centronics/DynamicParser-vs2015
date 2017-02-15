@@ -710,8 +710,8 @@
             </summary>
             <param name="width">Ширина.</param>
             <param name="height">Высота.</param>
-            <param name="mapWidth">Ширина карт, которые проходили обработку.</param>
-            <param name="mapHeight">Высота карт, которые проходили обработку.</param>
+            <param name="mapWidth">Ширина обрабатываемых карт.</param>
+            <param name="mapHeight">Высота обрабатываемых карт.</param>
         </member>
         <member name="M:DynamicParser.SearchResults.FindRelation(System.Int32,System.Int32,System.String[])">
             <summary>

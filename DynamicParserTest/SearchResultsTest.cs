@@ -178,32 +178,259 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
-        public void FindRelationTest1()
+        public void FindRelationCoords()
         {
-            Processor pr1 = new Processor(new[] { SignValue.MaxValue }, "121");
-            Processor pr2 = new Processor(new[] { SignValue.MinValue }, "552hjfgh");
-            Processor pr3 = new Processor(new[] { SignValue.MinValue }, "683A");
-            SearchResults sr = new SearchResults(1, 1, 1, 1)
+            SignValue[,] svs = new SignValue[2, 1];
+            Processor pr1 = new Processor(svs, "121");      // 0, 0
+            Processor pr2 = new Processor(svs, "552hjfgh"); // 0, 1
+            Processor pr3 = new Processor(svs, "683A");     // 1, 0
+            Processor pr4 = new Processor(svs, "rt67");     // 1, 1
+
+            SearchResults sr = new SearchResults(2, 2, 2, 1)
             {
-                [0, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { pr1, pr3, pr2 } }
+                [0, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { pr1 } },
+                [0, 1] = new ProcPerc { Percent = 0.55, Procs = new[] { pr2 } },
+                [1, 0] = new ProcPerc { Percent = 0.65, Procs = new[] { pr3 } },
+                [1, 1] = new ProcPerc { Percent = 0.75, Procs = new[] { pr4 } }
             };
+
             Assert.AreEqual(true, sr.FindRelation("1"));
             Assert.AreEqual(true, sr.FindRelation("5"));
             Assert.AreEqual(true, sr.FindRelation("6"));
-            Assert.AreEqual(false, sr.FindRelation("7"));
-            Assert.AreEqual(true, sr.FindRelation("1", 2));
-            Assert.AreEqual(true, sr.FindRelation("2", 2));
-            Assert.AreEqual(true, sr.FindRelation("3", 2));
-            Assert.AreEqual(false, sr.FindRelation("7", 2));
-            Assert.AreEqual(true, sr.FindRelation("121212", 0, 2));
-            Assert.AreEqual(true, sr.FindRelation("55555555", 0, 2));
-            Assert.AreEqual(false, sr.FindRelation("55555555", 0, 8));
-            Assert.AreEqual(false, sr.FindRelation("55555555", 0, 4));
-            Assert.AreEqual(true, sr.FindRelation("686868", 0, 2));
-            Assert.AreEqual(false, sr.FindRelation("696868", 0, 2));
-            Assert.AreEqual(true, sr.FindRelation("6868", 0, 2));
-            Assert.AreEqual(true, sr.FindRelation("68", 0, 2));
-            //добавить параллельный
+            Assert.AreEqual(true, sr.FindRelation("r"));
+
+            Assert.AreEqual(false, sr.FindRelation("15"));
+            Assert.AreEqual(true, sr.FindRelation("1r"));
+            Assert.AreEqual(true, sr.FindRelation("16"));
+            Assert.AreEqual(true, sr.FindRelation("11"));
+
+            Assert.AreEqual(false, sr.FindRelation("51"));
+            Assert.AreEqual(true, sr.FindRelation("55"));
+            Assert.AreEqual(true, sr.FindRelation("56"));
+            Assert.AreEqual(true, sr.FindRelation("5r"));
+
+            Assert.AreEqual(true, sr.FindRelation("61"));
+            Assert.AreEqual(true, sr.FindRelation("65"));
+            Assert.AreEqual(true, sr.FindRelation("66"));
+            Assert.AreEqual(false, sr.FindRelation("6r"));
+
+            Assert.AreEqual(true, sr.FindRelation("r1"));
+            Assert.AreEqual(false, sr.FindRelation("r5"));
+            Assert.AreEqual(true, sr.FindRelation("r6"));
+            Assert.AreEqual(true, sr.FindRelation("rr"));
+
+            {
+                ConcurrentBag<string> bag = sr.FindRelation(1, 0, "1", "5", "6", "r");
+                Assert.AreEqual(true, bag.Contains("1"));
+                Assert.AreEqual(true, bag.Contains("5"));
+                Assert.AreEqual(true, bag.Contains("6"));
+                Assert.AreEqual(true, bag.Contains("r"));
+            }
+
+            {
+                ConcurrentBag<string> bag = sr.FindRelation(1, 0, "15", "1r", "16", "11");
+                Assert.AreEqual(false, bag.Contains("15"));
+                Assert.AreEqual(true, bag.Contains("1r"));
+                Assert.AreEqual(true, bag.Contains("16"));
+                Assert.AreEqual(true, bag.Contains("11"));
+            }
+
+            {
+                ConcurrentBag<string> bag = sr.FindRelation(1, 0, "51", "55", "56", "5r");
+                Assert.AreEqual(false, bag.Contains("51"));
+                Assert.AreEqual(true, bag.Contains("55"));
+                Assert.AreEqual(true, bag.Contains("56"));
+                Assert.AreEqual(true, bag.Contains("5r"));
+            }
+
+            {
+                ConcurrentBag<string> bag = sr.FindRelation(1, 0, "61", "65", "66", "6r");
+                Assert.AreEqual(true, bag.Contains("61"));
+                Assert.AreEqual(true, bag.Contains("65"));
+                Assert.AreEqual(true, bag.Contains("66"));
+                Assert.AreEqual(false, bag.Contains("6r"));
+            }
+
+            {
+                ConcurrentBag<string> bag = sr.FindRelation(1, 0, "r1", "r5", "r6", "rr");
+                Assert.AreEqual(true, bag.Contains("r1"));
+                Assert.AreEqual(false, bag.Contains("r5"));
+                Assert.AreEqual(true, bag.Contains("r6"));
+                Assert.AreEqual(true, bag.Contains("rr"));
+            }
+        }
+
+        [TestMethod]
+        public void FindRelationTest1()
+        {
+            {
+                Processor pr1 = new Processor(new[] { SignValue.MaxValue }, "121");
+                Processor pr2 = new Processor(new[] { SignValue.MinValue }, "552hjfgh");
+                Processor pr3 = new Processor(new[] { SignValue.MinValue }, "683A");
+                SearchResults sr = new SearchResults(1, 1, 1, 1)
+                {
+                    [0, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { pr1, pr3, pr2 } }
+                };
+                Assert.AreEqual(true, sr.FindRelation("1"));
+                Assert.AreEqual(true, sr.FindRelation("5"));
+                Assert.AreEqual(true, sr.FindRelation("6"));
+                Assert.AreEqual(false, sr.FindRelation("7"));
+                Assert.AreEqual(false, sr.FindRelation("17"));
+                Assert.AreEqual(false, sr.FindRelation("15"));
+                Assert.AreEqual(false, sr.FindRelation("56"));
+                Assert.AreEqual(true, sr.FindRelation("1", 2));
+                Assert.AreEqual(true, sr.FindRelation("2", 2));
+                Assert.AreEqual(true, sr.FindRelation("3", 2));
+                Assert.AreEqual(false, sr.FindRelation("7", 2));
+                Assert.AreEqual(true, sr.FindRelation("121212", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("55555555", 0, 2));
+                Assert.AreEqual(false, sr.FindRelation("55555555", 0, 8));
+                Assert.AreEqual(false, sr.FindRelation("55555555", 0, 4));
+                Assert.AreEqual(true, sr.FindRelation("686868", 0, 2));
+                Assert.AreEqual(false, sr.FindRelation("696868", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("6868", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("68", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("552552", 0, 3));
+            }
+
+            {
+                Processor pr1 = new Processor(new[] { SignValue.MaxValue }, "1224");
+                Processor pr2 = new Processor(new[] { SignValue.MinValue }, "552hjfgh");
+                Processor pr3 = new Processor(new[] { SignValue.MinValue }, "12243A");
+                Processor pr4 = new Processor(new[] { SignValue.MinValue }, "552h5Bgh");
+                SearchResults sr = new SearchResults(2, 2, 1, 1)
+                {
+                    [0, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { pr1 } },
+                    [1, 0] = new ProcPerc { Percent = 0.55, Procs = new[] { pr2 } },
+                    [0, 1] = new ProcPerc { Percent = 0.65, Procs = new[] { pr3 } },
+                    [1, 1] = new ProcPerc { Percent = 0.75, Procs = new[] { pr4 } }
+                };
+                Assert.AreEqual(true, sr.FindRelation("12241224", 0, 4));
+                Assert.AreEqual(true, sr.FindRelation("122122", 0, 3));
+                Assert.AreEqual(true, sr.FindRelation("1212", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("11"));
+                Assert.AreEqual(true, sr.FindRelation("552552552", 0, 4));
+                Assert.AreEqual(true, sr.FindRelation("552hj552hj552hj552hj", 0, 4));
+                Assert.AreEqual(true, sr.FindRelation("552552552", 0, 3));
+                Assert.AreEqual(true, sr.FindRelation("555555", 0, 2));
+                Assert.AreEqual(true, sr.FindRelation("555"));
+                Assert.AreEqual(true, sr.FindRelation("gh", 6, 2));
+                Assert.AreEqual(true, sr.FindRelation("ghgh", 6, 2));
+
+                Assert.AreEqual(true, sr.FindRelation("Gh", 6, 2));
+                Assert.AreEqual(true, sr.FindRelation("GHGH", 6, 2));
+                Assert.AreEqual(true, sr.FindRelation("GH", 6, 2));
+                Assert.AreEqual(true, sr.FindRelation("HGHG", 6, 2));
+                Assert.AreEqual(true, sr.FindRelation("gH", 6, 2));
+                Assert.AreEqual(true, sr.FindRelation("hghg", 6, 2));
+                Assert.AreEqual(true, sr.FindRelation("GhGh", 6, 2));
+                Assert.AreEqual(true, sr.FindRelation("gHgH", 6, 2));
+
+                Assert.AreEqual(true, sr.FindRelation("g", 6));
+                Assert.AreEqual(true, sr.FindRelation("gg", 6));
+                Assert.AreEqual(true, sr.FindRelation("ggg", 6));
+                Assert.AreEqual(true, sr.FindRelation("ggggg", 6));
+                Assert.AreEqual(true, sr.FindRelation("h", 7));
+                Assert.AreEqual(true, sr.FindRelation("hh", 7));
+                Assert.AreEqual(true, sr.FindRelation("hhHHH", 7));
+                Assert.AreEqual(true, sr.FindRelation("HhhhH", 7));
+                Assert.AreEqual(true, sr.FindRelation("G", 6));
+                Assert.AreEqual(true, sr.FindRelation("Gg", 6));
+                Assert.AreEqual(true, sr.FindRelation("H", 7));
+                Assert.AreEqual(true, sr.FindRelation("HH", 7));
+                Assert.AreEqual(true, sr.FindRelation("gG", 6));
+                Assert.AreEqual(true, sr.FindRelation("hH", 7));
+                Assert.AreEqual(true, sr.FindRelation("Hh", 7));
+                Assert.AreEqual(true, sr.FindRelation("GG", 6));
+                Assert.AreEqual(true, sr.FindRelation("3a", 4, 2));
+                Assert.AreEqual(true, sr.FindRelation("3A", 4, 2));
+
+                {
+                    ConcurrentBag<string> bag = sr.FindRelation(0, 4, "12241224", "552552552", "552hJ552Hj552HJ552hj", "552hj552hj552hj552hj");
+                    Assert.AreEqual(true, bag.Contains("12241224"));
+                    Assert.AreEqual(true, bag.Contains("552552552"));
+                    Assert.AreEqual(true, bag.Contains("552hJ552Hj552HJ552hj"));
+                    Assert.AreEqual(true, bag.Contains("552hj552hj552hj552hj"));
+                }
+
+                {
+                    ConcurrentBag<string> bag = sr.FindRelation(0, 3, "12241224", "552552552", "552hJ552Hj552HJ552hj", "552hj552hj552hj552hj", "fg");
+                    Assert.AreEqual(true, bag.Contains("122122"));
+                    Assert.AreEqual(true, bag.Contains("552552552"));
+                    Assert.AreEqual(true, bag.Contains("552hJ552Hj552HJ552hj"));
+                    Assert.AreEqual(false, bag.Contains("fg"));
+                }
+
+                {
+                    ConcurrentBag<string> bag = sr.FindRelation(0, 3, "1212", "555555", "gh", "ghgh", "fg");
+                    Assert.AreEqual(true, bag.Contains("1212"));
+                    Assert.AreEqual(true, bag.Contains("555555"));
+                    Assert.AreEqual(true, bag.Contains("gh"));
+                    Assert.AreEqual(true, bag.Contains("ghgh"));
+                    Assert.AreEqual(false, bag.Contains("fg"));
+                }
+
+                {
+                    ConcurrentBag<string> bag = sr.FindRelation(0, 2, "11", "555", "gh", "ghgh", "fg");
+                    Assert.AreEqual(true, bag.Contains("11"));
+                    Assert.AreEqual(true, bag.Contains("555"));
+                    Assert.AreEqual(true, bag.Contains("gh"));
+                    Assert.AreEqual(true, bag.Contains("ghgh"));
+                    Assert.AreEqual(false, bag.Contains("fg"));
+                }
+
+                {
+                    ConcurrentBag<string> bag = sr.FindRelation(6, 2, "Gh", "GHGH", "GH", "HGHG", "fg", "gH", "hghg", "GhGh", "gHgH");
+                    Assert.AreEqual(true, bag.Contains("Gh"));
+                    Assert.AreEqual(true, bag.Contains("GHGH"));
+                    Assert.AreEqual(true, bag.Contains("GH"));
+                    Assert.AreEqual(true, bag.Contains("HGHG"));
+                    Assert.AreEqual(true, bag.Contains("gH"));
+                    Assert.AreEqual(true, bag.Contains("hghg"));
+                    Assert.AreEqual(true, bag.Contains("GhGh"));
+                    Assert.AreEqual(true, bag.Contains("gHgH"));
+                    Assert.AreEqual(false, bag.Contains("fg"));
+                    Assert.AreEqual(false, bag.Contains("fG"));
+                }
+
+                {
+                    ConcurrentBag<string> bag = sr.FindRelation(6, 1, "g", "gg", "ggg", "ggggg", "fg");
+                    Assert.AreEqual(true, bag.Contains("g"));
+                    Assert.AreEqual(true, bag.Contains("gg"));
+                    Assert.AreEqual(true, bag.Contains("ggg"));
+                    Assert.AreEqual(true, bag.Contains("ggggg"));
+                    Assert.AreEqual(false, bag.Contains("fg"));
+                }
+
+                {
+                    ConcurrentBag<string> bag = sr.FindRelation(7, 1, "h", "hh", "hhHHH", "HhhhH", "fg", "H", "HH", "hH", "Hh");
+                    Assert.AreEqual(true, bag.Contains("h"));
+                    Assert.AreEqual(true, bag.Contains("hh"));
+                    Assert.AreEqual(true, bag.Contains("hhHHH"));
+                    Assert.AreEqual(true, bag.Contains("HhhhH"));
+                    Assert.AreEqual(true, bag.Contains("H"));
+                    Assert.AreEqual(true, bag.Contains("HH"));
+                    Assert.AreEqual(true, bag.Contains("hH"));
+                    Assert.AreEqual(true, bag.Contains("Hh"));
+                    Assert.AreEqual(false, bag.Contains("fg"));
+                }
+
+                {
+                    ConcurrentBag<string> bag = sr.FindRelation(6, 1, "G", "Gg", "gG", "GG", "3a", "3A", "dS");
+                    Assert.AreEqual(true, bag.Contains("G"));
+                    Assert.AreEqual(true, bag.Contains("Gg"));
+                    Assert.AreEqual(true, bag.Contains("gG"));
+                    Assert.AreEqual(true, bag.Contains("GG"));
+                }
+
+                {
+                    ConcurrentBag<string> bag = sr.FindRelation(4, 2, "3a", "3A", "dS", "Sd");
+                    Assert.AreEqual(true, bag.Contains("3a"));
+                    Assert.AreEqual(true, bag.Contains("3A"));
+                    Assert.AreEqual(false, bag.Contains("dS"));
+                    Assert.AreEqual(false, bag.Contains("Sd"));
+                }
+            }
         }
 
         [TestMethod]

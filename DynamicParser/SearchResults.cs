@@ -139,8 +139,8 @@ namespace DynamicParser
         /// </summary>
         /// <param name="width">Ширина.</param>
         /// <param name="height">Высота.</param>
-        /// <param name="mapWidth">Ширина карт, которые проходили обработку.</param>
-        /// <param name="mapHeight">Высота карт, которые проходили обработку.</param>
+        /// <param name="mapWidth">Ширина обрабатываемых карт.</param>
+        /// <param name="mapHeight">Высота обрабатываемых карт.</param>
         public SearchResults(int width, int height, int mapWidth, int mapHeight)
         {
             if (width <= 0)
@@ -151,6 +151,12 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(SearchResults)}: Ширина карт указана некорректно ({mapWidth}).", nameof(mapWidth));
             if (mapHeight <= 0)
                 throw new ArgumentException($"{nameof(SearchResults)}: Высота карт указана некорректно ({mapHeight}).", nameof(mapHeight));
+            if (mapWidth > width)
+                throw new ArgumentException($"{nameof(SearchResults)}: Ширина обрабатываемых карт не может превышать ширину карты ({mapWidth} > {width}).",
+                    nameof(mapWidth));
+            if (mapHeight > height)
+                throw new ArgumentException($"{nameof(SearchResults)}: Высота обрабатываемых карт не может превышать высоту карты ({mapHeight} > {height}).",
+                    nameof(mapHeight));
             MapWidth = mapWidth;
             MapHeight = mapHeight;
             _coords = new ProcPerc[width, height];

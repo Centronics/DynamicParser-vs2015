@@ -193,7 +193,7 @@ namespace DynamicParser
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
-                    $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
+                    $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше или равно нолю ({count}).");
             if (words.Count <= 0)
                 return null;
             List<string> lst = new List<string>(words.Count);
@@ -218,7 +218,7 @@ namespace DynamicParser
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
-                    $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
+                    $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше или равно нолю ({count}).");
             if (words.Count <= 0)
                 return null;
             ConcurrentBag<string> result = new ConcurrentBag<string>();
@@ -279,11 +279,13 @@ namespace DynamicParser
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
-                    $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
+                    $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше или равно нолю ({count}).");
             if (word.Length <= 0)
                 return false;
-            if (word.Length % count != 0)
-                throw new ArgumentException($"{nameof(FindRelation)}: Количество символов для выборки должно быть кратно длине искомого слова.", nameof(count));
+            int mod = word.Length % count;
+            if (mod != 0)
+                throw new ArgumentException($@"{nameof(FindRelation)}: Количество символов для выборки должно быть кратно длине искомого слова: слово: {
+                    word}, длина: {word.Length}, количество символов для выборки: {count}, остаток от деления: {mod}.", nameof(count));
             List<ProcPoint> lst = new List<ProcPoint>();
             foreach (string str in GetWord(word, count))
             {
@@ -381,7 +383,7 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(region), $"{nameof(GetStringFromRegion)}: Регион равен null.");
             if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
-                    $@"{nameof(GetStringFromRegion)}: Количество символов для выборки из названия карты меньше ноля ({count}).");
+                    $@"{nameof(GetStringFromRegion)}: Количество символов для выборки из названия карты меньше или равно нолю ({count}).");
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetStringFromRegion)}: Индекс вышел за допустимые пределы ({startIndex}).");
             List<string> lstWords = new List<string>();

@@ -328,6 +328,7 @@ namespace DynamicParserTest
             Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 1, 3)));
 
             Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 2, 1)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 2, 2)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 3, 3)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 4, 3)));
@@ -380,10 +381,6 @@ namespace DynamicParserTest
             Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 2, 1)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 2, 2)));
 
-            Assert.AreEqual(false, region.IsConflict(new Rectangle(2, 2, 1, 1)));
-            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 2, 1)));
-            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 1, 2)));
-
             Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 1, 1)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 1, 2)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 2, 1)));
@@ -402,8 +399,6 @@ namespace DynamicParserTest
             Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 2, 1)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 2, 2)));
 
-            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 1)));
-            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 2)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 3)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 4)));
 

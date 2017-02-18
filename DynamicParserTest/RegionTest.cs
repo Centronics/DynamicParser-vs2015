@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DynamicParser;
+using DynamicProcessor;
+using Processor = DynamicParser.Processor;
 using Region = DynamicParser.Region;
 
 namespace DynamicParserTest
@@ -153,15 +156,130 @@ namespace DynamicParserTest
             attacher.Add(0, 0);
             attacher.Add(2, 2);
             attacher.Add(3, 3);
-//            region.SetMask(attacher);
             attacher.SetMask(region);
             foreach (Attach.Proc proc in attacher.Attaches.Select(att => att.Unique))
             {
-                bool bl = (proc.Place.X == 0 && proc.Place.Y == 0) ||
-                          (proc.Place.X == 2 && proc.Place.Y == 2) ||
-                          (proc.Place.X == 3 && proc.Place.Y == 3);
+                bool bl = proc.Place.X == 0 && proc.Place.Y == 0 ||
+                          proc.Place.X == 2 && proc.Place.Y == 2 ||
+                          proc.Place.X == 3 && proc.Place.Y == 3;
                 Assert.AreEqual(true, bl);
             }
+        }
+
+        [TestMethod]
+        public void RegionTest1()
+        {
+            Region region = new Region(2, 2);
+            region.Add(new Rectangle(0, 0, 1, 1));
+            region.Add(new Rectangle(1, 1, 1, 1));
+            Assert.AreEqual(2, region.Rectangles.Count());
+            Assert.AreEqual(2, region.Elements.Count());
+            region.Clear();
+            Assert.AreEqual(0, region.Rectangles.Count());
+            Assert.AreEqual(0, region.Elements.Count());
+            region.Add(new Rectangle(0, 0, 1, 1));
+            region.Add(new Rectangle(1, 0, 1, 1));
+            region.Add(new Rectangle(0, 1, 1, 1));
+            region.Add(new Rectangle(1, 1, 1, 1));
+            Assert.AreEqual(4, region.Rectangles.Count());
+            Assert.AreEqual(4, region.Elements.Count());
+            region.Clear();
+            Assert.AreEqual(0, region.Rectangles.Count());
+            Assert.AreEqual(0, region.Elements.Count());
+        }
+
+        [TestMethod]
+        public void RegionTest2()
+        {
+            Region region = new Region(2, 2);
+            region.Add(0, 0, 1, 1);
+            region.Add(1, 1, 1, 1);
+            region[0, 0].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
+            region[1, 1].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            Assert.AreEqual(true, region.Contains("1, 1", 0));
+            Assert.AreEqual(true, region.Contains("0, 0", 0));
+            Assert.AreEqual(true, region.Contains(", 1", 1));
+            Assert.AreEqual(true, region.Contains(", 0", 1));
+            Assert.AreEqual(true, region.Contains(" 1", 2));
+            Assert.AreEqual(true, region.Contains(" 0", 2));
+            Assert.AreEqual(true, region.Contains("1", 3));
+            Assert.AreEqual(true, region.Contains("0", 3));
+            Assert.AreEqual(false, region.Contains("1", 4));
+            Assert.AreEqual(false, region.Contains("a", 0));
+            Assert.AreEqual(false, region.Contains("b", 4));
+            Assert.AreEqual(false, region.Contains("c", 3));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void RegisteredOutEx1Test()
+        {
+            Region region = new Region(2, 2);
+            region.Add(0, 0, 1, 1);
+            region.Add(1, 1, 1, 1);
+            region[0, 0].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
+            region[1, 1].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            Assert.AreEqual(true, region.Contains("1, 1", -1));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void RegisteredOutEx2Test()
+        {
+            Region region = new Region(2, 2);
+            region.Add(0, 0, 1, 1);
+            region.Add(1, 1, 1, 1);
+            region[0, 0].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
+            region[1, 1].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            Assert.AreEqual(true, region.Contains("0, 0", -1));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void RegisteredOutEx3Test()
+        {
+            Region region = new Region(2, 2);
+            region.Add(0, 0, 1, 1);
+            region.Add(1, 1, 1, 1);
+            region[0, 0].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
+            region[1, 1].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            Assert.AreEqual(true, region.Contains("1, 1", int.MinValue));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void RegisteredOutEx4Test()
+        {
+            Region region = new Region(2, 2);
+            region.Add(0, 0, 1, 1);
+            region.Add(1, 1, 1, 1);
+            region[0, 0].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
+            region[1, 1].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            Assert.AreEqual(true, region.Contains("0, 0", int.MinValue));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisteredOutEx5Test()
+        {
+            Region region = new Region(2, 2);
+            region.Add(0, 0, 1, 1);
+            region.Add(1, 1, 1, 1);
+            region[0, 0].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
+            region[1, 1].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            Assert.AreEqual(true, region.Contains("", 0));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisteredOutEx6Test()
+        {
+            Region region = new Region(2, 2);
+            region.Add(0, 0, 1, 1);
+            region.Add(1, 1, 1, 1);
+            region[0, 0].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
+            region[1, 1].Register = new List<Reg> { new Reg { Procs = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            Assert.AreEqual(true, region.Contains(null, 0));
         }
 
         [TestMethod]

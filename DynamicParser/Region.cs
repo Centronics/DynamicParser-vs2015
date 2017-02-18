@@ -177,12 +177,10 @@ namespace DynamicParser
         {
             if (processorName == null)
                 throw new ArgumentNullException(nameof(processorName), $@"{nameof(Contains)}: Проверяемая карта отсутствует (null).");
-            if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), $@"{nameof(Contains)}: Индекс подстроки названия карты недопустим: ({index}).");
-            if (processorName == null)
-                throw new ArgumentNullException(nameof(processorName), $@"{nameof(Contains)}: Имя проверяемой карты пустое (null).");
             if (processorName == string.Empty)
                 throw new ArgumentException($"{nameof(Contains)}: Имя проверяемой карты пустое (\"\").", nameof(processorName));
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), $@"{nameof(Contains)}: Индекс подстроки названия карты недопустим: ({index}).");
             return Elements.Where(registered => registered != null && !registered.IsEmpty).Any(registered => registered.Register.Where(reg => reg.Procs != null).
                 Any(reg => reg.Procs.Where(proc => proc != null).Any(proc => proc.IsProcessorName(processorName, index))));
         }

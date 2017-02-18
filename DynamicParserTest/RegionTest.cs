@@ -211,6 +211,212 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
+        public void RegionTest3()
+        {
+            Region region = new Region(3, 3);
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 0, 2, 2)));
+            region.Add(0, 0, 2, 2);
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 2)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 0, 0)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 0, 0)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 0, 0)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 0, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 1, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 0, 0)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 0, 0)));
+
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(2, 0, 1, 1)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(2, 1, 1, 1)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(2, 2, 1, 1)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 2, 1, 1)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(1, 2, 1, 1)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(-1, 2, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, -2, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, -1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 1, -1)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(-1, -2, -1, -1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, -2, -1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(-1, -2, -1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, -2, 1, -1)));
+
+            region.Clear();
+
+            region.Add(1, 0, 1, 1);
+            region.Add(1, 1, 1, 1);
+            region.Add(2, 1, 1, 1);
+            region.Add(1, 2, 1, 1);
+
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 0, 1, 1)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 1, 1, 1)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 2, 1, 1)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(2, 0, 1, 1)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(2, 2, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 1, 1)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 2, 2)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 0, 1, 2)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 0, 1, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 1, 4)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 3, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 4, 1)));
+
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 1, 1, 1)));
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 1, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 1, 3)));
+
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 3, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 4, 3)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 3, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 4, 3)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 3, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 4, 1)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 3)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 3, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 4, 3)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 4)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 2, 1)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(3, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(3, 1, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(3, 1, 3, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(3, 1, 4, 3)));
+
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(2, 0, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 0, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 0, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 0, 1, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 0, 1, 4)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 1, 4)));
+
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(2, 2, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 1, 2, 2)));
+
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(2, 2, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(2, 2, 1, 2)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 3, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 2, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 3, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 2, 2, 2)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 2, 2)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 2, 2)));
+
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 4)));
+
+            Assert.AreEqual(false, region.IsConflict(new Rectangle(0, 2, 1, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 2, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 2, 2, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 2, 2, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 2, 3, 1)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 2, 1, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 2, 1, 4)));
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void RegisteredOutEx1Test()
         {

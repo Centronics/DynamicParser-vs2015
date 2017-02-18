@@ -162,7 +162,7 @@ namespace DynamicParser
         /// <returns>В случае, если перекрываются, возвращает true, в противном случае false.</returns>
         public bool IsConflict(Rectangle rect)
         {
-            if (rect.Right > Width || rect.Bottom > Height)
+            if (rect.Right > Width || rect.Bottom > Height || rect.Width <= 0 || rect.Height <= 0 || rect.X < 0 || rect.Y < 0)
                 return true;
             return _rects.Values.Any(reg => reg.IsConflict(rect));
         }

@@ -403,6 +403,13 @@
             <param name="processors">Список карт, с которыми идёт сопоставление.</param>
             <returns>Возвращает true в случае, если все ли указанные карты одного размера, в противном случае false.</returns>
         </member>
+        <member name="M:DynamicParser.ProcessorContainer.FirstInArray(System.Collections.Generic.ICollection{DynamicParser.Processor})">
+            <summary>
+            Находит первый процессор в коллекции, который не равен null.
+            </summary>
+            <param name="processors">Коллекция процессоров, в которой производится поиск.</param>
+            <returns>Возвращает первый процессор в коллекции, который не равен null или null, если таких процессоров в коллекции нет.</returns>
+        </member>
         <member name="M:DynamicParser.ProcessorContainer.IsNull(System.Collections.Generic.ICollection{DynamicParser.Processor})">
             <summary>
             Проверяет, все ли элементы коллекции равны null или отсутствуют.

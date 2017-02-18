@@ -42,9 +42,9 @@ namespace DynamicParser
         /// <param name="processors">Добавляемые карты.</param>
         public ProcessorContainer(IList<Processor> processors)
         {
-            AgrumentAssertions(processors);
-            Width = processors[0].Width;
-            Height = processors[0].Height;
+            Processor processor = AgrumentAssertions(processors);
+            Width = processor.Width;
+            Height = processor.Height;
             AddProcessors(processors);
         }
 
@@ -54,9 +54,9 @@ namespace DynamicParser
         /// <param name="processors">Добавляемые карты.</param>
         public ProcessorContainer(params Processor[] processors)
         {
-            AgrumentAssertions(processors);
-            Width = processors[0].Width;
-            Height = processors[0].Height;
+            Processor processor = AgrumentAssertions(processors);
+            Width = processor.Width;
+            Height = processor.Height;
             AddProcessors(processors);
         }
 
@@ -73,7 +73,7 @@ namespace DynamicParser
         /// Выдаёт исключения в случае обнаружения каких-либо ошибок.
         /// </summary>
         /// <param name="processors">Добавляемые карты.</param>
-        void AgrumentAssertions(IList<Processor> processors)
+        Processor AgrumentAssertions(IList<Processor> processors)
         {
             if (processors == null)
                 throw new ArgumentNullException(nameof(processors), $"{nameof(ProcessorContainer)}: Коллекция карт не может быть равна null.");
@@ -87,6 +87,7 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(ProcessorContainer)}: Обнаружены карты различных размеров.", nameof(processors));
             if (!InOneTag(processors))
                 throw new ArgumentException($"{nameof(ProcessorContainer)}: Карты с одинаковыми Tag не могут быть в одном списке.", nameof(processors));
+            return FirstInArray(processors);
         }
 
         /// <summary>
@@ -190,9 +191,24 @@ namespace DynamicParser
         {
             if (processors == null || processors.Count <= 0)
                 return true;
-            int width = processors[0].Width;
-            int height = processors[0].Height;
+            Processor processor = FirstInArray(processors);
+            if (processor == null)
+                return true;
+            int width = processor.Width;
+            int height = processor.Height;
             return processors.Count <= 0 || processors.All(pr => pr == null || pr.Width == width && pr.Height == height);
+        }
+
+        /// <summary>
+        /// Находит первый процессор в коллекции, который не равен null.
+        /// </summary>
+        /// <param name="processors">Коллекция процессоров, в которой производится поиск.</param>
+        /// <returns>Возвращает первый процессор в коллекции, который не равен null или null, если таких процессоров в коллекции нет.</returns>
+        static Processor FirstInArray(ICollection<Processor> processors)
+        {
+            if (processors == null || processors.Count <= 0)
+                return null;
+            return processors.FirstOrDefault(pr => pr != null);
         }
 
         /// <summary>

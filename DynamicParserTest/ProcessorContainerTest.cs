@@ -27,6 +27,22 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
+        public void ProcessorContainerConsTest1()
+        {
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> {
+                new Processor(new[] { new SignValue(1), SignValue.MaxValue }, "Одномерный1"),
+                new Processor(new[] { new SignValue(2), SignValue.MinValue }, "Одномерный2"),
+                null, //                                                       Одномерный3
+                new Processor(new[] { new SignValue(3), SignValue.MaxValue }, "Одномерный4")});
+            Assert.AreEqual(3, pc.Count);
+            Assert.AreEqual(2, pc.Width);
+            Assert.AreEqual(1, pc.Height);
+            Assert.AreEqual("Одномерный1", pc[0].Tag);
+            Assert.AreEqual("Одномерный2", pc[1].Tag);
+            Assert.AreEqual("Одномерный4", pc[2].Tag);
+        }
+
+        [TestMethod]
         public void ProcessorContainerAddRange1Test()
         {
             Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
@@ -131,7 +147,6 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ProcessorContainerEx3Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable");
@@ -218,7 +233,7 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx5Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
@@ -267,7 +282,7 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx10Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
@@ -278,7 +293,7 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx11Test()
         {
             Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
@@ -368,6 +383,53 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorContainerEx17Test()
+        {
+            Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
+            Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25) }, "Одномерный2");
+            // ReSharper disable once UnusedVariable
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { proc1, proc2 });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorContainerEx18Test()
+        {
+            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
+                p1 = new Processor(new[] { SignValue.MaxValue }, " Unusedvariable ");
+            // ReSharper disable once UnusedVariable
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { null, p, p1 });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorContainerEx19Test()
+        {
+            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable");
+            // ReSharper disable once UnusedVariable
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { p, p });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorContainerEx20Test()
+        {
+            Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
+            Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25) }, "Одномерный2");
+            // ReSharper disable once UnusedVariable
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { proc1, proc2 });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ProcessorContainerEx21Test()
+        {
+            // ReSharper disable once UnusedVariable
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { null });
+        }
+
+        [TestMethod]
         public void ProcessorContainerInOneSizeTestIsEquals()
         {
             SignValue[,] pr1 = new SignValue[2, 3];
@@ -409,12 +471,12 @@ namespace DynamicParserTest
 
             Assert.AreEqual(false, ProcessorContainer.InOneSize(new[] { proc1, proc2, proc3 }));
             Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] { proc1, proc2 }));
-            Assert.AreEqual(false, ProcessorContainer.InOneSize(new[] { proc1, proc2 }));
-            Assert.AreEqual(false, ProcessorContainer.InOneSize(null));
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] { proc1, proc2 }));
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(null));
             Assert.AreEqual(false, ProcessorContainer.InOneSize(new[] { proc1, proc1, proc2, proc3 }));
             Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] { proc1 }));
-            Assert.AreEqual(false, ProcessorContainer.InOneSize(new[] { proc1 }));
-            Assert.AreEqual(false, ProcessorContainer.InOneSize(new[] { proc1 }));
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] { proc1 }));
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] { proc1 }));
 
             Assert.AreEqual(false, ProcessorContainer.IsEquals(new[] { proc1, proc2 }));
             Assert.AreEqual(true, ProcessorContainer.IsEquals(new[] { proc1, proc1 }));

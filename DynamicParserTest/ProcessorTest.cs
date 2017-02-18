@@ -41,6 +41,56 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
+        public void ToStringTest()
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                {
+                    Processor pr = new Processor(new[] { SignValue.MaxValue }, "Tag");
+                    pr.Serialize(ms);
+                    Assert.AreEqual("Tag", pr.Tag);
+                    Assert.AreEqual("Tag", pr.ToString());
+                }
+                {
+                    ms.Position = 0;
+                    Processor pr = new Processor(ms);
+                    Assert.AreEqual("Tag", pr.Tag);
+                    Assert.AreEqual("Tag", pr.ToString());
+                }
+            }
+            using (MemoryStream ms = new MemoryStream())
+            {
+                {
+                    Processor pr = new Processor(new SignValue[5, 10], "Tag");
+                    pr.Serialize(ms);
+                    Assert.AreEqual("Tag", pr.Tag);
+                    Assert.AreEqual("Tag", pr.ToString());
+                }
+                {
+                    ms.Position = 0;
+                    Processor pr = new Processor(ms);
+                    Assert.AreEqual("Tag", pr.Tag);
+                    Assert.AreEqual("Tag", pr.ToString());
+                }
+            }
+            using (MemoryStream ms = new MemoryStream())
+            {
+                {
+                    Processor pr = new Processor(new Bitmap(1, 1), "Tag");
+                    pr.Serialize(ms);
+                    Assert.AreEqual("Tag", pr.Tag);
+                    Assert.AreEqual("Tag", pr.ToString());
+                }
+                {
+                    ms.Position = 0;
+                    Processor pr = new Processor(ms);
+                    Assert.AreEqual("Tag", pr.Tag);
+                    Assert.AreEqual("Tag", pr.ToString());
+                }
+            }
+        }
+
+        [TestMethod]
         public void ProcessorTestSerialization()
         {
             Bitmap btm = new Bitmap(2, 3);
@@ -237,6 +287,8 @@ namespace DynamicParserTest
             Assert.AreEqual(15, proc.Width);
             Assert.AreEqual(10, proc.Height);
             Assert.AreEqual(150, proc.Length);
+            Assert.AreEqual(15, proc.Size.Width);
+            Assert.AreEqual(10, proc.Size.Height);
             Region cr = proc.CurrentRegion;
             Assert.AreEqual(15, cr.Width);
             Assert.AreEqual(10, cr.Height);

@@ -379,187 +379,187 @@ namespace DynamicParser
                 try
                 {
                     Parallel.For(0, Width - prc.Width + 1, (x1, stateWidthMain) =>
-                     {
-                         try
-                         {
-                             SignValue[][,] procPercent = new SignValue[prc.Count][,];
-                             Parallel.For(0, prc.Count, (j, stateCountMap) =>
-                             {
-                                 try
-                                 {
-                                     Processor ps = prc[j];
-                                     SignValue[,] pc = new SignValue[ps.Width, ps.Height];
-                                     Parallel.For(0, prc.Height, (y, stateCountY) =>
-                                     {
-                                         try
-                                         {
-                                             if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped || stateCountY.IsStopped)
-                                                 return;
-                                             Parallel.For(0, prc.Width, (x, stateCountX) =>
-                                             {
-                                                 try
-                                                 {
-                                                     pc[x, y] = ps[x, y] - this[x + x1, y + y1];
-                                                 }
-                                                 catch (Exception ex)
-                                                 {
-                                                     try
-                                                     {
-                                                         errString = ex.Message;
-                                                         exThrown = true;
-                                                         stateCountX.Stop();
-                                                         stateCountY.Stop();
-                                                         stateCountMap.Stop();
-                                                         stateWidthMain.Stop();
-                                                     }
-                                                     catch (Exception exs)
-                                                     {
-                                                         errStopping = exs.Message;
-                                                         exStopping = true;
-                                                     }
-                                                 }
-                                             });
-                                         }
-                                         catch (Exception ex)
-                                         {
-                                             try
-                                             {
-                                                 errString = ex.Message;
-                                                 exThrown = true;
-                                                 stateCountY.Stop();
-                                                 stateCountMap.Stop();
-                                                 stateWidthMain.Stop();
-                                             }
-                                             catch (Exception exs)
-                                             {
-                                                 errStopping = exs.Message;
-                                                 exStopping = true;
-                                             }
-                                         }
-                                     });
-                                     procPercent[j] = pc;
-                                 }
-                                 catch (Exception ex)
-                                 {
-                                     try
-                                     {
-                                         errString = ex.Message;
-                                         exThrown = true;
-                                         stateCountMap.Stop();
-                                         stateWidthMain.Stop();
-                                     }
-                                     catch (Exception exs)
-                                     {
-                                         errStopping = exs.Message;
-                                         exStopping = true;
-                                     }
-                                 }
-                             });
-                             if (stateHeightMain.IsStopped || stateWidthMain.IsStopped)
-                                 return;
-                             double[] mas = new double[prc.Count];
-                             Parallel.For(0, prc.Count, (k, stateCountMap) =>
-                             {
-                                 try
-                                 {
-                                     if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped)
-                                         return;
-                                     int prcCount = 0;
-                                     Parallel.For(0, prc.Height, (y2, stateHeightCount) =>
-                                     {
-                                         try
-                                         {
-                                             if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped || stateHeightCount.IsStopped)
-                                                 return;
-                                             Parallel.For(0, prc.Width, (x2, stateWidthCount) =>
-                                             {
-                                                 try
-                                                 {
-                                                     if (GetMinIndex(procPercent, x2, y2, k))
-                                                         Interlocked.Increment(ref prcCount);
-                                                 }
-                                                 catch (Exception ex)
-                                                 {
-                                                     try
-                                                     {
-                                                         errString = ex.Message;
-                                                         exThrown = true;
-                                                         stateWidthCount.Stop();
-                                                         stateHeightCount.Stop();
-                                                         stateHeightMain.Stop();
-                                                         stateWidthMain.Stop();
-                                                         stateCountMap.Stop();
-                                                     }
-                                                     catch (Exception exs)
-                                                     {
-                                                         errStopping = exs.Message;
-                                                         exStopping = true;
-                                                     }
-                                                 }
-                                             });
-                                         }
-                                         catch (Exception ex)
-                                         {
-                                             try
-                                             {
-                                                 errString = ex.Message;
-                                                 exThrown = true;
-                                                 stateHeightCount.Stop();
-                                                 stateCountMap.Stop();
-                                                 stateHeightMain.Stop();
-                                                 stateWidthMain.Stop();
-                                             }
-                                             catch (Exception exs)
-                                             {
-                                                 errStopping = exs.Message;
-                                                 exStopping = true;
-                                             }
-                                         }
-                                     });
-                                     mas[k] = Convert.ToDouble(prcCount) / Convert.ToDouble(prc[k].Length);
-                                 }
-                                 catch (Exception ex)
-                                 {
-                                     try
-                                     {
-                                         errString = ex.Message;
-                                         exThrown = true;
-                                         stateCountMap.Stop();
-                                         stateHeightMain.Stop();
-                                         stateWidthMain.Stop();
-                                     }
-                                     catch (Exception exs)
-                                     {
-                                         errStopping = exs.Message;
-                                         exStopping = true;
-                                     }
-                                 }
-                             });
-                             if (stateHeightMain.IsStopped || stateWidthMain.IsStopped)
-                                 return;
-                             double db = mas.Max();
-                             sr[x1, y1] = new ProcPerc
-                             {
-                                 Procs = GetMaxIndex(mas, db).Select(i => prc[i]).ToArray(),
-                                 Percent = db
-                             };
-                         }
-                         catch (Exception ex)
-                         {
-                             try
-                             {
-                                 errString = ex.Message;
-                                 exThrown = true;
-                                 stateHeightMain.Stop();
-                                 stateWidthMain.Stop();
-                             }
-                             catch (Exception exs)
-                             {
-                                 errStopping = exs.Message;
-                                 exStopping = true;
-                             }
-                         }
-                     });
+                    {
+                        try
+                        {
+                            SignValue[][,] procPercent = new SignValue[prc.Count][,];
+                            Parallel.For(0, prc.Count, (j, stateCountMap) =>
+                            {
+                                try
+                                {
+                                    Processor ps = prc[j];
+                                    SignValue[,] pc = new SignValue[ps.Width, ps.Height];
+                                    Parallel.For(0, prc.Height, (y, stateCountY) =>
+                                    {
+                                        try
+                                        {
+                                            if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped || stateCountY.IsStopped)
+                                                return;
+                                            Parallel.For(0, prc.Width, (x, stateCountX) =>
+                                            {
+                                                try
+                                                {
+                                                    pc[x, y] = ps[x, y] - this[x + x1, y + y1];
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    try
+                                                    {
+                                                        errString = ex.Message;
+                                                        exThrown = true;
+                                                        stateCountX.Stop();
+                                                        stateCountY.Stop();
+                                                        stateCountMap.Stop();
+                                                        stateWidthMain.Stop();
+                                                    }
+                                                    catch (Exception exs)
+                                                    {
+                                                        errStopping = exs.Message;
+                                                        exStopping = true;
+                                                    }
+                                                }
+                                            });
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            try
+                                            {
+                                                errString = ex.Message;
+                                                exThrown = true;
+                                                stateCountY.Stop();
+                                                stateCountMap.Stop();
+                                                stateWidthMain.Stop();
+                                            }
+                                            catch (Exception exs)
+                                            {
+                                                errStopping = exs.Message;
+                                                exStopping = true;
+                                            }
+                                        }
+                                    });
+                                    procPercent[j] = pc;
+                                }
+                                catch (Exception ex)
+                                {
+                                    try
+                                    {
+                                        errString = ex.Message;
+                                        exThrown = true;
+                                        stateCountMap.Stop();
+                                        stateWidthMain.Stop();
+                                    }
+                                    catch (Exception exs)
+                                    {
+                                        errStopping = exs.Message;
+                                        exStopping = true;
+                                    }
+                                }
+                            });
+                            if (stateHeightMain.IsStopped || stateWidthMain.IsStopped)
+                                return;
+                            double[] mas = new double[prc.Count];
+                            Parallel.For(0, prc.Count, (k, stateCountMap) =>
+                            {
+                                try
+                                {
+                                    if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped)
+                                        return;
+                                    int prcCount = 0;
+                                    Parallel.For(0, prc.Height, (y2, stateHeightCount) =>
+                                    {
+                                        try
+                                        {
+                                            if (stateHeightMain.IsStopped || stateWidthMain.IsStopped || stateCountMap.IsStopped || stateHeightCount.IsStopped)
+                                                return;
+                                            Parallel.For(0, prc.Width, (x2, stateWidthCount) =>
+                                            {
+                                                try
+                                                {
+                                                    if (GetMinIndex(procPercent, x2, y2, k))
+                                                        Interlocked.Increment(ref prcCount);
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    try
+                                                    {
+                                                        errString = ex.Message;
+                                                        exThrown = true;
+                                                        stateWidthCount.Stop();
+                                                        stateHeightCount.Stop();
+                                                        stateHeightMain.Stop();
+                                                        stateWidthMain.Stop();
+                                                        stateCountMap.Stop();
+                                                    }
+                                                    catch (Exception exs)
+                                                    {
+                                                        errStopping = exs.Message;
+                                                        exStopping = true;
+                                                    }
+                                                }
+                                            });
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            try
+                                            {
+                                                errString = ex.Message;
+                                                exThrown = true;
+                                                stateHeightCount.Stop();
+                                                stateCountMap.Stop();
+                                                stateHeightMain.Stop();
+                                                stateWidthMain.Stop();
+                                            }
+                                            catch (Exception exs)
+                                            {
+                                                errStopping = exs.Message;
+                                                exStopping = true;
+                                            }
+                                        }
+                                    });
+                                    mas[k] = Convert.ToDouble(prcCount) / Convert.ToDouble(prc[k].Length);
+                                }
+                                catch (Exception ex)
+                                {
+                                    try
+                                    {
+                                        errString = ex.Message;
+                                        exThrown = true;
+                                        stateCountMap.Stop();
+                                        stateHeightMain.Stop();
+                                        stateWidthMain.Stop();
+                                    }
+                                    catch (Exception exs)
+                                    {
+                                        errStopping = exs.Message;
+                                        exStopping = true;
+                                    }
+                                }
+                            });
+                            if (stateHeightMain.IsStopped || stateWidthMain.IsStopped)
+                                return;
+                            double db = mas.Max();
+                            sr[x1, y1] = new ProcPerc
+                            {
+                                Procs = GetMaxIndex(mas, db).Select(i => prc[i]).ToArray(),
+                                Percent = db
+                            };
+                        }
+                        catch (Exception ex)
+                        {
+                            try
+                            {
+                                errString = ex.Message;
+                                exThrown = true;
+                                stateHeightMain.Stop();
+                                stateWidthMain.Stop();
+                            }
+                            catch (Exception exs)
+                            {
+                                errStopping = exs.Message;
+                                exStopping = true;
+                            }
+                        }
+                    });
                 }
                 catch (Exception ex)
                 {

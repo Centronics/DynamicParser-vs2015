@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicParser", "DynamicParser\DynamicParser.csproj", "{DBA31F86-345D-40B7-AF46-BE0488899AEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessorContainerTest", "DynamicParserTest\ProcessorContainerTest.csproj", "{57474D91-1CC3-4D42-9CE2-A08902E1083E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicParserTest", "DynamicParserTest\DynamicParserTest.csproj", "{57474D91-1CC3-4D42-9CE2-A08902E1083E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

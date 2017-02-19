@@ -414,6 +414,49 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
+        public void RegionTest4()
+        {
+            Region region = new Region(2, 2);
+            region.Add(0, 0, 1, 1);
+            region.Add(1, 0, 1, 2);
+            Assert.AreNotEqual(null, region[0, 0]);
+            Assert.AreNotEqual(null, region[1, 0]);
+            Assert.AreEqual(null, region[0, 1]);
+            Assert.AreNotEqual(null, region[1, 1]);
+            Assert.AreEqual(2, region.Count);
+            region.Remove(0, 0);
+            Assert.AreEqual(null, region[0, 0]);
+            Assert.AreNotEqual(null, region[1, 0]);
+            Assert.AreEqual(null, region[0, 1]);
+            Assert.AreNotEqual(null, region[1, 1]);
+            Assert.AreEqual(1, region.Count);
+            region.Remove(1, 0);
+            Assert.AreEqual(null, region[0, 0]);
+            Assert.AreEqual(null, region[1, 0]);
+            Assert.AreEqual(null, region[0, 1]);
+            Assert.AreEqual(null, region[1, 1]);
+            Assert.AreEqual(0, region.Count);
+
+            region.Add(0, 0, 1, 1);
+            region.Add(1, 0, 1, 1);
+            region.Add(0, 1, 1, 1);
+            region.Add(1, 1, 1, 1);
+            Assert.AreEqual(4, region.Count);
+            region.Remove(0, 0);
+            Assert.AreEqual(3, region.Count);
+            region.Remove(0, 0);
+            Assert.AreEqual(3, region.Count);
+            region.Remove(1, 0);
+            Assert.AreEqual(2, region.Count);
+            region.Remove(0, 1);
+            Assert.AreEqual(1, region.Count);
+            region.Remove(1, 1);
+            Assert.AreEqual(0, region.Count);
+            region.Remove(1, 1);
+            Assert.AreEqual(0, region.Count);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void RegisteredOutEx1Test()
         {

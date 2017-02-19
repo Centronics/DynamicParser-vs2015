@@ -232,6 +232,8 @@ namespace DynamicParserTest
             Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 1, 2)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 1, 1, 2)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 1, 1, 2)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 3, 3)));
+            Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 4, 4)));
 
             Assert.AreEqual(true, region.IsConflict(new Rectangle(0, 0, 0, 1)));
             Assert.AreEqual(true, region.IsConflict(new Rectangle(1, 0, 0, 1)));

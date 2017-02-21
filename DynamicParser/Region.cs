@@ -17,14 +17,14 @@ namespace DynamicParser
         public Rectangle Region { get; set; }
 
         /// <summary>
-        /// Список наиболее соответствующих найденных карт.
+        /// Содержит наиболее соответствующие найденные карты.
         /// </summary>
-        public List<Reg> Register { get; set; }
+        public Reg Register { get; set; }
 
         /// <summary>
-        /// Возвращает true в случае, если список найденных карт пуст.
+        /// Возвращает true в случае, если карта отсутстует.
         /// </summary>
-        public bool IsEmpty => (Register?.Count ?? 0) <= 0;
+        public bool IsEmpty => Register.SelectedProcessor == null;
 
         /// <summary>
         /// Координата X начала области.
@@ -181,15 +181,15 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(Contains)}: Имя проверяемой карты пустое (\"\").", nameof(processorName));
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index), $@"{nameof(Contains)}: Индекс подстроки названия карты недопустим: ({index}).");
-            return Elements.Where(registered => registered != null && !registered.IsEmpty).Any(registered => registered.Register.Where(reg => reg.Procs != null).
-                Any(reg => reg.Procs.Where(proc => proc != null).Any(proc => proc.IsProcessorName(processorName, index))));
+            return Elements.Where(registered => registered != null && !registered.IsEmpty).Any(registered => registered.Register.SelectedProcessor.
+                IsProcessorName(processorName, index));
         }
 
         /// <summary>
         /// Вставляет указанную область в коллекцию.
         /// </summary>
         /// <param name="rect">Вставляемая область.</param>
-        public void Add(Rectangle rect)
+        public Registered Add(Rectangle rect)
         {
             if (rect.Right > Width)
                 throw new ArgumentException($@"{nameof(Add)}: Попытка вставить элемент, конфликтующий с шириной региона (Width = {Width
@@ -199,7 +199,9 @@ namespace DynamicParser
                     }, {nameof(rect.Bottom)} = {rect.Bottom}).", nameof(rect));
             if (IsConflict(rect))
                 throw new ArgumentException($"{nameof(Add)}: Попытка вставить элемент, конфликтующий с существующими.", nameof(rect));
-            _rects[GetIndex(rect.X, rect.Y)] = new Registered { Region = rect };
+            Registered registered = new Registered { Region = rect };
+            _rects[GetIndex(rect.X, rect.Y)] = registered;
+            return registered;
         }
 
         /// <summary>

@@ -444,12 +444,12 @@
         </member>
         <member name="P:DynamicParser.Registered.Register">
             <summary>
-            Список наиболее соответствующих найденных карт.
+            Содержит наиболее соответствующие найденные карты.
             </summary>
         </member>
         <member name="P:DynamicParser.Registered.IsEmpty">
             <summary>
-            Возвращает true в случае, если список найденных карт пуст.
+            Возвращает true в случае, если карта отсутстует.
             </summary>
         </member>
         <member name="P:DynamicParser.Registered.X">
@@ -601,19 +601,14 @@
             Карты.
             </summary>
         </member>
-        <member name="T:DynamicParser.Reg">
-            <summary>
-            Содержит карты, отобранные по проценту соответствия в указанной области.
-            </summary>
-        </member>
-        <member name="F:DynamicParser.Reg.Position">
+        <member name="F:DynamicParser.ProcPerc.Position">
             <summary>
             Точка.
             </summary>
         </member>
-        <member name="F:DynamicParser.Reg.Procs">
+        <member name="T:DynamicParser.Reg">
             <summary>
-            Карты, отобранные по проценту соответствия.
+            Содержит информацию о выбранной карте.
             </summary>
         </member>
         <member name="F:DynamicParser.Reg.Percent">
@@ -621,24 +616,14 @@
             Процент соответствия.
             </summary>
         </member>
-        <member name="T:DynamicParser.ProcPoint">
-            <summary>
-            Предоставляет информацию о состоянии карты в конкретной точке.
-            </summary>
-        </member>
-        <member name="F:DynamicParser.ProcPoint.Position">
-            <summary>
-            Координаты карты.
-            </summary>
-        </member>
-        <member name="F:DynamicParser.ProcPoint.CurrentProcessor">
+        <member name="F:DynamicParser.Reg.SelectedProcessor">
             <summary>
             Карта.
             </summary>
         </member>
-        <member name="F:DynamicParser.ProcPoint.Percent">
+        <member name="F:DynamicParser.Reg.Position">
             <summary>
-            Процент соответствия.
+            Координаты карты.
             </summary>
         </member>
         <member name="T:DynamicParser.RegionStatus">
@@ -772,7 +757,7 @@
             <param name="length">Требуемое количество букв в подстроке.</param>
             <returns>Возвращает части слова указанной длины.</returns>
         </member>
-        <member name="M:DynamicParser.SearchResults.FindWord(System.Collections.Generic.IList{DynamicParser.ProcPoint},System.Int32,System.String,System.Int32)">
+        <member name="M:DynamicParser.SearchResults.FindWord(System.Collections.Generic.IList{DynamicParser.Reg},System.Int32,System.String,System.Int32)">
             <summary>
             Получает значение true в случае нахождения искомого слова, в противном случае - false.
             </summary>
@@ -829,13 +814,6 @@
             </summary>
             <param name="region">Регион, относительно которого происходит проверка.</param>
             <returns>Возвращает OK в случае отсутствия конфликтов.</returns>
-        </member>
-        <member name="M:DynamicParser.SearchResults.FindRegion(DynamicParser.Region)">
-            <summary>
-            Заполняет указанный Region найденными наиболее подходящими картами в соответствии с расположением областей в указанном регионе.
-            </summary>
-            <param name="region">Регион для заполнения.</param>
-            <returns>Возвращает OK в случае отсутствия конфликтов. Если результат не равен OK, то состояние region не изменяется.</returns>
         </member>
         <member name="T:DynamicParser.TagSearcher">
             <summary>

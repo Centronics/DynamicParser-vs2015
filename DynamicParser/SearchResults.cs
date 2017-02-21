@@ -22,48 +22,32 @@ namespace DynamicParser
         /// Карты.
         /// </summary>
         public Processor[] Procs;
-    }
 
-    /// <summary>
-    /// Содержит карты, отобранные по проценту соответствия в указанной области.
-    /// </summary>
-    public struct Reg
-    {
         /// <summary>
         /// Точка.
         /// </summary>
         public Point Position;
+    }
 
-        /// <summary>
-        /// Карты, отобранные по проценту соответствия.
-        /// </summary>
-        public Processor[] Procs;
-
+    /// <summary>
+    /// Содержит информацию о выбранной карте.
+    /// </summary>
+    public struct Reg
+    {
         /// <summary>
         /// Процент соответствия.
         /// </summary>
         public double Percent;
-    }
-
-    /// <summary>
-    /// Предоставляет информацию о состоянии карты в конкретной точке.
-    /// </summary>
-    public struct ProcPoint
-    {
-        /// <summary>
-        /// Координаты карты.
-        /// </summary>
-        public Point Position;
 
         /// <summary>
         /// Карта.
         /// </summary>
-        public Processor CurrentProcessor;
+        public Processor SelectedProcessor;
 
         /// <summary>
-        /// Процент соответствия.
+        /// Координаты карты.
         /// </summary>
-        public double Percent;
+        public Point Position;
     }
 
     /// <summary>
@@ -286,10 +270,10 @@ namespace DynamicParser
             if (mod != 0)
                 throw new ArgumentException($@"{nameof(FindRelation)}: Количество символов для выборки должно быть кратно длине искомого слова: слово: {
                     word}, длина: {word.Length}, количество символов для выборки: {count}, остаток от деления: {mod}.", nameof(count));
-            List<ProcPoint> lst = new List<ProcPoint>();
+            List<Reg> lst = new List<Reg>();
             foreach (string str in GetWord(word, count))
             {
-                List<ProcPoint> lstReg = FindSymbols(str, startIndex);
+                List<Reg> lstReg = FindSymbols(str, startIndex);
                 if (lstReg != null && lstReg.Count > 0)
                     lst.AddRange(lstReg);
             }
@@ -316,7 +300,7 @@ namespace DynamicParser
         /// <param name="word">Искомое слово.</param>
         /// <param name="selectCount">Количество символов, которое необходимо выбрать из названия карты для поиска требуемого слова.</param>
         /// <returns>Возвращает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
-        bool FindWord(IList<ProcPoint> regs, int startIndex, string word, int selectCount)
+        bool FindWord(IList<Reg> regs, int startIndex, string word, int selectCount)
         {
             if (regs == null)
                 throw new ArgumentNullException(nameof(regs), $"{nameof(FindWord)}: Список обрабатываемых карт равен null.");
@@ -332,16 +316,16 @@ namespace DynamicParser
             if (regs.Count <= 0)
                 return false;
             int[] counting = new int[sCount];
-            ProcPoint[] regsCounting = new ProcPoint[sCount];
+            Reg[] regsCounting = new Reg[sCount];
             Region region = new Region(Width, Height);
             for (int counter = sCount - 1; counter >= 0;)
             {
                 bool result = true;
                 for (int k = 0; k < counting.Length; k++)
                     regsCounting[k] = regs[counting[k]];
-                foreach (ProcPoint pp in regsCounting)
+                foreach (Reg pp in regsCounting)
                 {
-                    if (region.Contains(pp.CurrentProcessor.GetProcessorName(startIndex, selectCount), startIndex))
+                    if (region.Contains(pp.SelectedProcessor.GetProcessorName(startIndex, selectCount), startIndex))
                         continue;
                     Rectangle rect = new Rectangle(pp.Position, MapSize);
                     if (region.IsConflict(rect))
@@ -349,15 +333,11 @@ namespace DynamicParser
                         result = false;
                         break;
                     }
-                    region.Add(rect);
-                    region[pp.Position].Register = new List<Reg>
+                    region.Add(rect).Register = new Reg
                     {
-                        new Reg
-                        {
-                            Percent = pp.Percent,
-                            Position = pp.Position,
-                            Procs = new[] { pp.CurrentProcessor }
-                        }
+                        Percent = pp.Percent,
+                        Position = pp.Position,
+                        SelectedProcessor = pp.SelectedProcessor
                     };
                 }
                 if (result)
@@ -386,11 +366,9 @@ namespace DynamicParser
                     $@"{nameof(GetStringFromRegion)}: Количество символов для выборки из названия карты меньше или равно нолю ({count}).");
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetStringFromRegion)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            List<string> lstWords = new List<string>();
-            foreach (Registered registered in region.Elements)
-                foreach (Reg reg in registered.Register)
-                    lstWords.AddRange(reg.Procs.Select(pr => pr.GetProcessorName(startIndex, count)).Where(str => !string.IsNullOrEmpty(str)));
-            return lstWords.Count <= 0 ? null : new WordSearcher(lstWords);
+            string[] lstWords = region.Elements.Select(registered => registered.Register.SelectedProcessor.GetProcessorName(startIndex, count)).
+                Where(procName => !string.IsNullOrEmpty(procName)).ToArray();
+            return lstWords.Length <= 0 ? null : new WordSearcher(lstWords);
         }
 
         /// <summary>
@@ -399,7 +377,7 @@ namespace DynamicParser
         /// <param name="procName">Искомая строка.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
         /// <returns>Возвращает информацию о найденных объектах.</returns>
-        List<ProcPoint> FindSymbols(string procName, int startIndex)
+        List<Reg> FindSymbols(string procName, int startIndex)
         {
             if (procName == null)
                 throw new ArgumentNullException(nameof(procName), $"{nameof(FindSymbols)}: Искомая строка равна null.");
@@ -407,7 +385,7 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(FindSymbols)}: Искомая строка должна состоять хотя бы из одного символа.", nameof(procName));
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindSymbols)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            List<ProcPoint> lstRegs = new List<ProcPoint>();
+            List<Reg> lstRegs = new List<Reg>();
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)
                 {
@@ -418,9 +396,9 @@ namespace DynamicParser
                     Point point = new Point(x, y);
                     lstRegs.AddRange(from pr in processors
                                      where pr != null
-                                     select new ProcPoint
+                                     select new Reg
                                      {
-                                         CurrentProcessor = pr,
+                                         SelectedProcessor = pr,
                                          Position = point,
                                          Percent = percent
                                      });
@@ -472,7 +450,7 @@ namespace DynamicParser
         /// </summary>
         /// <param name="rect">Указанная область.</param>
         /// <returns>Возвращает список наиболее подходящих карт в указанной области.</returns>
-        List<Reg> Find(Rectangle rect)
+        public List<ProcPerc> Find(Rectangle rect)
         {
             if (rect.Width > Width)
                 throw new ArgumentException($"{nameof(Find)}: Указанная область шире, чем текущая.", nameof(rect.Width));
@@ -491,13 +469,13 @@ namespace DynamicParser
                 }
             if (max <= 0)
                 return null;
-            exit: List<Reg> procs = new List<Reg>();
+            exit: List<ProcPerc> procs = new List<ProcPerc>();
             for (int y = rect.Y; y < rect.Bottom; y++)
                 for (int x = rect.X; x < rect.Right; x++)
                 {
                     ProcPerc pp = _coords[x, y];
                     if (Math.Abs(pp.Percent - max) <= DiffEqual)
-                        procs.Add(new Reg { Position = new Point(x, y), Procs = pp.Procs, Percent = pp.Percent });
+                        procs.Add(pp);
                 }
             return procs;
         }
@@ -514,21 +492,6 @@ namespace DynamicParser
             if (region.Width > Width)
                 return RegionStatus.WidthBig;
             return region.Height > Height ? RegionStatus.HeightBig : RegionStatus.Ok;
-        }
-
-        /// <summary>
-        /// Заполняет указанный Region найденными наиболее подходящими картами в соответствии с расположением областей в указанном регионе.
-        /// </summary>
-        /// <param name="region">Регион для заполнения.</param>
-        /// <returns>Возвращает OK в случае отсутствия конфликтов. Если результат не равен OK, то состояние region не изменяется.</returns>
-        public RegionStatus FindRegion(Region region)
-        {
-            RegionStatus rs = RegionCorrect(region);
-            if (rs != RegionStatus.Ok)
-                return rs;
-            foreach (Registered reg in region.Elements)
-                reg.Register = Find(reg.Region);
-            return RegionStatus.Ok;
         }
     }
 }

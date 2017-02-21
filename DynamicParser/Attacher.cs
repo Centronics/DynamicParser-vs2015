@@ -39,7 +39,7 @@ namespace DynamicParser
         /// <summary>
         /// Получает список карт из списка сопоставленных карт.
         /// </summary>
-        public IEnumerable<Processor> Processors => from rg in Regs from proc in rg.Procs select proc;
+        public IEnumerable<Processor> Processors => from rg in Regs select rg.SelectedProcessor;
 
         /// <summary>
         /// Получает уникальные по полю Tag карты.
@@ -194,7 +194,12 @@ namespace DynamicParser
             if (IsConflict(region))
                 throw new ArgumentException($"{nameof(SetMask)}: Найдено две или более точек, указывающих на один и тот же регион.", nameof(region));
             foreach (Attach att in Attaches)
-                att.Regs = region[att.Point]?.Register;
+            {
+                Reg? rg = region[att.Point]?.Register;
+                if (rg == null)
+                    continue;
+                att.Regs.Add(rg.Value);
+            }
         }
 
         /// <summary>

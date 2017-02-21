@@ -739,25 +739,25 @@ namespace DynamicParserTest
             foreach (Attach att in attacher.Attaches)
                 Assert.AreEqual(true, att.Regs.Count(r => r.Position == new Point(0, 0)) == 1 || att.Regs.Count(r => r.Position == new Point(3, 3)) == 1);
             foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(0, 0)).Count(r => r.Procs == null));
+                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(0, 0)).Count(r => r.SelectedProcessor == null));
             foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.Procs == null));
+                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.SelectedProcessor == null));
             foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(0, 0)).Count(r => r.Procs.Length != 1));
+                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(0, 0)).Count(r => r.SelectedProcessor.Length != 1));
             foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.Procs.Length != 1));
+                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.SelectedProcessor.Length != 1));
             foreach (Attach att in attacher.Attaches)
             {
                 List<Reg> r00 = new List<Reg>(att.Regs.Where(r => r.Position == new Point(0, 0) || r.Position == new Point(1, 0) ||
                     r.Position == new Point(0, 1) || r.Position == new Point(1, 1)));
                 if (!r00.Any()) continue;
-                Assert.AreEqual(r00.Count, r00.Count(r => r.Procs[0].Tag == "1"));
+                Assert.AreEqual(r00.Count, r00.Count(r => r.SelectedProcessor[0].Tag == "1"));
             }
             foreach (Attach att in attacher.Attaches)
             {
                 List<Reg> r33 = new List<Reg>(att.Regs.Where(r => r.Position == new Point(3, 3)));
                 if (!r33.Any()) continue;
-                Assert.AreEqual(r33.Count, r33.Count(r => r.Procs[0].Tag == "2"));
+                Assert.AreEqual(r33.Count, r33.Count(r => r.SelectedProcessor[0].Tag == "2"));
             }
         }
 

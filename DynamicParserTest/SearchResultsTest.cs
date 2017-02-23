@@ -976,56 +976,57 @@ namespace DynamicParserTest
             Assert.AreEqual(22.4, sr[3, 4].Percent);
             Assert.AreEqual(23.4, sr[4, 4].Percent);
 
+            Rectangle rect1 = new Rectangle(0, 0, 2, 2),
+                rect2 = new Rectangle(2, 2, 1, 1),
+                rect3 = new Rectangle(3, 0, 1, 1),
+                rect4 = new Rectangle(0, 3, 1, 1);
+
             Region region = new Region(4, 4);
-            region.Add(0, 0, 2, 2);
-            region.Add(2, 2, 1, 1);
-            region.Add(3, 0, 1, 1);
-            region.Add(0, 3, 1, 1);
 
-            /*Assert.AreEqual(RegionStatus.Ok, sr.RegionCorrect(region));
-            Assert.AreEqual(RegionStatus.Ok, sr.Find(region));
+            Assert.AreEqual(RegionStatus.Ok, sr.RegionCorrect(region));
 
-            Assert.AreEqual(false, region[0, 0].IsEmpty);
-            foreach (Reg reg in region[0, 0].Register)
-                Assert.AreEqual(true, reg.Percent == 1.48 || reg.Percent == 1.4709);
-            Assert.AreEqual(2, region[0, 0].Register.Count);
+            List<ProcPerc> lst1 = sr.Find(rect1);
+            List<ProcPerc> lst2 = sr.Find(rect2);
+            List<ProcPerc> lst3 = sr.Find(rect3);
+            List<ProcPerc> lst4 = sr.Find(rect4);
+
+            Assert.AreEqual(2, lst1.Count);
+            Assert.AreEqual(1, lst2.Count);
+            Assert.AreEqual(1, lst3.Count);
+            Assert.AreEqual(1, lst4.Count);
+
+            Assert.AreEqual(true, lst1[0].Percent == 1.48 || lst1[0].Percent == 1.4709);
+            Assert.AreEqual(true, lst1[1].Percent == 1.48 || lst1[1].Percent == 1.4709);
+
+            region.Add(rect1, null, lst1[0].Percent);
+            region.Add(rect2, null, lst2[0].Percent);
+            region.Add(rect3, null, lst3[0].Percent);
+            region.Add(rect4, null, lst4[0].Percent);
+
+            Assert.AreEqual(true, region[0, 0].IsEmpty);
+            Assert.AreEqual(true, region[0, 0].Register.Percent == 1.48 || region[0, 0].Register.Percent == 1.4709);
             Assert.AreEqual(new Rectangle(0, 0, 2, 2), region[0, 0].Region);
-            Assert.AreEqual(false, region[0, 1].IsEmpty);
-            foreach (Reg reg in region[0, 1].Register)
-                Assert.AreEqual(true, reg.Percent == 1.48 || reg.Percent == 1.4709);
-            Assert.AreEqual(2, region[0, 1].Register.Count);
+            Assert.AreEqual(true, region[0, 1].IsEmpty);
+            Assert.AreEqual(true, region[0, 1].Register.Percent == 1.48 || region[0, 1].Register.Percent == 1.4709);
             Assert.AreEqual(new Rectangle(0, 0, 2, 2), region[0, 1].Region);
-            Assert.AreEqual(false, region[0, 3].IsEmpty);
-            foreach (Reg reg in region[0, 3].Register)
-                Assert.AreEqual(15.4, reg.Percent);
+            Assert.AreEqual(true, region[0, 3].IsEmpty);
+            Assert.AreEqual(15.4, region[0, 3].Register.Percent);
             Assert.AreEqual(new Rectangle(0, 3, 1, 1), region[0, 3].Region);
-            Assert.AreEqual(false, region[0, 3].IsEmpty);
-            foreach (Reg reg in region[0, 3].Register)
-                Assert.AreEqual(15.4, reg.Percent);
-            Assert.AreEqual(new Rectangle(0, 3, 1, 1), region[0, 3].Region);
-            Assert.AreEqual(false, region[1, 0].IsEmpty);
-            Assert.AreEqual(2, region[1, 0].Register.Count);
-            foreach (Reg reg in region[1, 0].Register)
-                Assert.AreEqual(true, reg.Percent == 1.48 || reg.Percent == 1.4709);
+            Assert.AreEqual(true, region[1, 0].IsEmpty);
+            Assert.AreEqual(true, region[1, 0].Register.Percent == 1.48 || region[1, 0].Register.Percent == 1.4709);
             Assert.AreEqual(new Rectangle(0, 0, 2, 2), region[1, 0].Region);
-            Assert.AreEqual(false, region[1, 1].IsEmpty);
-            Assert.AreEqual(2, region[1, 1].Register.Count);
-            foreach (Reg reg in region[1, 1].Register)
-                Assert.AreEqual(true, reg.Percent == 1.48 || reg.Percent == 1.4709);
+            Assert.AreEqual(true, region[1, 1].IsEmpty);
+            Assert.AreEqual(true, region[1, 1].Register.Percent == 1.48 || region[1, 1].Register.Percent == 1.4709);
             Assert.AreEqual(new Rectangle(0, 0, 2, 2), region[1, 1].Region);
-            foreach (Reg reg in region[2, 2].Register)
-                Assert.AreEqual(12.4, reg.Percent);
-            Assert.AreEqual(false, region[2, 2].IsEmpty);
+            Assert.AreEqual(12.4, region[2, 2].Register.Percent);
+            Assert.AreEqual(true, region[2, 2].IsEmpty);
             Assert.AreEqual(new Rectangle(2, 2, 1, 1), region[2, 2].Region);
-            Assert.AreEqual(1, region[3, 0].Register.Count);
-            foreach (Reg reg in region[3, 0].Register)
-                Assert.AreEqual(3.4, reg.Percent);
-            Assert.AreEqual(false, region[3, 0].IsEmpty);
+            Assert.AreEqual(3.4, region[3, 0].Register.Percent);
+            Assert.AreEqual(true, region[3, 0].IsEmpty);
             Assert.AreEqual(new Rectangle(3, 0, 1, 1), region[3, 0].Region);
-            Assert.AreEqual(false, region[3, 0].IsEmpty);
-            foreach (Reg reg in region[3, 0].Register)
-                Assert.AreEqual(3.4, reg.Percent);
-            Assert.AreEqual(false, region[3, 0].IsEmpty);
+            Assert.AreEqual(true, region[3, 0].IsEmpty);
+            Assert.AreEqual(3.4, region[3, 0].Register.Percent);
+            Assert.AreEqual(true, region[3, 0].IsEmpty);
             Assert.AreEqual(new Rectangle(3, 0, 1, 1), region[3, 0].Region);
             Assert.AreEqual(null, region[0, 2]);
             Assert.AreEqual(null, region[1, 2]);
@@ -1038,17 +1039,11 @@ namespace DynamicParserTest
             Assert.AreEqual(null, region[3, 3]);
 
             Assert.AreEqual(RegionStatus.Ok, sr.RegionCorrect(new Region(4, 4)));
-            Assert.AreEqual(RegionStatus.Ok, sr.FindRegion(new Region(4, 4)));
             Assert.AreEqual(RegionStatus.Null, sr.RegionCorrect(null));
-            Assert.AreEqual(RegionStatus.Null, sr.FindRegion(null));
             Assert.AreEqual(RegionStatus.WidthBig, sr.RegionCorrect(new Region(11, 14)));
-            Assert.AreEqual(RegionStatus.WidthBig, sr.FindRegion(new Region(11, 14)));
             Assert.AreEqual(RegionStatus.HeightBig, sr.RegionCorrect(new Region(9, 16)));
-            Assert.AreEqual(RegionStatus.HeightBig, sr.FindRegion(new Region(9, 16)));
             Assert.AreEqual(RegionStatus.Ok, sr.RegionCorrect(new Region(4, 5)));
-            Assert.AreEqual(RegionStatus.Ok, sr.FindRegion(new Region(4, 5)));
             Assert.AreEqual(RegionStatus.Ok, sr.RegionCorrect(new Region(5, 4)));
-            Assert.AreEqual(RegionStatus.Ok, sr.FindRegion(new Region(5, 4)));*/
         }
 
         [TestMethod]

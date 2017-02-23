@@ -612,8 +612,20 @@ namespace DynamicParserTest
                     attacher.Add(0, 0);
                     attacher.Add(3, 3);
                     Region region = proc.CurrentRegion;
-                    region.Add(rect1);
-                    region.Add(rect2);
+                    Registered registered = region.Add(rect1);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst00[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
+                    registered = region.Add(rect2);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst33[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
                     attacher.SetMask(region);
                 }
 
@@ -631,8 +643,20 @@ namespace DynamicParserTest
                     attacher1.Add(0, 0);
                     attacher1.Add(3, 3);
                     Region region = proc.CurrentRegion;
-                    region.Add(rect1);
-                    region.Add(rect2);
+                    Registered registered = region.Add(rect1);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst00[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
+                    registered = region.Add(rect2);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst33[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
                     attacher1.SetMask(region);
                 }
 
@@ -647,16 +671,40 @@ namespace DynamicParserTest
                     Assert.AreEqual(1, lst00[0].Procs.Length);
                     Assert.AreEqual(1, lst33[0].Procs.Length);
                     Region region = proc.CurrentRegion;
-                    region.Add(rect1);
-                    region.Add(rect2);
+                    Registered registered = region.Add(rect1);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst00[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
+                    registered = region.Add(rect2);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst33[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
                     attacher2 = proc.CurrentAttacher;
                     attacher2.Add(0, 0);
                     attacher2.SetMask(region);
                     attacher21 = proc.CurrentAttacher;
                     attacher21.Add(3, 3);
                     Region region1 = proc.CurrentRegion;
-                    region1.Add(rect1);
-                    region1.Add(rect2);
+                    registered = region1.Add(rect1);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst00[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
+                    registered = region1.Add(rect2);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst33[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
                     attacher21.SetMask(region1);
                 }
 
@@ -673,14 +721,38 @@ namespace DynamicParserTest
                     attacher3 = proc.CurrentAttacher;
                     attacher3.Add(0, 0);
                     Region region = proc.CurrentRegion;
-                    region.Add(rect1);
-                    region.Add(rect2);
+                    Registered registered = region.Add(rect1);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst00[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
+                    registered = region.Add(rect2);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst33[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
                     attacher3.SetMask(region);
                     attacher4 = proc.CurrentAttacher;
                     attacher4.Add(3, 3);
                     Region region1 = proc.CurrentRegion;
-                    region1.Add(rect1);
-                    region1.Add(rect2);
+                    registered = region1.Add(rect1);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst00[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
+                    registered = region1.Add(rect2);
+                    registered.Register = new Reg
+                    {
+                        SelectedProcessor = lst33[0].Procs[0],
+                        Percent = registered.Register.Percent,
+                        Position = registered.Register.Position
+                    };
                     attacher4.SetMask(region1);
                 }
 

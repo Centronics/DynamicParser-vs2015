@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -600,10 +600,21 @@ namespace DynamicParserTest
 
                 Attacher attacher;
                 {
+                    Rectangle rect1 = new Rectangle(0, 0, 2, 2);
+                    Rectangle rect2 = new Rectangle(3, 3, 1, 1);
+                    List<ProcPerc> lst00 = sr1.Find(rect1);
+                    List<ProcPerc> lst33 = sr1.Find(rect2);
+                    Assert.AreEqual(1, lst00.Count);
+                    Assert.AreEqual(1, lst33.Count);
+                    Assert.AreEqual(1, lst00[0].Procs.Length);
+                    Assert.AreEqual(1, lst33[0].Procs.Length);
                     Region region = proc.CurrentRegion;
-                    region.Add(new Rectangle(0, 0, 2, 2));
-                    region.Add(new Rectangle(3, 3, 1, 1));
-                    Assert.AreEqual(RegionStatus.Ok, sr1.FindRegion(region));
+                    Registered registered00 = region.Add(rect1);
+                    Assert.AreNotEqual(null, registered00.Register.SelectedProcessor.Tag);
+                    Assert.AreEqual("1", registered00.Register.SelectedProcessor.Tag);
+                    Registered registered33 = region.Add(rect2);
+                    Assert.AreNotEqual(null, registered33.Register.SelectedProcessor.Tag);
+                    Assert.AreEqual("2", registered33.Register.SelectedProcessor.Tag);
                     attacher = proc.CurrentAttacher;
                     attacher.Add(0, 0);
                     attacher.Add(3, 3);
@@ -612,10 +623,21 @@ namespace DynamicParserTest
 
                 Attacher attacher1;
                 {
+                    Rectangle rect1 = new Rectangle(0, 0, 2, 2);
+                    Rectangle rect2 = new Rectangle(3, 3, 1, 1);
+                    List<ProcPerc> lst00 = sr2.Find(rect1);
+                    List<ProcPerc> lst33 = sr2.Find(rect2);
+                    Assert.AreEqual(1, lst00.Count);
+                    Assert.AreEqual(1, lst33.Count);
+                    Assert.AreEqual(1, lst00[0].Procs.Length);
+                    Assert.AreEqual(1, lst33[0].Procs.Length);
                     Region region = proc.CurrentRegion;
-                    region.Add(new Rectangle(0, 0, 2, 2));
-                    region.Add(new Rectangle(3, 3, 1, 1));
-                    Assert.AreEqual(RegionStatus.Ok, sr2.FindRegion(region));
+                    Registered registered00 = region.Add(rect1);
+                    Assert.AreNotEqual(null, registered00.Register.SelectedProcessor.Tag);
+                    Assert.AreEqual("1", registered00.Register.SelectedProcessor.Tag);
+                    Registered registered33 = region.Add(rect2);
+                    Assert.AreNotEqual(null, registered33.Register.SelectedProcessor.Tag);
+                    Assert.AreEqual("2", registered33.Register.SelectedProcessor.Tag);
                     attacher1 = proc.CurrentAttacher;
                     attacher1.Add(0, 0);
                     attacher1.Add(3, 3);
@@ -630,8 +652,8 @@ namespace DynamicParserTest
                     Region region1 = proc.CurrentRegion;
                     region1.Add(new Rectangle(0, 0, 2, 2));
                     region1.Add(new Rectangle(3, 3, 1, 1));
-                    Assert.AreEqual(RegionStatus.Ok, srp3[0].FindRegion(region));
-                    Assert.AreEqual(RegionStatus.Ok, srp3[1].FindRegion(region1));
+                    Assert.AreEqual(RegionStatus.Ok, srp3[0].Find(region));
+                    Assert.AreEqual(RegionStatus.Ok, srp3[1].Find(region1));
                     attacher2 = proc.CurrentAttacher;
                     attacher2.Add(0, 0);
                     attacher2.SetMask(region);
@@ -648,8 +670,8 @@ namespace DynamicParserTest
                     Region region1 = proc.CurrentRegion;
                     region1.Add(new Rectangle(0, 0, 2, 2));
                     region1.Add(new Rectangle(3, 3, 1, 1));
-                    Assert.AreEqual(RegionStatus.Ok, srp4[0].FindRegion(region));
-                    Assert.AreEqual(RegionStatus.Ok, srp4[1].FindRegion(region1));
+                    Assert.AreEqual(RegionStatus.Ok, srp4[0].Find(region));
+                    Assert.AreEqual(RegionStatus.Ok, srp4[1].Find(region1));
                     attacher3 = proc.CurrentAttacher;
                     attacher3.Add(0, 0);
                     attacher3.SetMask(region);
@@ -751,13 +773,13 @@ namespace DynamicParserTest
                 List<Reg> r00 = new List<Reg>(att.Regs.Where(r => r.Position == new Point(0, 0) || r.Position == new Point(1, 0) ||
                     r.Position == new Point(0, 1) || r.Position == new Point(1, 1)));
                 if (!r00.Any()) continue;
-                Assert.AreEqual(r00.Count, r00.Count(r => r.SelectedProcessor[0].Tag == "1"));
+                Assert.AreEqual(r00.Count, r00.Count(r => r.SelectedProcessor.Tag == "1"));
             }
             foreach (Attach att in attacher.Attaches)
             {
                 List<Reg> r33 = new List<Reg>(att.Regs.Where(r => r.Position == new Point(3, 3)));
                 if (!r33.Any()) continue;
-                Assert.AreEqual(r33.Count, r33.Count(r => r.SelectedProcessor[0].Tag == "2"));
+                Assert.AreEqual(r33.Count, r33.Count(r => r.SelectedProcessor.Tag == "2"));
             }
         }
 

@@ -34,10 +34,10 @@ namespace DynamicParserTest
             {
                 Regs = new List<Reg>
                 {
-                    new Reg {SelectedProcessor = new[] {pr1}},
-                    new Reg {SelectedProcessor = new[] {pr2}},
-                    new Reg {SelectedProcessor = new[] {pr3}},
-                    new Reg {SelectedProcessor = new[] {pr4}}
+                    new Reg {SelectedProcessor = pr1},
+                    new Reg {SelectedProcessor = pr2},
+                    new Reg {SelectedProcessor = pr3},
+                    new Reg {SelectedProcessor = pr4}
                 }
             };
 

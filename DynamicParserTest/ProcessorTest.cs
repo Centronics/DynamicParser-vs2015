@@ -608,16 +608,12 @@ namespace DynamicParserTest
                     Assert.AreEqual(1, lst33.Count);
                     Assert.AreEqual(1, lst00[0].Procs.Length);
                     Assert.AreEqual(1, lst33[0].Procs.Length);
-                    Region region = proc.CurrentRegion;
-                    Registered registered00 = region.Add(rect1);
-                    Assert.AreNotEqual(null, registered00.Register.SelectedProcessor.Tag);
-                    Assert.AreEqual("1", registered00.Register.SelectedProcessor.Tag);
-                    Registered registered33 = region.Add(rect2);
-                    Assert.AreNotEqual(null, registered33.Register.SelectedProcessor.Tag);
-                    Assert.AreEqual("2", registered33.Register.SelectedProcessor.Tag);
                     attacher = proc.CurrentAttacher;
                     attacher.Add(0, 0);
                     attacher.Add(3, 3);
+                    Region region = proc.CurrentRegion;
+                    region.Add(rect1);
+                    region.Add(rect2);
                     attacher.SetMask(region);
                 }
 
@@ -631,52 +627,60 @@ namespace DynamicParserTest
                     Assert.AreEqual(1, lst33.Count);
                     Assert.AreEqual(1, lst00[0].Procs.Length);
                     Assert.AreEqual(1, lst33[0].Procs.Length);
-                    Region region = proc.CurrentRegion;
-                    Registered registered00 = region.Add(rect1);
-                    Assert.AreNotEqual(null, registered00.Register.SelectedProcessor.Tag);
-                    Assert.AreEqual("1", registered00.Register.SelectedProcessor.Tag);
-                    Registered registered33 = region.Add(rect2);
-                    Assert.AreNotEqual(null, registered33.Register.SelectedProcessor.Tag);
-                    Assert.AreEqual("2", registered33.Register.SelectedProcessor.Tag);
                     attacher1 = proc.CurrentAttacher;
                     attacher1.Add(0, 0);
                     attacher1.Add(3, 3);
+                    Region region = proc.CurrentRegion;
+                    region.Add(rect1);
+                    region.Add(rect2);
                     attacher1.SetMask(region);
                 }
 
                 Attacher attacher2, attacher21;
                 {
+                    Rectangle rect1 = new Rectangle(0, 0, 2, 2);
+                    Rectangle rect2 = new Rectangle(3, 3, 1, 1);
+                    List<ProcPerc> lst00 = srp3[0].Find(rect1);
+                    List<ProcPerc> lst33 = srp3[1].Find(rect2);
+                    Assert.AreEqual(1, lst00.Count);
+                    Assert.AreEqual(1, lst33.Count);
+                    Assert.AreEqual(1, lst00[0].Procs.Length);
+                    Assert.AreEqual(1, lst33[0].Procs.Length);
                     Region region = proc.CurrentRegion;
-                    region.Add(new Rectangle(0, 0, 2, 2));
-                    region.Add(new Rectangle(3, 3, 1, 1));
-                    Region region1 = proc.CurrentRegion;
-                    region1.Add(new Rectangle(0, 0, 2, 2));
-                    region1.Add(new Rectangle(3, 3, 1, 1));
-                    Assert.AreEqual(RegionStatus.Ok, srp3[0].Find(region));
-                    Assert.AreEqual(RegionStatus.Ok, srp3[1].Find(region1));
+                    region.Add(rect1);
+                    region.Add(rect2);
                     attacher2 = proc.CurrentAttacher;
                     attacher2.Add(0, 0);
                     attacher2.SetMask(region);
                     attacher21 = proc.CurrentAttacher;
                     attacher21.Add(3, 3);
+                    Region region1 = proc.CurrentRegion;
+                    region1.Add(rect1);
+                    region1.Add(rect2);
                     attacher21.SetMask(region1);
                 }
 
                 Attacher attacher3, attacher4;
                 {
-                    Region region = proc.CurrentRegion;
-                    region.Add(new Rectangle(0, 0, 2, 2));
-                    region.Add(new Rectangle(3, 3, 1, 1));
-                    Region region1 = proc.CurrentRegion;
-                    region1.Add(new Rectangle(0, 0, 2, 2));
-                    region1.Add(new Rectangle(3, 3, 1, 1));
-                    Assert.AreEqual(RegionStatus.Ok, srp4[0].Find(region));
-                    Assert.AreEqual(RegionStatus.Ok, srp4[1].Find(region1));
+                    Rectangle rect1 = new Rectangle(0, 0, 2, 2);
+                    Rectangle rect2 = new Rectangle(3, 3, 1, 1);
+                    List<ProcPerc> lst00 = srp4[0].Find(rect1);
+                    List<ProcPerc> lst33 = srp4[1].Find(rect2);
+                    Assert.AreEqual(1, lst00.Count);
+                    Assert.AreEqual(1, lst33.Count);
+                    Assert.AreEqual(1, lst00[0].Procs.Length);
+                    Assert.AreEqual(1, lst33[0].Procs.Length);
                     attacher3 = proc.CurrentAttacher;
                     attacher3.Add(0, 0);
+                    Region region = proc.CurrentRegion;
+                    region.Add(rect1);
+                    region.Add(rect2);
                     attacher3.SetMask(region);
                     attacher4 = proc.CurrentAttacher;
                     attacher4.Add(3, 3);
+                    Region region1 = proc.CurrentRegion;
+                    region1.Add(rect1);
+                    region1.Add(rect2);
                     attacher4.SetMask(region1);
                 }
 

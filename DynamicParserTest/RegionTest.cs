@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -194,8 +193,8 @@ namespace DynamicParserTest
             Region region = new Region(2, 2);
             region.Add(0, 0, 1, 1);
             region.Add(1, 1, 1, 1);
-            region[0, 0].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
-            region[1, 1].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            region[0, 0].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MaxValue }, "0, 0") };
+            region[1, 1].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MinValue }, "1, 1") };
             Assert.AreEqual(true, region.Contains("1, 1", 0));
             Assert.AreEqual(true, region.Contains("0, 0", 0));
             Assert.AreEqual(true, region.Contains(", 1", 1));
@@ -463,8 +462,8 @@ namespace DynamicParserTest
             Region region = new Region(2, 2);
             region.Add(0, 0, 1, 1);
             region.Add(1, 1, 1, 1);
-            region[0, 0].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
-            region[1, 1].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            region[0, 0].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MaxValue }, "0, 0") };
+            region[1, 1].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MinValue }, "1, 1") };
             Assert.AreEqual(true, region.Contains("1, 1", -1));
         }
 
@@ -475,8 +474,8 @@ namespace DynamicParserTest
             Region region = new Region(2, 2);
             region.Add(0, 0, 1, 1);
             region.Add(1, 1, 1, 1);
-            region[0, 0].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
-            region[1, 1].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            region[0, 0].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MaxValue }, "0, 0") };
+            region[1, 1].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MinValue }, "1, 1") };
             Assert.AreEqual(true, region.Contains("0, 0", -1));
         }
 
@@ -487,8 +486,8 @@ namespace DynamicParserTest
             Region region = new Region(2, 2);
             region.Add(0, 0, 1, 1);
             region.Add(1, 1, 1, 1);
-            region[0, 0].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
-            region[1, 1].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            region[0, 0].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MaxValue }, "0, 0") };
+            region[1, 1].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MinValue }, "1, 1") };
             Assert.AreEqual(true, region.Contains("1, 1", int.MinValue));
         }
 
@@ -499,8 +498,8 @@ namespace DynamicParserTest
             Region region = new Region(2, 2);
             region.Add(0, 0, 1, 1);
             region.Add(1, 1, 1, 1);
-            region[0, 0].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
-            region[1, 1].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            region[0, 0].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MaxValue }, "0, 0") };
+            region[1, 1].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MinValue }, "1, 1") };
             Assert.AreEqual(true, region.Contains("0, 0", int.MinValue));
         }
 
@@ -511,8 +510,8 @@ namespace DynamicParserTest
             Region region = new Region(2, 2);
             region.Add(0, 0, 1, 1);
             region.Add(1, 1, 1, 1);
-            region[0, 0].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
-            region[1, 1].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            region[0, 0].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MaxValue }, "0, 0") };
+            region[1, 1].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MinValue }, "1, 1") };
             Assert.AreEqual(true, region.Contains("", 0));
         }
 
@@ -523,8 +522,8 @@ namespace DynamicParserTest
             Region region = new Region(2, 2);
             region.Add(0, 0, 1, 1);
             region.Add(1, 1, 1, 1);
-            region[0, 0].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MaxValue }, "0, 0") } } };
-            region[1, 1].Register = new List<Reg> { new Reg { SelectedProcessor = new[] { new Processor(new[] { SignValue.MinValue }, "1, 1") } } };
+            region[0, 0].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MaxValue }, "0, 0") };
+            region[1, 1].Register = new Reg { SelectedProcessor = new Processor(new[] { SignValue.MinValue }, "1, 1") };
             Assert.AreEqual(true, region.Contains(null, 0));
         }
 

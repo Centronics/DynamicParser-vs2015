@@ -559,13 +559,15 @@
             <param name="index">Индекс, с которого необходимо начать выбор подстроки названия указанной карты.</param>
             <returns>Возвращает значение true в случае, если указанная карта присутствует в текущем регионе, в противном случае - false.</returns>
         </member>
-        <member name="M:DynamicParser.Region.Add(System.Drawing.Rectangle)">
+        <member name="M:DynamicParser.Region.Add(System.Drawing.Rectangle,DynamicParser.Processor,System.Double)">
             <summary>
             Вставляет указанную область в коллекцию.
             </summary>
             <param name="rect">Вставляемая область.</param>
+            <param name="processor">Добавляемая карта.</param>
+            <param name="percent">Добавляемый процент соответствия карты.</param>
         </member>
-        <member name="M:DynamicParser.Region.Add(System.Int32,System.Int32,System.Int32,System.Int32)">
+        <member name="M:DynamicParser.Region.Add(System.Int32,System.Int32,System.Int32,System.Int32,DynamicParser.Processor,System.Double)">
             <summary>
             Вставляет указанную область в коллекцию.
             </summary>
@@ -573,6 +575,8 @@
             <param name="y">Координата Y.</param>
             <param name="width">Ширина.</param>
             <param name="height">Высота.</param>
+            <param name="processor">Добавляемая карта.</param>
+            <param name="percent">Добавляемый процент соответствия карты.</param>
         </member>
         <member name="M:DynamicParser.Region.Remove(System.Int32,System.Int32)">
             <summary>

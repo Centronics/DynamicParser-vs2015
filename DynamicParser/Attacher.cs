@@ -198,6 +198,8 @@ namespace DynamicParser
                 Reg? rg = region[att.Point]?.Register;
                 if (rg == null)
                     continue;
+                if (att.Regs == null)
+                    att.Regs = new List<Reg>();
                 att.Regs.Add(rg.Value);
             }
         }

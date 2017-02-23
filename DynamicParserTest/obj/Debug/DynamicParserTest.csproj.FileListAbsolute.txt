@@ -8,3 +8,4 @@ D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\DynamicProcess
 D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\DynamicParser.pdb
 D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\DynamicProcessor.xml
 D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+D:\разработки\DynamicParser\DynamicParserTest\bin\Debug\DynamicParser.xml

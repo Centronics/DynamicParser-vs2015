@@ -333,12 +333,7 @@ namespace DynamicParser
                         result = false;
                         break;
                     }
-                    region.Add(rect).Register = new Reg
-                    {
-                        Percent = pp.Percent,
-                        Position = pp.Position,
-                        SelectedProcessor = pp.SelectedProcessor
-                    };
+                    region.Add(rect, pp.SelectedProcessor, pp.Percent);
                 }
                 if (result)
                     if (GetStringFromRegion(region, startIndex, selectCount)?.IsEqual(word) ?? false)

@@ -612,20 +612,8 @@ namespace DynamicParserTest
                     attacher.Add(0, 0);
                     attacher.Add(3, 3);
                     Region region = proc.CurrentRegion;
-                    Registered registered = region.Add(rect1);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst00[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
-                    registered = region.Add(rect2);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst33[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
+                    region.Add(rect1, lst00[0].Procs[0]);
+                    region.Add(rect2, lst33[0].Procs[0]);
                     attacher.SetMask(region);
                 }
 
@@ -643,20 +631,8 @@ namespace DynamicParserTest
                     attacher1.Add(0, 0);
                     attacher1.Add(3, 3);
                     Region region = proc.CurrentRegion;
-                    Registered registered = region.Add(rect1);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst00[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
-                    registered = region.Add(rect2);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst33[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
+                    region.Add(rect1, lst00[0].Procs[0]);
+                    region.Add(rect2, lst33[0].Procs[0]);
                     attacher1.SetMask(region);
                 }
 
@@ -666,45 +642,24 @@ namespace DynamicParserTest
                     Rectangle rect2 = new Rectangle(3, 3, 1, 1);
                     List<ProcPerc> lst00 = srp3[0].Find(rect1);
                     List<ProcPerc> lst33 = srp3[1].Find(rect2);
-                    Assert.AreEqual(1, lst00.Count);
+                    Assert.AreEqual(4, lst00.Count);
                     Assert.AreEqual(1, lst33.Count);
                     Assert.AreEqual(1, lst00[0].Procs.Length);
+                    Assert.AreEqual(1, lst00[1].Procs.Length);
+                    Assert.AreEqual(1, lst00[2].Procs.Length);
+                    Assert.AreEqual(1, lst00[3].Procs.Length);
                     Assert.AreEqual(1, lst33[0].Procs.Length);
                     Region region = proc.CurrentRegion;
-                    Registered registered = region.Add(rect1);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst00[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
-                    registered = region.Add(rect2);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst33[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
+                    region.Add(rect1, lst00[0].Procs[0]);
+                    region.Add(rect2, lst33[0].Procs[0]);
                     attacher2 = proc.CurrentAttacher;
                     attacher2.Add(0, 0);
                     attacher2.SetMask(region);
                     attacher21 = proc.CurrentAttacher;
                     attacher21.Add(3, 3);
                     Region region1 = proc.CurrentRegion;
-                    registered = region1.Add(rect1);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst00[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
-                    registered = region1.Add(rect2);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst33[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
+                    region1.Add(rect1, lst00[0].Procs[0]);
+                    region1.Add(rect2, lst33[0].Procs[0]);
                     attacher21.SetMask(region1);
                 }
 
@@ -714,45 +669,21 @@ namespace DynamicParserTest
                     Rectangle rect2 = new Rectangle(3, 3, 1, 1);
                     List<ProcPerc> lst00 = srp4[0].Find(rect1);
                     List<ProcPerc> lst33 = srp4[1].Find(rect2);
-                    Assert.AreEqual(1, lst00.Count);
+                    Assert.AreEqual(4, lst00.Count);
                     Assert.AreEqual(1, lst33.Count);
                     Assert.AreEqual(1, lst00[0].Procs.Length);
                     Assert.AreEqual(1, lst33[0].Procs.Length);
                     attacher3 = proc.CurrentAttacher;
                     attacher3.Add(0, 0);
                     Region region = proc.CurrentRegion;
-                    Registered registered = region.Add(rect1);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst00[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
-                    registered = region.Add(rect2);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst33[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
+                    region.Add(rect1, lst00[0].Procs[0]);
+                    region.Add(rect2, lst33[0].Procs[0]);
                     attacher3.SetMask(region);
                     attacher4 = proc.CurrentAttacher;
                     attacher4.Add(3, 3);
                     Region region1 = proc.CurrentRegion;
-                    registered = region1.Add(rect1);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst00[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
-                    registered = region1.Add(rect2);
-                    registered.Register = new Reg
-                    {
-                        SelectedProcessor = lst33[0].Procs[0],
-                        Percent = registered.Register.Percent,
-                        Position = registered.Register.Position
-                    };
+                    region1.Add(rect1, lst00[0].Procs[0]);
+                    region1.Add(rect2, lst33[0].Procs[0]);
                     attacher4.SetMask(region1);
                 }
 
@@ -841,9 +772,9 @@ namespace DynamicParserTest
             foreach (Attach att in attacher.Attaches)
                 Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.SelectedProcessor == null));
             foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(0, 0)).Count(r => r.SelectedProcessor.Length != 1));
+                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(0, 0)).Count(r => r.SelectedProcessor.Length != 4));
             foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.SelectedProcessor.Length != 1));
+                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.SelectedProcessor.Length != 4));
             foreach (Attach att in attacher.Attaches)
             {
                 List<Reg> r00 = new List<Reg>(att.Regs.Where(r => r.Position == new Point(0, 0) || r.Position == new Point(1, 0) ||

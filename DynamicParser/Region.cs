@@ -189,7 +189,9 @@ namespace DynamicParser
         /// Вставляет указанную область в коллекцию.
         /// </summary>
         /// <param name="rect">Вставляемая область.</param>
-        public Registered Add(Rectangle rect)
+        /// <param name="processor">Добавляемая карта.</param>
+        /// <param name="percent">Добавляемый процент соответствия карты.</param>
+        public Registered Add(Rectangle rect, Processor processor = null, double percent = 0.0)
         {
             if (rect.Right > Width)
                 throw new ArgumentException($@"{nameof(Add)}: Попытка вставить элемент, конфликтующий с шириной региона (Width = {Width
@@ -199,7 +201,16 @@ namespace DynamicParser
                     }, {nameof(rect.Bottom)} = {rect.Bottom}).", nameof(rect));
             if (IsConflict(rect))
                 throw new ArgumentException($"{nameof(Add)}: Попытка вставить элемент, конфликтующий с существующими.", nameof(rect));
-            Registered registered = new Registered { Region = rect };
+            Registered registered = new Registered
+            {
+                Region = rect,
+                Register = new Reg
+                {
+                    Position = rect.Location,
+                    Percent = percent,
+                    SelectedProcessor = processor
+                }
+            };
             _rects[GetIndex(rect.X, rect.Y)] = registered;
             return registered;
         }
@@ -211,9 +222,11 @@ namespace DynamicParser
         /// <param name="y">Координата Y.</param>
         /// <param name="width">Ширина.</param>
         /// <param name="height">Высота.</param>
-        public void Add(int x, int y, int width, int height)
+        /// <param name="processor">Добавляемая карта.</param>
+        /// <param name="percent">Добавляемый процент соответствия карты.</param>
+        public void Add(int x, int y, int width, int height, Processor processor = null, double percent = 0.0)
         {
-            Add(new Rectangle(x, y, width, height));
+            Add(new Rectangle(x, y, width, height), processor, percent);
         }
 
         /// <summary>

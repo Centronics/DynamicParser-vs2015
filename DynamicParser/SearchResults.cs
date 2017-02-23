@@ -35,6 +35,17 @@ namespace DynamicParser
     public struct Reg
     {
         /// <summary>
+        /// Инициализирует структуру с заданной позицией.
+        /// </summary>
+        /// <param name="position">Позиция.</param>
+        public Reg(Point position)
+        {
+            Position = position;
+            Percent = 0.0;
+            SelectedProcessor = null;
+        }
+
+        /// <summary>
         /// Процент соответствия.
         /// </summary>
         public double Percent;
@@ -47,7 +58,7 @@ namespace DynamicParser
         /// <summary>
         /// Координаты карты.
         /// </summary>
-        public Point Position;
+        public Point Position { get; }
     }
 
     /// <summary>
@@ -391,10 +402,9 @@ namespace DynamicParser
                     Point point = new Point(x, y);
                     lstRegs.AddRange(from pr in processors
                                      where pr != null
-                                     select new Reg
+                                     select new Reg(point)
                                      {
                                          SelectedProcessor = pr,
-                                         Position = point,
                                          Percent = percent
                                      });
                 }

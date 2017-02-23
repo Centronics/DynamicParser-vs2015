@@ -204,9 +204,8 @@ namespace DynamicParser
             Registered registered = new Registered
             {
                 Region = rect,
-                Register = new Reg
+                Register = new Reg(rect.Location)
                 {
-                    Position = rect.Location,
                     Percent = percent,
                     SelectedProcessor = processor
                 }

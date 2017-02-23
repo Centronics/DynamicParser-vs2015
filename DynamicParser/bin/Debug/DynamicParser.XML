@@ -615,6 +615,12 @@
             Содержит информацию о выбранной карте.
             </summary>
         </member>
+        <member name="M:DynamicParser.Reg.#ctor(System.Drawing.Point)">
+            <summary>
+            Инициализирует структуру с заданной позицией.
+            </summary>
+            <param name="position">Позиция.</param>
+        </member>
         <member name="F:DynamicParser.Reg.Percent">
             <summary>
             Процент соответствия.
@@ -625,7 +631,7 @@
             Карта.
             </summary>
         </member>
-        <member name="F:DynamicParser.Reg.Position">
+        <member name="P:DynamicParser.Reg.Position">
             <summary>
             Координаты карты.
             </summary>

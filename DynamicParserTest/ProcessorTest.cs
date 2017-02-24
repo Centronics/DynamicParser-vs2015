@@ -382,6 +382,22 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorCtorTestEx21()
+        {
+            Processor pr = new Processor(new[] { SignValue.MaxValue }, "Tag");
+            pr.GetEqual(new List<ProcessorContainer>());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ProcessorCtorTestEx22()
+        {
+            Processor pr = new Processor(new[] { SignValue.MaxValue }, "Tag");
+            pr.GetEqual((IList<ProcessorContainer>)null);
+        }
+
+        [TestMethod]
         public void ProcessorTest1()
         {
             Processor proc = new Processor(new Bitmap(15, 10), " f1   ");

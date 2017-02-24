@@ -279,6 +279,109 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorGetEqualTestEx11()
+        {
+            SignValue[,] svs1 = new SignValue[2, 1];
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { new Processor(svs1, "k") });
+            SignValue[,] svs = new SignValue[1, 1];
+            Processor pr = new Processor(svs, "Tag");
+            pr.GetEqual(pc);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorGetEqualTestEx12()
+        {
+            SignValue[,] svs1 = new SignValue[1, 2];
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { new Processor(svs1, "k") });
+            SignValue[,] svs = new SignValue[1, 1];
+            Processor pr = new Processor(svs, "Tag");
+            pr.GetEqual(pc);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ProcessorGetEqualTestEx13()
+        {
+            Processor pr = new Processor(new SignValue[1, 1], "Tag");
+            pr.GetEqual((ProcessorContainer)null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ProcessorCtorTestEx14()
+        {
+            // ReSharper disable once UnusedVariable
+            Processor pr = new Processor(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ProcessorCtorTestEx15()
+        {
+            Processor pr = new Processor(new SignValue[1, 1], "Tag");
+            pr.Serialize(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void ProcessorCtorTestEx16()
+        {
+            MemoryStream s = new MemoryStream(17);
+            for (byte k = 0; k < 17; k++)
+                s.WriteByte(k);
+            s.Position = 16;
+            // ReSharper disable once UnusedVariable
+            Processor pr = new Processor(s);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void ProcessorCtorTestEx17()
+        {
+            MemoryStream s = new MemoryStream(17);
+            for (byte k = 0; k < 17; k++)
+                s.WriteByte(k);
+            s.Position = 12;
+            // ReSharper disable once UnusedVariable
+            Processor pr = new Processor(s);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void ProcessorCtorTestEx18()
+        {
+            MemoryStream s = new MemoryStream(17);
+            for (byte k = 0; k < 17; k++)
+                s.WriteByte(k);
+            s.Position = 8;
+            // ReSharper disable once UnusedVariable
+            Processor pr = new Processor(s);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ProcessorCtorTestEx19()
+        {
+            MemoryStream s = new MemoryStream(17);
+            for (byte k = 0; k < 8; k++)
+                s.WriteByte(k);
+            s.WriteByte(1);
+            s.WriteByte(0);
+            s.WriteByte(0);
+            s.WriteByte(0);
+            s.WriteByte(32);
+            s.WriteByte(0);
+            s.WriteByte(0);
+            s.WriteByte(0);
+            s.WriteByte(0);
+            s.Position = 0;
+            // ReSharper disable once UnusedVariable
+            Processor pr = new Processor(s);
+        }
+
+        [TestMethod]
         public void ProcessorTest1()
         {
             Processor proc = new Processor(new Bitmap(15, 10), " f1   ");

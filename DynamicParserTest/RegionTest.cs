@@ -150,19 +150,6 @@ namespace DynamicParserTest
                 bool bl3 = reg1.X == 3 && reg1.Y == 3 && reg1.Right == 4 && reg1.Bottom == 4;
                 Assert.AreEqual(true, bl1 || bl2 || bl3);
             }
-
-            Attacher attacher = new Attacher(region.Width, region.Height);
-            attacher.Add(0, 0);
-            attacher.Add(2, 2);
-            attacher.Add(3, 3);
-            attacher.SetMask(region);
-            foreach (Attach.Proc proc in attacher.Attaches.Select(att => att.Unique))
-            {
-                bool bl = proc.Place.X == 0 && proc.Place.Y == 0 ||
-                          proc.Place.X == 2 && proc.Place.Y == 2 ||
-                          proc.Place.X == 3 && proc.Place.Y == 3;
-                Assert.AreEqual(true, bl);
-            }
         }
 
         [TestMethod]

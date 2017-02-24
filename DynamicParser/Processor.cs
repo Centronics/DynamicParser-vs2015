@@ -66,11 +66,6 @@ namespace DynamicParser
         public Region CurrentRegion => new Region(Width, Height);
 
         /// <summary>
-        /// Генерирует поле для поиска обозначенных регионов на текущем рабочем поле.
-        /// </summary>
-        public Attacher CurrentAttacher => new Attacher(Width, Height);
-
-        /// <summary>
         /// Предназначен для загрузки изображения как рабочего поля.
         /// </summary>
         /// <param name="btm">Загружаемое изображение.</param>

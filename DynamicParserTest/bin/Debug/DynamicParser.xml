@@ -4,153 +4,6 @@
         <name>DynamicParser</name>
     </assembly>
     <members>
-        <member name="T:DynamicParser.Attach">
-            <summary>
-            Содержит информацию о точке и сопоставленных с ней картах.
-            </summary>
-        </member>
-        <member name="T:DynamicParser.Attach.Proc">
-            <summary>
-            Содержит информацию о точке и сопоставленных с ней картах.
-            </summary>
-        </member>
-        <member name="F:DynamicParser.Attach.Proc.Place">
-            <summary>
-            Точка.
-            </summary>
-        </member>
-        <member name="F:DynamicParser.Attach.Proc.Procs">
-            <summary>
-            Сопоставленные карты.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.Attach.Point">
-            <summary>
-            Точка.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.Attach.Regs">
-            <summary>
-            Сопоставленные карты.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.Attach.Processors">
-            <summary>
-            Получает список карт из списка сопоставленных карт.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.Attach.Unique">
-            <summary>
-            Получает уникальные по полю Tag карты.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.Attach.UniqueMas">
-            <summary>
-            Получает уникальные по полю Tag карты.
-            </summary>
-        </member>
-        <member name="M:DynamicParser.Attach.Inclusive(System.Collections.Generic.IEnumerable{DynamicParser.Processor},System.String)">
-            <summary>
-            Проверяет, хранится ли в указанном списке карта с указанным значением свойства Tag. Сравнение происходит с обрезанием пробелов и без учёта регистра.
-            </summary>
-            <param name="lst">Список карт для поиска.</param>
-            <param name="str">Искомое значение свойства Tag.</param>
-            <returns>Если карта с указанным значением свойства Tag хранится в указанном списке, возвращается true, иначе false.</returns>
-        </member>
-        <member name="M:DynamicParser.Attach.TagStringCompare(System.String,System.String)">
-            <summary>
-            Сравнивает строки по правилам сравнения свойства "Tag".
-            С обрезанием пробелов и без учёта регистра.
-            </summary>
-            <param name="tag">Строка, которую надо сравнить.</param>
-            <param name="cmp">Строка, с которой надо сравнить.</param>
-            <returns>Если строки равны, возвращает true, в противном случае false.</returns>
-        </member>
-        <member name="T:DynamicParser.Attacher">
-            <summary>
-            Представляет собой полотно, состоящее из точек, которые отображаются на регион.
-            </summary>
-        </member>
-        <member name="F:DynamicParser.Attacher._attaches">
-            <summary>
-            Содержит информацию о точках.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.Attacher.Width">
-            <summary>
-            Ширина.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.Attacher.Height">
-            <summary>
-            Высота.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.Attacher.Attaches">
-            <summary>
-            Перечисляет добавленные точки и информацию о сопоставленных с ними картах.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.Attacher.Points">
-            <summary>
-            Перечисляет добавленные точки.
-            </summary>
-        </member>
-        <member name="M:DynamicParser.Attacher.#ctor(System.Int32,System.Int32)">
-            <summary>
-            Инициализирует класс с указанными шириной и высотой.
-            </summary>
-            <param name="width">Ширина.</param>
-            <param name="height">Высота.</param>
-        </member>
-        <member name="M:DynamicParser.Attacher.InRectangle(System.Drawing.Point,System.Drawing.Rectangle)">
-            <summary>
-            Выясняет, попадает ли указанная точка на указанную область.
-            </summary>
-            <param name="pt">Точка.</param>
-            <param name="rect">Область.</param>
-            <returns>В случае попадания возвращает true, в противном случае false.</returns>
-        </member>
-        <member name="M:DynamicParser.Attacher.IsConflict(System.Drawing.Rectangle)">
-            <summary>
-            Выясняет, указывают ли две или более точки на проверяемую область.
-            </summary>
-            <param name="rect">Проверяемая область.</param>
-            <returns>Если две или более точки указывают на одну и ту же проверяемую область, возвращается true, в противном случае false.</returns>
-        </member>
-        <member name="M:DynamicParser.Attacher.IsConflict(DynamicParser.Region)">
-            <summary>
-            Выясняет, указывают ли две или более точки на одну и ту же область.
-            </summary>
-            <param name="region">Проверяемый регион.</param>
-            <returns>В случае, когда конфликт обнаружен, возвращается true, в противном случае false.</returns>
-        </member>
-        <member name="M:DynamicParser.Attacher.SetMask(DynamicParser.Region)">
-            <summary>
-            Накладывает маску на указанный регион, записывая результат в текущий экземпляр.
-            </summary>
-            <param name="region">Регион, на который необходимо наложить маску.</param>
-        </member>
-        <member name="M:DynamicParser.Attacher.Contains(System.Drawing.Point)">
-            <summary>
-            Проверяет, содержится ли указанная точка в списке.
-            </summary>
-            <param name="point">Проверяемая точка.</param>
-            <returns>Если в списке содержится указанная точка, возвращается true, в противном случае false.</returns>
-        </member>
-        <member name="M:DynamicParser.Attacher.Add(System.Drawing.Point)">
-            <summary>
-            Добавляет точку в список.
-            </summary>
-            <param name="point">Добавляемая точка.</param>
-        </member>
-        <member name="M:DynamicParser.Attacher.Add(System.Int32,System.Int32)">
-            <summary>
-            Добавляет точку в список.
-            </summary>
-            <param name="x">Координата X.</param>
-            <param name="y">Координата Y.</param>
-        </member>
         <member name="T:DynamicParser.Processor">
             <summary>
             Процессор (одновременно являющийся картой), выполняющий поиск соответствующих указанных карт на рабочем поле.
@@ -204,11 +57,6 @@
         <member name="P:DynamicParser.Processor.CurrentRegion">
             <summary>
             Генерирует регион, равный по размеру текущему рабочему полю.
-            </summary>
-        </member>
-        <member name="P:DynamicParser.Processor.CurrentAttacher">
-            <summary>
-            Генерирует поле для поиска обозначенных регионов на текущем рабочем поле.
             </summary>
         </member>
         <member name="M:DynamicParser.Processor.#ctor(System.Drawing.Bitmap,System.String)">
@@ -430,6 +278,15 @@
             </summary>
             <param name="tag">Искомый тег.</param>
             <returns>Возвращает true в случае, если карта найдена, в противном случае false.</returns>
+        </member>
+        <member name="M:DynamicParser.ProcessorContainer.TagStringCompare(System.String,System.String)">
+            <summary>
+            Сравнивает строки по правилам сравнения свойства <see cref="P:DynamicParser.Processor.Tag"/>.
+            С обрезанием пробелов и без учёта регистра.
+            </summary>
+            <param name="tag">Строка, которую надо сравнить.</param>
+            <param name="cmp">Строка, с которой надо сравнить.</param>
+            <returns>Если строки равны, возвращает true, в противном случае false.</returns>
         </member>
         <member name="T:DynamicParser.Registered">
             <summary>

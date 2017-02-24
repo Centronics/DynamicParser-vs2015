@@ -242,7 +242,7 @@ namespace DynamicParser
                 {
                     if (pr == null)
                         return true;
-                    if (Attach.TagStringCompare(pr.Tag, tag.Tag))
+                    if (TagStringCompare(pr.Tag, tag.Tag))
                         count++;
                     return count <= 1;
                 })) return false;
@@ -257,7 +257,23 @@ namespace DynamicParser
         /// <returns>Возвращает true в случае, если карта найдена, в противном случае false.</returns>
         public bool ContainsTag(string tag)
         {
-            return !string.IsNullOrWhiteSpace(tag) && _lstProcs.Any(pr => Attach.TagStringCompare(pr.Tag, tag));
+            return !string.IsNullOrWhiteSpace(tag) && _lstProcs.Any(pr => TagStringCompare(pr.Tag, tag));
+        }
+
+        /// <summary>
+        /// Сравнивает строки по правилам сравнения свойства <see cref="Processor.Tag"/>.
+        /// С обрезанием пробелов и без учёта регистра.
+        /// </summary>
+        /// <param name="tag">Строка, которую надо сравнить.</param>
+        /// <param name="cmp">Строка, с которой надо сравнить.</param>
+        /// <returns>Если строки равны, возвращает true, в противном случае false.</returns>
+        public static bool TagStringCompare(string tag, string cmp)
+        {
+            if (string.IsNullOrEmpty(tag))
+                throw new ArgumentException($"{nameof(TagStringCompare)}: Свойство Tag не может быть равно null.", nameof(tag));
+            if (string.IsNullOrEmpty(cmp))
+                throw new ArgumentException($"{nameof(TagStringCompare)}: Свойство Tag не может быть равно null.", nameof(cmp));
+            return string.Compare(tag.Trim(), cmp.Trim(), StringComparison.OrdinalIgnoreCase) == 0;
         }
     }
 }

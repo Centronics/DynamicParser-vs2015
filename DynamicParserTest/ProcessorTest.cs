@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
 using DynamicParser;
 using DynamicProcessor;
@@ -292,9 +291,6 @@ namespace DynamicParserTest
             Region cr = proc.CurrentRegion;
             Assert.AreEqual(15, cr.Width);
             Assert.AreEqual(10, cr.Height);
-            Attacher at = proc.CurrentAttacher;
-            Assert.AreEqual(15, at.Width);
-            Assert.AreEqual(10, at.Height);
         }
 
         [TestMethod]
@@ -598,7 +594,6 @@ namespace DynamicParserTest
                         }
                     }
 
-                Attacher attacher;
                 {
                     Rectangle rect1 = new Rectangle(0, 0, 2, 2);
                     Rectangle rect2 = new Rectangle(3, 3, 1, 1);
@@ -608,16 +603,11 @@ namespace DynamicParserTest
                     Assert.AreEqual(1, lst33.Count);
                     Assert.AreEqual(1, lst00[0].Procs.Length);
                     Assert.AreEqual(1, lst33[0].Procs.Length);
-                    attacher = proc.CurrentAttacher;
-                    attacher.Add(0, 0);
-                    attacher.Add(3, 3);
                     Region region = proc.CurrentRegion;
                     region.Add(rect1, lst00[0].Procs[0]);
                     region.Add(rect2, lst33[0].Procs[0]);
-                    attacher.SetMask(region);
                 }
 
-                Attacher attacher1;
                 {
                     Rectangle rect1 = new Rectangle(0, 0, 2, 2);
                     Rectangle rect2 = new Rectangle(3, 3, 1, 1);
@@ -627,16 +617,11 @@ namespace DynamicParserTest
                     Assert.AreEqual(1, lst33.Count);
                     Assert.AreEqual(1, lst00[0].Procs.Length);
                     Assert.AreEqual(1, lst33[0].Procs.Length);
-                    attacher1 = proc.CurrentAttacher;
-                    attacher1.Add(0, 0);
-                    attacher1.Add(3, 3);
                     Region region = proc.CurrentRegion;
                     region.Add(rect1, lst00[0].Procs[0]);
                     region.Add(rect2, lst33[0].Procs[0]);
-                    attacher1.SetMask(region);
                 }
 
-                Attacher attacher2, attacher21;
                 {
                     Rectangle rect1 = new Rectangle(0, 0, 2, 2);
                     Rectangle rect2 = new Rectangle(3, 3, 1, 1);
@@ -652,18 +637,11 @@ namespace DynamicParserTest
                     Region region = proc.CurrentRegion;
                     region.Add(rect1, lst00[0].Procs[0]);
                     region.Add(rect2, lst33[0].Procs[0]);
-                    attacher2 = proc.CurrentAttacher;
-                    attacher2.Add(0, 0);
-                    attacher2.SetMask(region);
-                    attacher21 = proc.CurrentAttacher;
-                    attacher21.Add(3, 3);
                     Region region1 = proc.CurrentRegion;
                     region1.Add(rect1, lst00[0].Procs[0]);
                     region1.Add(rect2, lst33[0].Procs[0]);
-                    attacher21.SetMask(region1);
                 }
 
-                Attacher attacher3, attacher4;
                 {
                     Rectangle rect1 = new Rectangle(0, 0, 2, 2);
                     Rectangle rect2 = new Rectangle(3, 3, 1, 1);
@@ -673,62 +651,12 @@ namespace DynamicParserTest
                     Assert.AreEqual(1, lst33.Count);
                     Assert.AreEqual(1, lst00[0].Procs.Length);
                     Assert.AreEqual(1, lst33[0].Procs.Length);
-                    attacher3 = proc.CurrentAttacher;
-                    attacher3.Add(0, 0);
                     Region region = proc.CurrentRegion;
                     region.Add(rect1, lst00[0].Procs[0]);
                     region.Add(rect2, lst33[0].Procs[0]);
-                    attacher3.SetMask(region);
-                    attacher4 = proc.CurrentAttacher;
-                    attacher4.Add(3, 3);
                     Region region1 = proc.CurrentRegion;
                     region1.Add(rect1, lst00[0].Procs[0]);
                     region1.Add(rect2, lst33[0].Procs[0]);
-                    attacher4.SetMask(region1);
-                }
-
-                Assert.AreEqual(2, attacher.Attaches.Count());
-                Assert.AreEqual(2, attacher1.Attaches.Count());
-                Assert.AreEqual(1, attacher2.Attaches.Count());
-                Assert.AreEqual(1, attacher3.Attaches.Count());
-                Assert.AreEqual(1, attacher4.Attaches.Count());
-                Assert.AreEqual(1, attacher21.Attaches.Count());
-
-                AttacherTest(attacher);
-                AttacherTest(attacher1);
-                AttacherTest(attacher2);
-                AttacherTest(attacher3);
-                AttacherTest(attacher4);
-                AttacherTest(attacher21);
-
-                List<Attach.Proc> lst = attacher.Attaches.Select(att => att.Unique).ToList();
-                List<Attach.Proc> lst1 = attacher1.Attaches.Select(att => att.Unique).ToList();
-                List<Attach.Proc> lst3 = attacher2.Attaches.Select(att => att.Unique).ToList();
-                List<Attach.Proc> lst4 = attacher3.Attaches.Select(att => att.Unique).ToList();
-
-                Assert.AreEqual(2, lst.Count);
-                Assert.AreEqual(2, lst1.Count);
-                Assert.AreEqual(1, lst3.Count);
-                Assert.AreEqual(1, lst4.Count);
-                Assert.AreEqual(lst.Count, lst1.Count);
-                Assert.AreEqual(lst3.Count, lst4.Count);
-
-                for (int k = 0; k < lst.Count; k++)
-                {
-                    Attach.Proc pr = lst[k], pr1 = lst1[k];
-                    Assert.AreEqual(true, pr.Place == pr1.Place);
-                    Assert.AreEqual(true, pr.Procs.Count() == pr1.Procs.Count());
-                    for (int j = 0; j < pr.Procs.Count(); j++)
-                        Assert.AreEqual(pr.Procs.ElementAt(j).Tag, pr1.Procs.ElementAt(j).Tag);
-                }
-
-                for (int k = 0; k < lst3.Count; k++)
-                {
-                    Attach.Proc pr3 = lst3[k], pr4 = lst4[k];
-                    Assert.AreEqual(true, pr3.Place == pr4.Place);
-                    Assert.AreEqual(true, pr3.Procs.Count() == pr4.Procs.Count());
-                    for (int j = 0; j < pr3.Procs.Count(); j++)
-                        Assert.AreEqual(pr3.Procs.ElementAt(j).Tag, pr4.Procs.ElementAt(j).Tag);
                 }
 
                 {
@@ -752,41 +680,6 @@ namespace DynamicParserTest
                             Assert.AreSame(pr3, sr3[x, y].Procs[0]);
                         }
                 }
-            }
-        }
-
-        static void AttacherTest(Attacher attacher)
-        {
-            foreach (Attach att in attacher.Attaches)
-                Assert.AreNotEqual(null, att);
-            foreach (Attach att in attacher.Attaches)
-                Assert.AreNotEqual(null, att.Regs);
-            foreach (Attach att in attacher.Attaches)
-                Assert.AreNotEqual(null, att.Regs.Where(r => r.Position == new Point(0, 0)));
-            foreach (Attach att in attacher.Attaches)
-                Assert.AreNotEqual(null, att.Regs.Where(r => r.Position == new Point(3, 3)));
-            foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(true, att.Regs.Count(r => r.Position == new Point(0, 0)) == 1 || att.Regs.Count(r => r.Position == new Point(3, 3)) == 1);
-            foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(0, 0)).Count(r => r.SelectedProcessor == null));
-            foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.SelectedProcessor == null));
-            foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(0, 0)).Count(r => r.SelectedProcessor.Length != 4));
-            foreach (Attach att in attacher.Attaches)
-                Assert.AreEqual(0, att.Regs.Where(r => r.Position == new Point(3, 3)).Count(r => r.SelectedProcessor.Length != 4));
-            foreach (Attach att in attacher.Attaches)
-            {
-                List<Reg> r00 = new List<Reg>(att.Regs.Where(r => r.Position == new Point(0, 0) || r.Position == new Point(1, 0) ||
-                    r.Position == new Point(0, 1) || r.Position == new Point(1, 1)));
-                if (!r00.Any()) continue;
-                Assert.AreEqual(r00.Count, r00.Count(r => r.SelectedProcessor.Tag == "1"));
-            }
-            foreach (Attach att in attacher.Attaches)
-            {
-                List<Reg> r33 = new List<Reg>(att.Regs.Where(r => r.Position == new Point(3, 3)));
-                if (!r33.Any()) continue;
-                Assert.AreEqual(r33.Count, r33.Count(r => r.SelectedProcessor.Tag == "2"));
             }
         }
 

@@ -516,6 +516,60 @@ namespace DynamicParserTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
+        public void RegisteredOutEx7Test()
+        {
+            Region region = new Region(2, 2);
+            // ReSharper disable once UnusedVariable
+            Registered r = region[-1, 0];
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisteredOutEx8Test()
+        {
+            Region region = new Region(2, 2);
+            // ReSharper disable once UnusedVariable
+            Registered r = region[0, -1];
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisteredOutEx9Test()
+        {
+            Region region = new Region(2, 2);
+            // ReSharper disable once UnusedVariable
+            Registered r = region[2, 0];
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisteredOutEx10Test()
+        {
+            Region region = new Region(2, 2);
+            // ReSharper disable once UnusedVariable
+            Registered r = region[0, 2];
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisteredOutEx11Test()
+        {
+            Region region = new Region(2, 2);
+            // ReSharper disable once UnusedVariable
+            Registered r = region[3, 0];
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisteredOutEx12Test()
+        {
+            Region region = new Region(2, 2);
+            // ReSharper disable once UnusedVariable
+            Registered r = region[0, 3];
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
         public void RegisteredEx1Test()
         {
             // ReSharper disable once UnusedVariable
@@ -576,6 +630,24 @@ namespace DynamicParserTest
         {
             Region reg = new Region(10, 10);
             reg.Add(2, 3, 5, 10);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisteredTestEx9()
+        {
+            Region reg = new Region(10, 10);
+            reg.Add(2, 3, 5, 6);
+            reg.Add(2, 3, 4, 2);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisteredTestEx10()
+        {
+            Region reg = new Region(10, 10);
+            reg.Add(new Rectangle(2, 3, 5, 6));
+            reg.Add(new Rectangle(2, 3, 4, 2));
         }
     }
 }

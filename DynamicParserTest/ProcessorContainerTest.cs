@@ -430,6 +430,65 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorContainerEx22Test()
+        {
+            // ReSharper disable once UnusedVariable
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor>());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorContainerEx23Test()
+        {
+            // ReSharper disable once UnusedVariable
+            ProcessorContainer pc = new ProcessorContainer();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorContainerEx24Test()
+        {
+            // ReSharper disable once UnusedVariable
+            ProcessorContainer pc = new ProcessorContainer(new Processor(new[] { SignValue.MaxValue }, "Tag"));
+            pc.Add(new Processor(new SignValue[1, 2], "Tag1"));
+        }
+
+        [TestMethod]
+        public void ProcessorContainerInOneSizeTestNull()
+        {
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(new List<Processor> { null }));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ProcessorContainerTagStringCompareEx1()
+        {
+            ProcessorContainer.TagStringCompare(null, "k");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorContainerTagStringCompareEx2()
+        {
+            ProcessorContainer.TagStringCompare(string.Empty, "k");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ProcessorContainerTagStringCompareEx3()
+        {
+            ProcessorContainer.TagStringCompare("k", null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ProcessorContainerTagStringCompareEx4()
+        {
+            ProcessorContainer.TagStringCompare("k", string.Empty);
+        }
+
+        [TestMethod]
         public void ProcessorContainerInOneSizeTestIsEquals()
         {
             SignValue[,] pr1 = new SignValue[2, 3];

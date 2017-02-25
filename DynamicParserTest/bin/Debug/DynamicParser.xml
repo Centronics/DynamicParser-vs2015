@@ -212,7 +212,7 @@
             </summary>
             <param name="processors">Добавляемые карты.</param>
         </member>
-        <member name="M:DynamicParser.ProcessorContainer.AgrumentAssertions(System.Collections.Generic.IList{DynamicParser.Processor})">
+        <member name="M:DynamicParser.ProcessorContainer.ArgumentAssertions(System.Collections.Generic.IList{DynamicParser.Processor})">
             <summary>
             Выдаёт исключения в случае обнаружения каких-либо ошибок.
             </summary>
@@ -267,7 +267,7 @@
         </member>
         <member name="M:DynamicParser.ProcessorContainer.InOneTag(System.Collections.Generic.ICollection{DynamicParser.Processor})">
             <summary>
-            Проверяет присутствие карт с одинаковыми свойствами Tag в указанном списке.
+            Проверяет присутствие карт с одинаковыми свойствами <see cref="P:DynamicParser.Processor.Tag"/> в указанном списке.
             </summary>
             <param name="tags">Проверяемый список.</param>
             <returns>Возвращает true в случае, когда повторяющиеся значения не встречались, в противном случае false.</returns>

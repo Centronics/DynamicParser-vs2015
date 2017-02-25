@@ -317,13 +317,13 @@ namespace DynamicParser
                 throw new ArgumentNullException(nameof(regs), $"{nameof(FindWord)}: Список обрабатываемых карт равен null.");
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindWord)}: Индекс вышел за допустимые пределы ({startIndex}).");
+            if (selectCount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(selectCount), $@"{nameof(FindWord)
+                    }: Количество символов, которое необходимо выбрать из названия карты, должно быть больше ноля ({selectCount}).");
             int sCount = word.Length / selectCount;
             if (sCount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(word),
                     $@"{nameof(FindWord)}: Количество символов для выборки из названия карты меньше или равно нолю ({sCount}).");
-            if (selectCount <= 0)
-                throw new ArgumentOutOfRangeException(nameof(selectCount), $@"{nameof(FindWord)
-                    }: Количество символов, которое необходимо выбрать из названия карты, должно быть больше ноля ({selectCount}).");
             if (regs.Count <= 0)
                 return false;
             int[] counting = new int[sCount];
@@ -461,7 +461,7 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(Find)}: Указанная область шире, чем текущая.", nameof(rect.Width));
             if (rect.Height > Height)
                 throw new ArgumentException($"{nameof(Find)}: Указанная область выше, чем текущая.", nameof(rect.Height));
-            if (rect.Right >= Width || rect.Height >= Height || rect.Width <= 0 || rect.Height <= 0 || rect.X < 0 || rect.Y < 0)
+            if (rect.Right > Width || rect.Bottom > Height || rect.Width <= 0 || rect.Height <= 0 || rect.X < 0 || rect.Y < 0)
                 return null;
             double max = -1.0;
             for (int y = rect.Y; y < rect.Bottom; y++)

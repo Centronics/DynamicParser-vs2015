@@ -178,6 +178,115 @@ namespace DynamicParserTest
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void FindException24()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            sr.Find(new Rectangle(2, 2, 4, 2));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void FindException25()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            sr.Find(new Rectangle(2, 2, 2, 4));
+        }
+
+        [TestMethod]
+        public void FindTest1()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(2, 2, 3, 2)));
+        }
+
+        [TestMethod]
+        public void FindTest2()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(2, 1, 2, 1)));
+        }
+
+        [TestMethod]
+        public void FindTest3()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(1, 1, 3, 1)));
+        }
+
+        [TestMethod]
+        public void FindTest4()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(1, 2, 1, 2)));
+        }
+
+        [TestMethod]
+        public void FindTest5()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(2, 2, 0, 2)));
+        }
+
+        [TestMethod]
+        public void FindTest6()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(2, 2, -1, 2)));
+        }
+
+        [TestMethod]
+        public void FindTest7()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(2, 2, 1, 0)));
+        }
+
+        [TestMethod]
+        public void FindTest8()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(2, 2, 1, -1)));
+        }
+
+        [TestMethod]
+        public void FindTest9()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(-1, 2, 1, 1)));
+        }
+
+        [TestMethod]
+        public void FindTest10()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(2, -1, 1, 1)));
+        }
+
+        [TestMethod]
+        public void FindTest11()
+        {
+            SearchResults sr = new SearchResults(3, 3, 1, 1);
+            Assert.AreEqual(null, sr.Find(new Rectangle(2, 2, 1, 1)));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SearchResultsTest1()
+        {
+            // ReSharper disable once UnusedVariable
+            SearchResults sr = new SearchResults(1, 3, 2, 1);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SearchResultsTest2()
+        {
+            // ReSharper disable once UnusedVariable
+            SearchResults sr = new SearchResults(3, 1, 1, 2);
+        }
+
+        [TestMethod]
         public void FindRelationCoordsWidth()
         {
             SignValue[,] svs = new SignValue[2, 1];
@@ -893,6 +1002,51 @@ namespace DynamicParserTest
                 Assert.AreEqual(true, bag.Contains("686812"));
                 Assert.AreEqual(true, bag.Contains("686855"));
                 Assert.AreEqual(true, bag.Contains("686868"));
+            }
+        }
+
+        [TestMethod]
+        public void FindRelationTest2()
+        {
+            SearchResults sr = new SearchResults(1, 1, 1, 1)
+            {
+                [0, 0] = new ProcPerc { Procs = new[] { new Processor(new[] { SignValue.MaxValue }, "Tag") } }
+            };
+            {
+                ConcurrentBag<string> bag = sr.FindRelation(0, 3, "tag");
+                Assert.AreNotEqual(null, bag);
+                Assert.AreEqual(1, bag.Count);
+                Assert.AreEqual("tag", bag.ElementAt(0));
+            }
+            {
+                ConcurrentBag<string> bag = sr.FindRelation((ICollection)new[] { "tag" }, 0, 3);
+                Assert.AreNotEqual(null, bag);
+                Assert.AreEqual(1, bag.Count);
+                Assert.AreEqual("tag", bag.ElementAt(0));
+            }
+            {
+                ConcurrentBag<string> bag = sr.FindRelation((IList<string>)new[] { "tag" }, 0, 3);
+                Assert.AreNotEqual(null, bag);
+                Assert.AreEqual(1, bag.Count);
+                Assert.AreEqual("tag", bag.ElementAt(0));
+            }
+            {
+                ConcurrentBag<string> bag = sr.FindRelation((IList<string>)new[] { "Tag" });
+                Assert.AreEqual(null, bag);
+            }
+            {
+                ConcurrentBag<string> bag = sr.FindRelation((IList<string>)new[] { string.Empty });
+                Assert.AreEqual(null, bag);
+            }
+            {
+                ConcurrentBag<string> bag = sr.FindRelation((IList<string>)new[] { (string)null });
+                Assert.AreEqual(null, bag);
+            }
+            {
+                ConcurrentBag<string> bag = sr.FindRelation((IList<string>)new[] { null, "Tag" }, 0, 3);
+                Assert.AreNotEqual(null, bag);
+                Assert.AreEqual(1, bag.Count);
+                Assert.AreEqual("Tag", bag.ElementAt(0));
             }
         }
 

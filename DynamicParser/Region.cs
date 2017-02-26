@@ -7,7 +7,7 @@ namespace DynamicParser
 {
     /// <summary>
     ///     Представляет область, которая не пересекается ни с какой другой.
-    ///     Хранит список наиболее соответствующих найденных карт.
+    ///     Хранит наиболее соответствующую найденную карту.
     /// </summary>
     public sealed class Registered
     {
@@ -214,14 +214,14 @@ namespace DynamicParser
         {
             if (rect.Right > Width)
                 throw new ArgumentException(
-                    $@"{nameof(Add)}: Попытка вставить элемент, конфликтующий с шириной региона (Width = {Width
+                    $@"{nameof(Add)}: Попытка вставить область, выходящую за пределы ширины региона ({nameof(Width)} = {Width
                         }, {nameof(rect.Right)} = {rect.Right}).", nameof(rect));
             if (rect.Bottom > Height)
                 throw new ArgumentException(
-                    $@"{nameof(Add)}: Попытка вставить элемент, конфликтующий с высотой региона (Height = {Height
+                    $@"{nameof(Add)}: Попытка вставить область, выходящую за пределы высоты региона ({nameof(Height)} = {Height
                         }, {nameof(rect.Bottom)} = {rect.Bottom}).", nameof(rect));
             if (IsConflict(rect))
-                throw new ArgumentException($"{nameof(Add)}: Попытка вставить элемент, конфликтующий с существующими.",
+                throw new ArgumentException($"{nameof(Add)}: Попытка вставить область, перекрывающуюся с существующими.",
                     nameof(rect));
             Registered registered = new Registered
             {

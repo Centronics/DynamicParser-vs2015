@@ -11,9 +11,8 @@ using DynamicProcessor;
 namespace DynamicParser
 {
     /// <summary>
-    /// Процессор (одновременно являющийся картой), выполняющий поиск соответствующих указанных карт на рабочем поле.
-    /// Работает по принципу поисковика наиболее подходящей карты для каждого места на рабочем поле.
-    /// Поиск производится по всему полю.
+    /// Процессор (одновременно являющийся картой), выполняющий поиск указанных карт на рабочем поле.
+    /// Работает по принципу поисковика наиболее подходящей карты в каждой точке рабочего поля.
     /// </summary>
     public sealed class Processor
     {
@@ -23,7 +22,7 @@ namespace DynamicParser
         const double DiffEqual = 0.01;
 
         /// <summary>
-        /// Рабочее поле, на котором производится поиск требумых данных.
+        /// Рабочее поле, на котором производится поиск указанных карт.
         /// </summary>
         readonly SignValue[,] _bitmap;
 
@@ -33,12 +32,12 @@ namespace DynamicParser
         public string Tag { get; }
 
         /// <summary>
-        /// Ширина.
+        /// Ширина текущего рабочего поля.
         /// </summary>
         public int Width => _bitmap.GetLength(0);
 
         /// <summary>
-        /// Высота.
+        /// Высота текущего рабочего поля.
         /// </summary>
         public int Height => _bitmap.GetLength(1);
 
@@ -53,11 +52,11 @@ namespace DynamicParser
         public Size Size => new Size(Width, Height);
 
         /// <summary>
-        /// Извлекает объект рабочего поля.
+        /// Получает объект рабочего поля.
         /// </summary>
-        /// <param name="x">Координата X.</param>
-        /// <param name="y">Координата Y.</param>
-        /// <returns>Возвращает запрашиваемый объект рабочего поля.</returns>
+        /// <param name="x">Координата X рабочего поля.</param>
+        /// <param name="y">Координата Y рабочего поля.</param>
+        /// <returns>Возвращает объект рабочего поля по указанным координатам.</returns>
         public SignValue this[int x, int y] => _bitmap[x, y];
 
         /// <summary>
@@ -160,7 +159,7 @@ namespace DynamicParser
                 throw new Exception($"{nameof(Processor)}: Количество считанных байт ({read}) не соответствует требуемому (4).");
             int tagLength = BitConverter.ToInt32(bts, 0);
             if (tagLength <= 0)
-                throw new ArgumentOutOfRangeException(nameof(tagLength), $@"{nameof(Processor)}: Длина свойства Tag некорректна: {tagLength}.");
+                throw new ArgumentOutOfRangeException(nameof(tagLength), $@"{nameof(Processor)}: Длина свойства {nameof(Tag)} некорректна: {tagLength}.");
             byte[] btsTag = new byte[tagLength];
             read = stream.Read(btsTag, 0, tagLength);
             if (read != tagLength)
@@ -293,8 +292,8 @@ namespace DynamicParser
         /// <summary>
         /// Находит соответствие между заданными картами и рабочей областью, производя поиск по ней.
         /// </summary>
-        /// <param name="processors">Все остальные карты. Может быть null.</param>
-        /// <returns>Возвращает SearchResults, содержащий поле с результатами поиска.</returns>
+        /// <param name="processors">Исследуемые карты.</param>
+        /// <returns>Возвращает <see cref="SearchResults"/>, содержащий поле с результатами поиска.</returns>
         public SearchResults GetEqual(params Processor[] processors)
         {
             return GetEqual(new ProcessorContainer(processors));
@@ -304,7 +303,7 @@ namespace DynamicParser
         /// Находит соответствие между заданным массивом карт и рабочей областью в многопоточном режиме.
         /// </summary>
         /// <param name="processors">Массив искомых карт.</param>
-        /// <returns>Возвращает массив SearchResults, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
+        /// <returns>Возвращает массив <see cref="SearchResults"/>, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
         public SearchResults[] GetEqual(IList<ProcessorContainer> processors)
         {
             if (processors == null)
@@ -344,14 +343,14 @@ namespace DynamicParser
         /// Находит соответствие между заданным массивом карт и рабочей областью в многопоточном режиме.
         /// </summary>
         /// <param name="pc">Массив искомых карт.</param>
-        /// <returns>Возвращает массив SearchResults, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
+        /// <returns>Возвращает массив <see cref="SearchResults"/>, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
         public SearchResults[] GetEqual(params ProcessorContainer[] pc)
         {
             return GetEqual((IList<ProcessorContainer>)pc);
         }
 
         /// <summary>
-        /// Производит поиск указанных карт на рабочей области и возвращает результат в виде класса SearchResults,
+        /// Производит поиск указанных карт на рабочей области и возвращает результат в виде класса <see cref="SearchResults"/>,
         /// содержащего поле с результатами поиска.
         /// </summary>
         /// <param name="prc">Массив карт для поиска.</param>

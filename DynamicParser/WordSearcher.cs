@@ -8,7 +8,7 @@ namespace DynamicParser
     /// <summary>
     ///     Выполняет проверку соответствия слова указанной строке, состоящей из массива слов.
     /// </summary>
-    public class WordSearcher
+    public sealed class WordSearcher
     {
         /// <summary>
         ///     Содержит коллекцию слов, используемую для формирования заданного слова.

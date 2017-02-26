@@ -5,22 +5,17 @@ using System.Linq;
 namespace DynamicParser
 {
     /// <summary>
-    /// Сравнивает две строки по количеству встречающихся букв в каждой строке.
+    ///     Сравнивает две строки по количеству встречающихся букв в каждой строке.
     /// </summary>
     public sealed class TagSearcher
     {
         /// <summary>
-        /// Исходная строка.
-        /// </summary>
-        public string SourceString { get; }
-
-        /// <summary>
-        /// Счётчик количества каждой буквы в исходной строке.
+        ///     Счётчик количества каждой буквы в исходной строке.
         /// </summary>
         readonly Dictionary<char, int> _dicCurrent;
 
         /// <summary>
-        /// Инициализирует класс <see cref="TagSearcher" /> исходной строкой.
+        ///     Инициализирует класс <see cref="TagSearcher" /> исходной строкой.
         /// </summary>
         /// <param name="str">Строка, с которой будет производиться сравнение.</param>
         public TagSearcher(string str)
@@ -28,13 +23,19 @@ namespace DynamicParser
             if (str == null)
                 throw new ArgumentNullException(nameof(str), $"{nameof(TagSearcher)}: Подстрока пустая (null).");
             if (str == string.Empty)
-                throw new ArgumentException($"{nameof(TagSearcher)}: Подстрока пустая ({nameof(string.Empty)}).", nameof(str));
+                throw new ArgumentException($"{nameof(TagSearcher)}: Подстрока пустая ({nameof(string.Empty)}).",
+                    nameof(str));
             _dicCurrent = GetCount(SourceString = str.ToUpper());
         }
 
         /// <summary>
-        /// Получает значение, определяющее сходство между указанной строкой и текущей.
-        /// Сравнение производится без учёта регистра.
+        ///     Исходная строка.
+        /// </summary>
+        public string SourceString { get; }
+
+        /// <summary>
+        ///     Получает значение, определяющее сходство между указанной строкой и текущей.
+        ///     Сравнение производится без учёта регистра.
         /// </summary>
         /// <param name="str">Сравниваемая строка.</param>
         /// <returns>Возвращает значение true в случае сходства строк, false в противном случае.</returns>
@@ -57,8 +58,8 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Получает счётчики количества попаданий каждой буквы.
-        /// Буква является ключом в словаре, значение является количеством попаданий буквы, находящейся на этой позиции.
+        ///     Получает счётчики количества попаданий каждой буквы.
+        ///     Буква является ключом в словаре, значение является количеством попаданий буквы, находящейся на этой позиции.
         /// </summary>
         /// <param name="str">Проверяемая строка.</param>
         /// <returns>Возвращает счётчики количества попаданий каждой буквы.</returns>
@@ -79,7 +80,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Возвращает количество раз, которое встречается искомый символ в строке или ноль в случае отсутствия такового.
+        ///     Возвращает количество раз, которое встречается искомый символ в строке или ноль в случае отсутствия такового.
         /// </summary>
         /// <param name="ch">Искомый символ.</param>
         /// <returns>Возвращает количество раз, которое встречается искомый символ в строке или ноль в случае отсутствия такового.</returns>

@@ -9,33 +9,33 @@ using System.Threading.Tasks;
 namespace DynamicParser
 {
     /// <summary>
-    /// Содержит карты, отобранные по проценту соответствия в заданной точке.
+    ///     Содержит карты, отобранные по проценту соответствия в заданной точке.
     /// </summary>
     public struct ProcPerc
     {
         /// <summary>
-        /// Процент соответствия.
+        ///     Процент соответствия.
         /// </summary>
         public double Percent;
 
         /// <summary>
-        /// Карты.
+        ///     Карты.
         /// </summary>
         public Processor[] Procs;
 
         /// <summary>
-        /// Точка.
+        ///     Точка.
         /// </summary>
         public Point Position;
     }
 
     /// <summary>
-    /// Содержит информацию о выбранной карте.
+    ///     Содержит информацию о выбранной карте.
     /// </summary>
     public struct Reg
     {
         /// <summary>
-        /// Инициализирует структуру с заданной позицией.
+        ///     Инициализирует структуру с заданной позицией.
         /// </summary>
         /// <param name="position">Позиция выбранной карты.</param>
         public Reg(Point position)
@@ -46,91 +46,64 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Процент соответствия выбранной карты.
+        ///     Процент соответствия выбранной карты.
         /// </summary>
         public double Percent;
 
         /// <summary>
-        /// Выбранная карта.
+        ///     Выбранная карта.
         /// </summary>
         public Processor SelectedProcessor;
 
         /// <summary>
-        /// Координаты выбранной карты.
+        ///     Координаты выбранной карты.
         /// </summary>
         public Point Position { get; }
     }
 
     /// <summary>
-    /// Отражает статус конкретного <see cref="Region"/> при проверке на совместимость с другим.
+    ///     Отражает статус конкретного <see cref="Region" /> при проверке на совместимость с другим.
     /// </summary>
     public enum RegionStatus
     {
         /// <summary>
-        /// Проверка прошла успешно.
+        ///     Проверка прошла успешно.
         /// </summary>
         Ok,
+
         /// <summary>
-        /// Указанный регион равен null.
+        ///     Указанный регион равен null.
         /// </summary>
         Null,
+
         /// <summary>
-        /// Указанный регион шире текущего.
+        ///     Указанный регион шире текущего.
         /// </summary>
         WidthBig,
+
         /// <summary>
-        /// Указанный регион выше текущего.
+        ///     Указанный регион выше текущего.
         /// </summary>
         HeightBig
     }
 
     /// <summary>
-    /// Хранит информацию о соответствии карт в конкретной точке.
+    ///     Хранит информацию о соответствии карт в конкретной точке.
     /// </summary>
     public sealed class SearchResults
     {
         /// <summary>
-        /// Разница между процентами соответствия, позволяющая считать их равными.
+        ///     Разница между процентами соответствия, позволяющая считать их равными.
         /// </summary>
         const double DiffEqual = 0.01;
 
         /// <summary>
-        /// Хранит информацию о картах и проценте их соответствия в данной точке.
+        ///     Хранит информацию о картах и проценте их соответствия в данной точке.
         /// </summary>
         readonly ProcPerc[,] _coords;
 
         /// <summary>
-        /// Ширина.
-        /// </summary>
-        public int Width => _coords.GetLength(0);
-
-        /// <summary>
-        /// Высота.
-        /// </summary>
-        public int Height => _coords.GetLength(1);
-
-        /// <summary>
-        /// Размер текущей карты.
-        /// </summary>
-        public Size ResultSize => new Size(Width, Height);
-
-        /// <summary>
-        /// Ширина обрабатываемых карт.
-        /// </summary>
-        public int MapWidth { get; }
-
-        /// <summary>
-        /// Высота обрабатываемых карт.
-        /// </summary>
-        public int MapHeight { get; }
-
-        /// <summary>
-        /// Размер обрабатываемых карт.
-        /// </summary>
-        public Size MapSize => new Size(MapWidth, MapHeight);
-
-        /// <summary>
-        /// Инициализирует экземпляр с заданными параметрами ширины и высоты.
+        ///     Инициализирует экземпляр с заданными параметрами ширины и высоты.
         /// </summary>
         /// <param name="width">Ширина.</param>
         /// <param name="height">Высота.</param>
@@ -139,18 +112,24 @@ namespace DynamicParser
         public SearchResults(int width, int height, int mapWidth, int mapHeight)
         {
             if (width <= 0)
-                throw new ArgumentException($"{nameof(SearchResults)}: Ширина указана некорректно ({width}).", nameof(width));
+                throw new ArgumentException($"{nameof(SearchResults)}: Ширина указана некорректно ({width}).",
+                    nameof(width));
             if (height <= 0)
-                throw new ArgumentException($"{nameof(SearchResults)}: Высота указана некорректно ({height}).", nameof(height));
+                throw new ArgumentException($"{nameof(SearchResults)}: Высота указана некорректно ({height}).",
+                    nameof(height));
             if (mapWidth <= 0)
-                throw new ArgumentException($"{nameof(SearchResults)}: Ширина карт указана некорректно ({mapWidth}).", nameof(mapWidth));
+                throw new ArgumentException($"{nameof(SearchResults)}: Ширина карт указана некорректно ({mapWidth}).",
+                    nameof(mapWidth));
             if (mapHeight <= 0)
-                throw new ArgumentException($"{nameof(SearchResults)}: Высота карт указана некорректно ({mapHeight}).", nameof(mapHeight));
+                throw new ArgumentException($"{nameof(SearchResults)}: Высота карт указана некорректно ({mapHeight}).",
+                    nameof(mapHeight));
             if (mapWidth > width)
-                throw new ArgumentException($"{nameof(SearchResults)}: Ширина обрабатываемых карт не может превышать ширину карты ({mapWidth} > {width}).",
+                throw new ArgumentException(
+                    $"{nameof(SearchResults)}: Ширина обрабатываемых карт не может превышать ширину карты ({mapWidth} > {width}).",
                     nameof(mapWidth));
             if (mapHeight > height)
-                throw new ArgumentException($"{nameof(SearchResults)}: Высота обрабатываемых карт не может превышать высоту карты ({mapHeight} > {height}).",
+                throw new ArgumentException(
+                    $"{nameof(SearchResults)}: Высота обрабатываемых карт не может превышать высоту карты ({mapHeight} > {height}).",
                     nameof(mapHeight));
             MapWidth = mapWidth;
             MapHeight = mapHeight;
@@ -158,9 +137,53 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Равносилен вызову метода <see cref="FindRelation(string,int,int)"/> для каждого слова. Оптимизирован для многопоточного исполнения.
-        /// Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного массива.
+        ///     Ширина.
+        /// </summary>
+        public int Width => _coords.GetLength(0);
+
+        /// <summary>
+        ///     Высота.
+        /// </summary>
+        public int Height => _coords.GetLength(1);
+
+        /// <summary>
+        ///     Размер текущей карты.
+        /// </summary>
+        public Size ResultSize => new Size(Width, Height);
+
+        /// <summary>
+        ///     Ширина обрабатываемых карт.
+        /// </summary>
+        public int MapWidth { get; }
+
+        /// <summary>
+        ///     Высота обрабатываемых карт.
+        /// </summary>
+        public int MapHeight { get; }
+
+        /// <summary>
+        ///     Размер обрабатываемых карт.
+        /// </summary>
+        public Size MapSize => new Size(MapWidth, MapHeight);
+
+        /// <summary>
+        ///     Получает или задаёт информацию о картах в данной точке.
+        /// </summary>
+        /// <param name="x">Координата X.</param>
+        /// <param name="y">Координата Y.</param>
+        /// <returns>Возвращает информацию о картах в данной точке.</returns>
+        public ProcPerc this[int x, int y]
+        {
+            get { return _coords[x, y]; }
+            set { _coords[x, y] = value; }
+        }
+
+        /// <summary>
+        ///     Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag" /> найденных карт.
+        ///     Равносилен вызову метода <see cref="FindRelation(string,int,int)" /> для каждого слова. Оптимизирован для
+        ///     многопоточного исполнения.
+        ///     Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного
+        ///     массива.
         /// </summary>
         /// <param name="words">Искомые слова.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
@@ -168,13 +191,15 @@ namespace DynamicParser
         /// <returns>Возвращает список слов, с которыми удалось установить связь.</returns>
         public ConcurrentBag<string> FindRelation(int startIndex, int count, params string[] words)
         {
-            return FindRelation((IList<string>)words, startIndex, count);
+            return FindRelation((IList<string>) words, startIndex, count);
         }
 
         /// <summary>
-        /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Равносилен вызову метода <see cref="FindRelation(string,int,int)"/> для каждого слова. Оптимизирован для многопоточного исполнения.
-        /// Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного массива.
+        ///     Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag" /> найденных карт.
+        ///     Равносилен вызову метода <see cref="FindRelation(string,int,int)" /> для каждого слова. Оптимизирован для
+        ///     многопоточного исполнения.
+        ///     Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного
+        ///     массива.
         /// </summary>
         /// <param name="words">Искомые слова.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
@@ -185,7 +210,8 @@ namespace DynamicParser
             if (words == null)
                 throw new ArgumentNullException(nameof(words), $@"{nameof(FindRelation)}: Коллекция отсутствует (null).");
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
+                throw new ArgumentOutOfRangeException(nameof(startIndex),
+                    $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше или равно нолю ({count}).");
@@ -193,13 +219,15 @@ namespace DynamicParser
                 return null;
             List<string> lst = new List<string>(words.Count);
             lst.AddRange(from string s in words where !string.IsNullOrWhiteSpace(s) select s);
-            return FindRelation((IList<string>)lst, startIndex, count);
+            return FindRelation((IList<string>) lst, startIndex, count);
         }
 
         /// <summary>
-        /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Равносилен вызову метода <see cref="FindRelation(string,int,int)"/> для каждого слова. Оптимизирован для многопоточного исполнения.
-        /// Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного массива.
+        ///     Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag" /> найденных карт.
+        ///     Равносилен вызову метода <see cref="FindRelation(string,int,int)" /> для каждого слова. Оптимизирован для
+        ///     многопоточного исполнения.
+        ///     Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного
+        ///     массива.
         /// </summary>
         /// <param name="words">Искомые слова.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
@@ -208,9 +236,11 @@ namespace DynamicParser
         public ConcurrentBag<string> FindRelation(IList<string> words, int startIndex = 0, int count = 1)
         {
             if (words == null)
-                throw new ArgumentNullException(nameof(words), $"{nameof(FindRelation)}: Искомые слова отсутствуют (null).");
+                throw new ArgumentNullException(nameof(words),
+                    $"{nameof(FindRelation)}: Искомые слова отсутствуют (null).");
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
+                throw new ArgumentOutOfRangeException(nameof(startIndex),
+                    $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше или равно нолю ({count}).");
@@ -258,9 +288,9 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Ищет возможность связывания указанного слова с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомое слово?".
-        /// Возвращает значение true в случае нахождения слова, в противном случае - false.
+        ///     Ищет возможность связывания указанного слова с полями <see cref="Processor.Tag" /> найденных карт.
+        ///     Иными словами, отвечает на вопрос: "можно ли из имеющихся найденных карт составить искомое слово?".
+        ///     Возвращает значение true в случае нахождения слова, в противном случае - false.
         /// </summary>
         /// <param name="word">Искомое слово.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
@@ -269,9 +299,11 @@ namespace DynamicParser
         public bool FindRelation(string word, int startIndex = 0, int count = 1)
         {
             if (word == null)
-                throw new ArgumentNullException(nameof(word), $"{nameof(FindRelation)}: Искомое слово отсутствует (null).");
+                throw new ArgumentNullException(nameof(word),
+                    $"{nameof(FindRelation)}: Искомое слово отсутствует (null).");
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
+                throw new ArgumentOutOfRangeException(nameof(startIndex),
+                    $"{nameof(FindRelation)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (count <= 0)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(FindRelation)}: Количество символов для выборки из названия карты меньше или равно нолю ({count}).");
@@ -279,8 +311,10 @@ namespace DynamicParser
                 return false;
             int mod = word.Length % count;
             if (mod != 0)
-                throw new ArgumentException($@"{nameof(FindRelation)}: Количество символов для выборки должно быть кратно длине искомого слова: слово: {
-                    word}, длина: {word.Length}, количество символов для выборки: {count}, остаток от деления: {mod}.", nameof(count));
+                throw new ArgumentException(
+                    $@"{nameof(FindRelation)}: Количество символов для выборки должно быть кратно длине искомого слова: слово: {
+                        word}, длина: {word.Length}, количество символов для выборки: {count}, остаток от деления: {mod}.",
+                    nameof(count));
             List<Reg> lst = new List<Reg>();
             foreach (string str in GetWord(word, count))
             {
@@ -292,7 +326,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Получает части слова указанной длины.
+        ///     Получает части слова указанной длины.
         /// </summary>
         /// <param name="word">Искомое слово.</param>
         /// <param name="length">Требуемое количество букв в подстроке.</param>
@@ -304,19 +338,24 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Получает значение true в случае нахождения искомого слова, в противном случае - false.
+        ///     Получает значение true в случае нахождения искомого слова, в противном случае - false.
         /// </summary>
         /// <param name="regs">Список обрабатываемых карт.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
         /// <param name="word">Искомое слово.</param>
-        /// <param name="selectCount">Количество символов, которое необходимо выбрать из названия карты для поиска требуемого слова.</param>
-        /// <returns>Возвращает <see cref="WordSearcher"/>, который позволяет выполнить поиск требуемого слова.</returns>
+        /// <param name="selectCount">
+        ///     Количество символов, которое необходимо выбрать из названия карты для поиска требуемого
+        ///     слова.
+        /// </param>
+        /// <returns>Возвращает <see cref="WordSearcher" />, который позволяет выполнить поиск требуемого слова.</returns>
         bool FindWord(IList<Reg> regs, int startIndex, string word, int selectCount)
         {
             if (regs == null)
-                throw new ArgumentNullException(nameof(regs), $"{nameof(FindWord)}: Список обрабатываемых карт равен null.");
+                throw new ArgumentNullException(nameof(regs),
+                    $"{nameof(FindWord)}: Список обрабатываемых карт равен null.");
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindWord)}: Индекс вышел за допустимые пределы ({startIndex}).");
+                throw new ArgumentOutOfRangeException(nameof(startIndex),
+                    $"{nameof(FindWord)}: Индекс вышел за допустимые пределы ({startIndex}).");
             if (selectCount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(selectCount), $@"{nameof(FindWord)
                     }: Количество символов, которое необходимо выбрать из названия карты, должно быть больше ноля ({selectCount}).");
@@ -357,12 +396,15 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Генерирует <see cref="WordSearcher"/> из <see cref="Processor.GetProcessorName"/>.
+        ///     Генерирует <see cref="WordSearcher" /> из <see cref="Processor.GetProcessorName" />.
         /// </summary>
-        /// <param name="region"><see cref="Region"/>, из которого требуется получить <see cref="WordSearcher"/>.</param>
+        /// <param name="region"><see cref="Region" />, из которого требуется получить <see cref="WordSearcher" />.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <param name="count">Количество символов в строке <see cref="Processor.Tag"/> карты.</param>
-        /// <returns>Возвращает <see cref="WordSearcher"/> из первых букв названия (<see cref="Processor.Tag"/>) объектов <see cref="Region"/>.</returns>
+        /// <param name="count">Количество символов в строке <see cref="Processor.Tag" /> карты.</param>
+        /// <returns>
+        ///     Возвращает <see cref="WordSearcher" /> из первых букв названия (<see cref="Processor.Tag" />) объектов
+        ///     <see cref="Region" />.
+        /// </returns>
         static WordSearcher GetStringFromRegion(Region region, int startIndex, int count)
         {
             if (region == null)
@@ -371,14 +413,18 @@ namespace DynamicParser
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $@"{nameof(GetStringFromRegion)}: Количество символов для выборки из названия карты меньше или равно нолю ({count}).");
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(GetStringFromRegion)}: Индекс вышел за допустимые пределы ({startIndex}).");
-            string[] lstWords = region.Elements.Select(registered => registered.Register.SelectedProcessor.GetProcessorName(startIndex, count)).
-                Where(procName => !string.IsNullOrEmpty(procName)).ToArray();
+                throw new ArgumentOutOfRangeException(nameof(startIndex),
+                    $"{nameof(GetStringFromRegion)}: Индекс вышел за допустимые пределы ({startIndex}).");
+            string[] lstWords =
+                region.Elements.Select(
+                        registered => registered.Register.SelectedProcessor.GetProcessorName(startIndex, count)).
+                    Where(procName => !string.IsNullOrEmpty(procName)).ToArray();
             return lstWords.Length <= 0 ? null : new WordSearcher(lstWords);
         }
 
         /// <summary>
-        /// Находит карты в результатах поиска, поля <see cref="Processor.Tag"/> которых по указанной позиции соответствуют указанной строке.
+        ///     Находит карты в результатах поиска, поля <see cref="Processor.Tag" /> которых по указанной позиции соответствуют
+        ///     указанной строке.
         /// </summary>
         /// <param name="procName">Искомая строка.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
@@ -388,32 +434,37 @@ namespace DynamicParser
             if (procName == null)
                 throw new ArgumentNullException(nameof(procName), $"{nameof(FindSymbols)}: Искомая строка равна null.");
             if (procName == string.Empty)
-                throw new ArgumentException($"{nameof(FindSymbols)}: Искомая строка должна состоять хотя бы из одного символа.", nameof(procName));
+                throw new ArgumentException(
+                    $"{nameof(FindSymbols)}: Искомая строка должна состоять хотя бы из одного символа.",
+                    nameof(procName));
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(FindSymbols)}: Индекс вышел за допустимые пределы ({startIndex}).");
+                throw new ArgumentOutOfRangeException(nameof(startIndex),
+                    $"{nameof(FindSymbols)}: Индекс вышел за допустимые пределы ({startIndex}).");
             List<Reg> lstRegs = new List<Reg>();
             for (int y = 0; y < Height; y++)
-                for (int x = 0; x < Width; x++)
-                {
-                    Processor[] processors = this[x, y].Procs?.Where(pr => pr != null && pr.IsProcessorName(procName, startIndex)).ToArray();
-                    if ((processors?.Length ?? 0) <= 0)
-                        continue;
-                    double percent = this[x, y].Percent;
-                    Point point = new Point(x, y);
-                    lstRegs.AddRange(from pr in processors
-                                     where pr != null
-                                     select new Reg(point)
-                                     {
-                                         SelectedProcessor = pr,
-                                         Percent = percent
-                                     });
-                }
+            for (int x = 0; x < Width; x++)
+            {
+                Processor[] processors =
+                    this[x, y].Procs?.Where(pr => pr != null && pr.IsProcessorName(procName, startIndex)).ToArray();
+                if ((processors?.Length ?? 0) <= 0)
+                    continue;
+                double percent = this[x, y].Percent;
+                Point point = new Point(x, y);
+                lstRegs.AddRange(from pr in processors
+                    where pr != null
+                    select new Reg(point)
+                    {
+                        SelectedProcessor = pr,
+                        Percent = percent
+                    });
+            }
             return lstRegs;
         }
 
         /// <summary>
-        /// Увеличивает значение старших разрядов счётчика букв, если это возможно.
-        /// Если увеличение было произведено, возвращается номер позиции, на которой произошло изменение, в противном случае -1.
+        ///     Увеличивает значение старших разрядов счётчика букв, если это возможно.
+        ///     Если увеличение было произведено, возвращается номер позиции, на которой произошло изменение, в противном случае
+        ///     -1.
         /// </summary>
         /// <param name="count">Массив-счётчик.</param>
         /// <param name="maxCount">Максимальное значение счётчика.</param>
@@ -421,12 +472,16 @@ namespace DynamicParser
         static int ChangeCount(IList<int> count, int maxCount)
         {
             if (count == null)
-                throw new ArgumentNullException(nameof(count), $"{nameof(ChangeCount)}: Массив-счётчик не указан или его длина некорректна (null).");
+                throw new ArgumentNullException(nameof(count),
+                    $"{nameof(ChangeCount)}: Массив-счётчик не указан или его длина некорректна (null).");
             if (count.Count <= 0)
-                throw new ArgumentException($"{nameof(ChangeCount)}: Длина массива-счётчика должна быть больше ноля ({count.Count}).", nameof(count));
+                throw new ArgumentException(
+                    $"{nameof(ChangeCount)}: Длина массива-счётчика должна быть больше ноля ({count.Count}).",
+                    nameof(count));
             if (maxCount <= 0)
-                throw new ArgumentOutOfRangeException(nameof(maxCount), $@"{nameof(ChangeCount)}: Максимальное значение счётчика меньше или равно нолю ({maxCount
-                    }).");
+                throw new ArgumentOutOfRangeException(nameof(maxCount),
+                    $@"{nameof(ChangeCount)}: Максимальное значение счётчика меньше или равно нолю ({maxCount
+                        }).");
             for (int k = count.Count - 1, mc = maxCount - 1; k >= 0; k--)
             {
                 if (count[k] >= mc) continue;
@@ -439,19 +494,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Получает или задаёт информацию о картах в данной точке.
-        /// </summary>
-        /// <param name="x">Координата X.</param>
-        /// <param name="y">Координата Y.</param>
-        /// <returns>Возвращает информацию о картах в данной точке.</returns>
-        public ProcPerc this[int x, int y]
-        {
-            get { return _coords[x, y]; }
-            set { _coords[x, y] = value; }
-        }
-
-        /// <summary>
-        /// Выполняет поиск наиболее подходящих карт в указанной области.
+        ///     Выполняет поиск наиболее подходящих карт в указанной области.
         /// </summary>
         /// <param name="rect">Область поиска карт.</param>
         /// <returns>Возвращает список наиболее подходящих карт в указанной области.</returns>
@@ -461,35 +504,37 @@ namespace DynamicParser
                 throw new ArgumentException($"{nameof(Find)}: Указанная область шире, чем текущая.", nameof(rect.Width));
             if (rect.Height > Height)
                 throw new ArgumentException($"{nameof(Find)}: Указанная область выше, чем текущая.", nameof(rect.Height));
-            if (rect.Right > Width || rect.Bottom > Height || rect.Width <= 0 || rect.Height <= 0 || rect.X < 0 || rect.Y < 0)
+            if (rect.Right > Width || rect.Bottom > Height || rect.Width <= 0 || rect.Height <= 0 || rect.X < 0 ||
+                rect.Y < 0)
                 return null;
             double max = -1.0;
             for (int y = rect.Y; y < rect.Bottom; y++)
-                for (int x = rect.X; x < rect.Right; x++)
-                {
-                    if (max < _coords[x, y].Percent)
-                        max = _coords[x, y].Percent;
-                    if (max >= 1.0)
-                        goto exit;
-                }
+            for (int x = rect.X; x < rect.Right; x++)
+            {
+                if (max < _coords[x, y].Percent)
+                    max = _coords[x, y].Percent;
+                if (max >= 1.0)
+                    goto exit;
+            }
             if (max <= 0)
                 return null;
-            exit: List<ProcPerc> procs = new List<ProcPerc>();
+            exit:
+            List<ProcPerc> procs = new List<ProcPerc>();
             for (int y = rect.Y; y < rect.Bottom; y++)
-                for (int x = rect.X; x < rect.Right; x++)
-                {
-                    ProcPerc pp = _coords[x, y];
-                    if (Math.Abs(pp.Percent - max) <= DiffEqual)
-                        procs.Add(pp);
-                }
+            for (int x = rect.X; x < rect.Right; x++)
+            {
+                ProcPerc pp = _coords[x, y];
+                if (Math.Abs(pp.Percent - max) <= DiffEqual)
+                    procs.Add(pp);
+            }
             return procs;
         }
 
         /// <summary>
-        /// Определяет, есть ли какие-либо конфликты между заданным <see cref="Region"/> и текущим.
+        ///     Определяет, есть ли какие-либо конфликты между заданным <see cref="Region" /> и текущим.
         /// </summary>
-        /// <param name="region">Проверяемый <see cref="Region"/>.</param>
-        /// <returns>Возвращает <see cref="RegionStatus.Ok"/> в случае отсутствия конфликтов.</returns>
+        /// <param name="region">Проверяемый <see cref="Region" />.</param>
+        /// <returns>Возвращает <see cref="RegionStatus.Ok" /> в случае отсутствия конфликтов.</returns>
         public RegionStatus RegionCorrect(Region region)
         {
             if (region == null)

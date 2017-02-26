@@ -5,39 +5,18 @@ using System.Linq;
 namespace DynamicParser
 {
     /// <summary>
-    /// Содержит массив карт для поиска. Проверяет их, чтобы все они были одинакового размера.
+    ///     Содержит массив карт для поиска. Проверяет их, чтобы все они были одинакового размера.
     /// </summary>
     public sealed class ProcessorContainer
     {
         /// <summary>
-        /// Содержит добавленные карты.
+        ///     Содержит добавленные карты.
         /// </summary>
         readonly List<Processor> _lstProcs = new List<Processor>();
 
         /// <summary>
-        /// Получает карту по индексу.
-        /// </summary>
-        /// <param name="index">Индекс карты.</param>
-        /// <returns>Возвращает карту по индексу.</returns>
-        public Processor this[int index] => _lstProcs[index];
-
-        /// <summary>
-        /// Получает количество добавленных карт.
-        /// </summary>
-        public int Count => _lstProcs.Count;
-
-        /// <summary>
-        /// Ширина. Вычисляется по первой добавленной карте.
-        /// </summary>
-        public int Width { get; }
-
-        /// <summary>
-        /// Высота. Вычисляется по первой добавленной карте.
-        /// </summary>
-        public int Height { get; }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр хранилища, добавляя в него указанные карты и проверяя их на то, чтобы они были одного размера.
+        ///     Инициализирует новый экземпляр хранилища, добавляя в него указанные карты и проверяя их на то, чтобы они были
+        ///     одного размера.
         /// </summary>
         /// <param name="processors">Добавляемые карты.</param>
         public ProcessorContainer(IList<Processor> processors)
@@ -49,7 +28,8 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Инициализирует новый экземпляр хранилища, добавляя в него указанные карты и проверяя их на то, чтобы они были одного размера.
+        ///     Инициализирует новый экземпляр хранилища, добавляя в него указанные карты и проверяя их на то, чтобы они были
+        ///     одного размера.
         /// </summary>
         /// <param name="processors">Добавляемые карты.</param>
         public ProcessorContainer(params Processor[] processors)
@@ -61,7 +41,29 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Добавляет карты в коллекцию.
+        ///     Получает карту по индексу.
+        /// </summary>
+        /// <param name="index">Индекс карты.</param>
+        /// <returns>Возвращает карту по индексу.</returns>
+        public Processor this[int index] => _lstProcs[index];
+
+        /// <summary>
+        ///     Получает количество добавленных карт.
+        /// </summary>
+        public int Count => _lstProcs.Count;
+
+        /// <summary>
+        ///     Ширина. Вычисляется по первой добавленной карте.
+        /// </summary>
+        public int Width { get; }
+
+        /// <summary>
+        ///     Высота. Вычисляется по первой добавленной карте.
+        /// </summary>
+        public int Height { get; }
+
+        /// <summary>
+        ///     Добавляет карты в коллекцию.
         /// </summary>
         /// <param name="processors">Добавляемые карты.</param>
         void AddProcessors(IEnumerable<Processor> processors)
@@ -70,29 +72,40 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Выдаёт исключения в случае обнаружения каких-либо ошибок.
+        ///     Выдаёт исключения в случае обнаружения каких-либо ошибок.
         /// </summary>
         /// <param name="processors">Добавляемые карты.</param>
-        /// <returns>Возвращает первый процессор в коллекции, который не равен null или null, если таких процессоров в коллекции нет.</returns>
+        /// <returns>
+        ///     Возвращает первый процессор в коллекции, который не равен null или null, если таких процессоров в коллекции
+        ///     нет.
+        /// </returns>
         Processor ArgumentAssertions(IList<Processor> processors)
         {
             if (processors == null)
-                throw new ArgumentNullException(nameof(processors), $"{nameof(ProcessorContainer)}: Коллекция карт не может быть равна null.");
+                throw new ArgumentNullException(nameof(processors),
+                    $"{nameof(ProcessorContainer)}: Коллекция карт не может быть равна null.");
             if (processors.Count <= 0)
-                throw new ArgumentException($"{nameof(ProcessorContainer)}: В коллекции должен быть хотя бы один элемент.", nameof(processors));
+                throw new ArgumentException(
+                    $"{nameof(ProcessorContainer)}: В коллекции должен быть хотя бы один элемент.", nameof(processors));
             if (IsNull(processors))
-                throw new ArgumentNullException(nameof(processors), $"{nameof(ProcessorContainer)}: Все элементы коллекции процессоров равны null.");
+                throw new ArgumentNullException(nameof(processors),
+                    $"{nameof(ProcessorContainer)}: Все элементы коллекции процессоров равны null.");
             if (IsEquals(processors))
-                throw new ArgumentException($"{nameof(ProcessorContainer)}: Обнаружены ссылки, указывающие на одни и те же карты.", nameof(processors));
+                throw new ArgumentException(
+                    $"{nameof(ProcessorContainer)}: Обнаружены ссылки, указывающие на одни и те же карты.",
+                    nameof(processors));
             if (!InOneSize(processors))
-                throw new ArgumentException($"{nameof(ProcessorContainer)}: Обнаружены карты различных размеров.", nameof(processors));
+                throw new ArgumentException($"{nameof(ProcessorContainer)}: Обнаружены карты различных размеров.",
+                    nameof(processors));
             if (!InOneTag(processors))
-                throw new ArgumentException($"{nameof(ProcessorContainer)}: Карты с одинаковыми {nameof(Processor.Tag)} не могут быть в одном списке.", nameof(processors));
+                throw new ArgumentException(
+                    $"{nameof(ProcessorContainer)}: Карты с одинаковыми {nameof(Processor.Tag)} не могут быть в одном списке.",
+                    nameof(processors));
             return FirstInArray(processors);
         }
 
         /// <summary>
-        /// Добавляет карту в хранилище.
+        ///     Добавляет карту в хранилище.
         /// </summary>
         /// <param name="proc">Добавляемая карта.</param>
         public void Add(Processor proc)
@@ -100,16 +113,22 @@ namespace DynamicParser
             if (proc == null)
                 throw new ArgumentNullException(nameof(proc), $"{nameof(Add)}: {nameof(proc)} = null.");
             if (proc.Width != Width)
-                throw new ArgumentException($"{nameof(Add)}: Ширина добавляемой карты должна совпадать с шириной хранилища ({proc.Width} и {Width}).", nameof(proc));
+                throw new ArgumentException(
+                    $"{nameof(Add)}: Ширина добавляемой карты должна совпадать с шириной хранилища ({proc.Width} и {Width}).",
+                    nameof(proc));
             if (proc.Height != Height)
-                throw new ArgumentException($"{nameof(Add)}: Высота добавляемой карты должна совпадать с высотой хранилища ({proc.Height} и {Height}).", nameof(proc));
+                throw new ArgumentException(
+                    $"{nameof(Add)}: Высота добавляемой карты должна совпадать с высотой хранилища ({proc.Height} и {Height}).",
+                    nameof(proc));
             if (ContainsTag(proc.Tag))
-                throw new ArgumentException($"{nameof(Add)}: Попытка добавить карту, значение свойства {nameof(Processor.Tag)} которой уже существует в списке.", nameof(proc));
+                throw new ArgumentException(
+                    $"{nameof(Add)}: Попытка добавить карту, значение свойства {nameof(Processor.Tag)} которой уже существует в списке.",
+                    nameof(proc));
             _lstProcs.Add(proc);
         }
 
         /// <summary>
-        /// Добавляет коллекцию карт в хранилище.
+        ///     Добавляет коллекцию карт в хранилище.
         /// </summary>
         /// <param name="procs">Добавляемая коллекция карт.</param>
         public void AddRange(params Processor[] procs)
@@ -121,7 +140,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Добавляет коллекцию карт в хранилище.
+        ///     Добавляет коллекцию карт в хранилище.
         /// </summary>
         /// <param name="procs">Добавляемая коллекция карт.</param>
         public void AddRange(IList<Processor> procs)
@@ -133,7 +152,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Проверяет, присутствуют ли одинаковые ссылки на объекты карт.
+        ///     Проверяет, присутствуют ли одинаковые ссылки на объекты карт.
         /// </summary>
         /// <param name="processors">Проверяемый массив.</param>
         /// <returns>В случае, когда обнаружены совпадающе ссылки, возвращает true, иначе false.</returns>
@@ -163,7 +182,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Проверяет, являются ли все указанные карты, картами одного размера.
+        ///     Проверяет, являются ли все указанные карты, картами одного размера.
         /// </summary>
         /// <param name="processors">Список проверяемых карт.</param>
         /// <returns>Возвращает true в случае, если все ли указанные карты одного размера, в противном случае false.</returns>
@@ -180,10 +199,13 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Находит первый процессор в коллекции, который не равен null.
+        ///     Находит первый процессор в коллекции, который не равен null.
         /// </summary>
         /// <param name="processors">Коллекция процессоров, в которой производится поиск.</param>
-        /// <returns>Возвращает первый процессор в коллекции, который не равен null или null, если таких процессоров в коллекции нет.</returns>
+        /// <returns>
+        ///     Возвращает первый процессор в коллекции, который не равен null или null, если таких процессоров в коллекции
+        ///     нет.
+        /// </returns>
         static Processor FirstInArray(ICollection<Processor> processors)
         {
             if (processors == null || processors.Count <= 0)
@@ -192,19 +214,23 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Проверяет, все ли элементы коллекции равны null или отсутствуют.
+        ///     Проверяет, все ли элементы коллекции равны null или отсутствуют.
         /// </summary>
         /// <param name="collection">Проверяемая коллекция.</param>
-        /// <returns>Возвращает значение true в случае, если все элементы коллекции равны null или отсутствуют, в противном случае - false.</returns>
+        /// <returns>
+        ///     Возвращает значение true в случае, если все элементы коллекции равны null или отсутствуют, в противном случае
+        ///     - false.
+        /// </returns>
         static bool IsNull(ICollection<Processor> collection)
         {
             if (collection == null)
-                throw new ArgumentNullException(nameof(collection), $"{nameof(IsNull)}: Проверяемая коллекция равна null.");
+                throw new ArgumentNullException(nameof(collection),
+                    $"{nameof(IsNull)}: Проверяемая коллекция равна null.");
             return collection.Count <= 0 || collection.All(pr => pr == null);
         }
 
         /// <summary>
-        /// Проверяет присутствие карт с одинаковыми значениями свойства <see cref="Processor.Tag"/> в указанном списке.
+        ///     Проверяет присутствие карт с одинаковыми значениями свойства <see cref="Processor.Tag" /> в указанном списке.
         /// </summary>
         /// <param name="tags">Проверяемый список.</param>
         /// <returns>Возвращает true в случае, когда повторяющиеся значения отсутствуют, в противном случае false.</returns>
@@ -231,7 +257,8 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Определяет, существует ли в текущем списке карта с таким же значением свойства <see cref="Processor.Tag"/> или нет.
+        ///     Определяет, существует ли в текущем списке карта с таким же значением свойства <see cref="Processor.Tag" /> или
+        ///     нет.
         /// </summary>
         /// <param name="tag">Искомый тег.</param>
         /// <returns>Возвращает true в случае, если карта найдена, в противном случае false.</returns>
@@ -241,8 +268,8 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Сравнивает строки по правилам сравнения свойства <see cref="Processor.Tag"/>.
-        /// С обрезанием пробелов и без учёта регистра.
+        ///     Сравнивает строки по правилам сравнения свойства <see cref="Processor.Tag" />.
+        ///     С обрезанием пробелов и без учёта регистра.
         /// </summary>
         /// <param name="tag">Строка, которую надо сравнить.</param>
         /// <param name="cmp">Строка, с которой надо сравнить.</param>
@@ -250,14 +277,18 @@ namespace DynamicParser
         public static bool TagStringCompare(string tag, string cmp)
         {
             if (tag == null)
-                throw new ArgumentNullException(nameof(tag), $"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно null.");
+                throw new ArgumentNullException(nameof(tag),
+                    $"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно null.");
             if (tag == string.Empty)
-                throw new ArgumentException($"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно {nameof(string.Empty)}.",
+                throw new ArgumentException(
+                    $"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно {nameof(string.Empty)}.",
                     nameof(tag));
             if (cmp == null)
-                throw new ArgumentNullException(nameof(cmp), $"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно null.");
+                throw new ArgumentNullException(nameof(cmp),
+                    $"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно null.");
             if (cmp == string.Empty)
-                throw new ArgumentException($"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно {nameof(string.Empty)}.",
+                throw new ArgumentException(
+                    $"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно {nameof(string.Empty)}.",
                     nameof(cmp));
             return string.Compare(tag.Trim(), cmp.Trim(), StringComparison.OrdinalIgnoreCase) == 0;
         }

@@ -475,26 +475,26 @@
             <summary>
             Инициализирует структуру с заданной позицией.
             </summary>
-            <param name="position">Позиция.</param>
+            <param name="position">Позиция выбранной карты.</param>
         </member>
         <member name="F:DynamicParser.Reg.Percent">
             <summary>
-            Процент соответствия.
+            Процент соответствия выбранной карты.
             </summary>
         </member>
         <member name="F:DynamicParser.Reg.SelectedProcessor">
             <summary>
-            Карта.
+            Выбранная карта.
             </summary>
         </member>
         <member name="P:DynamicParser.Reg.Position">
             <summary>
-            Координаты карты.
+            Координаты выбранной карты.
             </summary>
         </member>
         <member name="T:DynamicParser.RegionStatus">
             <summary>
-            Отражает статус конкретного региона при проверке на совместимость с другим.
+            Отражает статус конкретного <see cref="T:DynamicParser.Region"/> при проверке на совместимость с другим.
             </summary>
         </member>
         <member name="F:DynamicParser.RegionStatus.Ok">
@@ -509,12 +509,12 @@
         </member>
         <member name="F:DynamicParser.RegionStatus.WidthBig">
             <summary>
-            Указанный регион шире существующего.
+            Указанный регион шире текущего.
             </summary>
         </member>
         <member name="F:DynamicParser.RegionStatus.HeightBig">
             <summary>
-            Указанный регион выше существующего.
+            Указанный регион выше текущего.
             </summary>
         </member>
         <member name="T:DynamicParser.SearchResults">
@@ -549,17 +549,17 @@
         </member>
         <member name="P:DynamicParser.SearchResults.MapWidth">
             <summary>
-            Ширина карт, которые проходили обработку.
+            Ширина обрабатываемых карт.
             </summary>
         </member>
         <member name="P:DynamicParser.SearchResults.MapHeight">
             <summary>
-            Высота карт, которые проходили обработку.
+            Высота обрабатываемых карт.
             </summary>
         </member>
         <member name="P:DynamicParser.SearchResults.MapSize">
             <summary>
-            Размер карт, которые проходили обработку.
+            Размер обрабатываемых карт.
             </summary>
         </member>
         <member name="M:DynamicParser.SearchResults.#ctor(System.Int32,System.Int32,System.Int32,System.Int32)">
@@ -574,7 +574,7 @@
         <member name="M:DynamicParser.SearchResults.FindRelation(System.Int32,System.Int32,System.String[])">
             <summary>
             Ищет возможность связывания указанных слов с полями <see cref="P:DynamicParser.Processor.Tag"/> найденных карт.
-            Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+            Равносилен вызову метода <see cref="M:DynamicParser.SearchResults.FindRelation(System.String,System.Int32,System.Int32)"/> для каждого слова. Оптимизирован для многопоточного исполнения.
             Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного массива.
             </summary>
             <param name="words">Искомые слова.</param>
@@ -585,7 +585,7 @@
         <member name="M:DynamicParser.SearchResults.FindRelation(System.Collections.ICollection,System.Int32,System.Int32)">
             <summary>
             Ищет возможность связывания указанных слов с полями <see cref="P:DynamicParser.Processor.Tag"/> найденных карт.
-            Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+            Равносилен вызову метода <see cref="M:DynamicParser.SearchResults.FindRelation(System.String,System.Int32,System.Int32)"/> для каждого слова. Оптимизирован для многопоточного исполнения.
             Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного массива.
             </summary>
             <param name="words">Искомые слова.</param>
@@ -596,7 +596,7 @@
         <member name="M:DynamicParser.SearchResults.FindRelation(System.Collections.Generic.IList{System.String},System.Int32,System.Int32)">
             <summary>
             Ищет возможность связывания указанных слов с полями <see cref="P:DynamicParser.Processor.Tag"/> найденных карт.
-            Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+            Равносилен вызову метода <see cref="M:DynamicParser.SearchResults.FindRelation(System.String,System.Int32,System.Int32)"/> для каждого слова. Оптимизирован для многопоточного исполнения.
             Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного массива.
             </summary>
             <param name="words">Искомые слова.</param>
@@ -637,18 +637,18 @@
             <summary>
             Генерирует <see cref="T:DynamicParser.WordSearcher"/> из <see cref="M:DynamicParser.Processor.GetProcessorName(System.Int32,System.Int32)"/>.
             </summary>
-            <param name="region">Регион, из которого требуется получить <see cref="T:DynamicParser.WordSearcher"/>.</param>
+            <param name="region"><see cref="T:DynamicParser.Region"/>, из которого требуется получить <see cref="T:DynamicParser.WordSearcher"/>.</param>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-            <param name="count">Количество символов в строке названия карты.</param>
-            <returns>Возвращает <see cref="T:DynamicParser.WordSearcher"/> из первых букв названия (<see cref="P:DynamicParser.Processor.Tag"/>) объектов региона.</returns>
+            <param name="count">Количество символов в строке <see cref="P:DynamicParser.Processor.Tag"/> карты.</param>
+            <returns>Возвращает <see cref="T:DynamicParser.WordSearcher"/> из первых букв названия (<see cref="P:DynamicParser.Processor.Tag"/>) объектов <see cref="T:DynamicParser.Region"/>.</returns>
         </member>
         <member name="M:DynamicParser.SearchResults.FindSymbols(System.String,System.Int32)">
             <summary>
-            Находит объекты в результатах поиска, поля <see cref="P:DynamicParser.Processor.Tag"/> которых по указанной позиции соответствуют указанной строке.
+            Находит карты в результатах поиска, поля <see cref="P:DynamicParser.Processor.Tag"/> которых по указанной позиции соответствуют указанной строке.
             </summary>
             <param name="procName">Искомая строка.</param>
             <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-            <returns>Возвращает информацию о найденных объектах.</returns>
+            <returns>Возвращает информацию о найденных картах.</returns>
         </member>
         <member name="M:DynamicParser.SearchResults.ChangeCount(System.Collections.Generic.IList{System.Int32},System.Int32)">
             <summary>
@@ -671,15 +671,15 @@
             <summary>
             Выполняет поиск наиболее подходящих карт в указанной области.
             </summary>
-            <param name="rect">Указанная область.</param>
+            <param name="rect">Область поиска карт.</param>
             <returns>Возвращает список наиболее подходящих карт в указанной области.</returns>
         </member>
         <member name="M:DynamicParser.SearchResults.RegionCorrect(DynamicParser.Region)">
             <summary>
-            Определяет, есть ли какие-либо конфликты между заданным регионом и текущим.
+            Определяет, есть ли какие-либо конфликты между заданным <see cref="T:DynamicParser.Region"/> и текущим.
             </summary>
-            <param name="region">Регион, относительно которого происходит проверка.</param>
-            <returns>Возвращает OK в случае отсутствия конфликтов.</returns>
+            <param name="region">Проверяемый <see cref="T:DynamicParser.Region"/>.</param>
+            <returns>Возвращает <see cref="F:DynamicParser.RegionStatus.Ok"/> в случае отсутствия конфликтов.</returns>
         </member>
         <member name="T:DynamicParser.TagSearcher">
             <summary>
@@ -705,6 +705,7 @@
         <member name="M:DynamicParser.TagSearcher.IsEqual(System.String)">
             <summary>
             Получает значение, определяющее сходство между указанной строкой и текущей.
+            Сравнение производится без учёта регистра.
             </summary>
             <param name="str">Сравниваемая строка.</param>
             <returns>Возвращает значение true в случае сходства строк, false в противном случае.</returns>
@@ -726,12 +727,12 @@
         </member>
         <member name="T:DynamicParser.WordSearcher">
             <summary>
-            Выполняет поиск соответствия слова указанной строке, состоящей из массива слов.
+            Выполняет проверку соответствия слова указанной строке, состоящей из массива слов.
             </summary>
         </member>
         <member name="F:DynamicParser.WordSearcher._words">
             <summary>
-            Содержит коллекцию слов.
+            Содержит коллекцию слов, используемую для формирования заданного слова.
             </summary>
         </member>
         <member name="P:DynamicParser.WordSearcher.Count">
@@ -741,9 +742,8 @@
         </member>
         <member name="M:DynamicParser.WordSearcher.#ctor(System.Collections.Generic.IList{System.String})">
             <summary>
-            Инициализирует текущий экземпляр коллекцией слов.
-            Выравнивает (синхронизирует) наличие всех слов в указанных коллекциях, в одной коллекции.
-            Возвращает список строк, в котором отсутствуют дублирующиеся и пустые значения.
+            Инициализирует текущий экземпляр указанной коллекцией слов.
+            Создаёт список строк, в котором отсутствуют дублирующиеся и пустые значения.
             Отсев производится без учёта регистра.
             </summary>
             <param name="strs">Коллекция слов.</param>
@@ -751,6 +751,7 @@
         <member name="M:DynamicParser.WordSearcher.IsEqual(System.String)">
             <summary>
             Выполняет проверку соответствия слов, содержащихся в текущем экземпляре, с заданным словом.
+            Проверка выполняется без учёта регистра.
             </summary>
             <param name="word">Проверяемое слово.</param>
             <returns>Возвращает значение true в случае, если соответствие обнаружено, в противном случае - false.</returns>

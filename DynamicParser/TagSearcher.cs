@@ -28,12 +28,13 @@ namespace DynamicParser
             if (str == null)
                 throw new ArgumentNullException(nameof(str), $"{nameof(TagSearcher)}: Подстрока пустая (null).");
             if (str == string.Empty)
-                throw new ArgumentException($"{nameof(TagSearcher)}: Подстрока не может быть пустой.", nameof(str));
+                throw new ArgumentException($"{nameof(TagSearcher)}: Подстрока пустая ({nameof(string.Empty)}).", nameof(str));
             _dicCurrent = GetCount(SourceString = str.ToUpper());
         }
 
         /// <summary>
         /// Получает значение, определяющее сходство между указанной строкой и текущей.
+        /// Сравнение производится без учёта регистра.
         /// </summary>
         /// <param name="str">Сравниваемая строка.</param>
         /// <returns>Возвращает значение true в случае сходства строк, false в противном случае.</returns>

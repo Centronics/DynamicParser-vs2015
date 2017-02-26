@@ -17,32 +17,32 @@ namespace DynamicParser
         public Rectangle Region { get; set; }
 
         /// <summary>
-        /// Содержит наиболее соответствующие найденные карты.
+        /// Содержит наиболее соответствующую найденную карту.
         /// </summary>
         public Reg Register { get; set; }
 
         /// <summary>
-        /// Возвращает true в случае, если карта отсутстует.
+        /// Возвращает true в случае, если карта отсутствует, в противном случае - false.
         /// </summary>
         public bool IsEmpty => Register.SelectedProcessor == null;
 
         /// <summary>
-        /// Координата X начала области.
+        /// Координата X верхнего левого угла области.
         /// </summary>
         public int X => Region.X;
 
         /// <summary>
-        /// Координата Y начала области.
+        /// Координата Y верхнего левого угла области.
         /// </summary>
         public int Y => Region.Y;
 
         /// <summary>
-        /// Возвращает координату, являющуюся суммой свойств X и Width.
+        /// Возвращает координату по оси X, являющуюся суммой значений свойств <see cref="Rectangle.X"/> и <see cref="Rectangle.Width"/>.
         /// </summary>
         public int Right => Region.Right;
 
         /// <summary>
-        /// Возвращает координату, являющуюся суммой свойств Y и Height.
+        /// Возвращает координату по оси Y, являющуюся суммой значений свойств <see cref="Rectangle.Y"/> и <see cref="Rectangle.Height"/>.
         /// </summary>
         public int Bottom => Region.Bottom;
 
@@ -50,7 +50,7 @@ namespace DynamicParser
         /// Выясняет, пересекается ли текущая область с указанной.
         /// </summary>
         /// <param name="rect">Проверяемая область.</param>
-        /// <returns>Возвращает true в случае обнаружения пересечения.</returns>
+        /// <returns>Возвращает значение true в случае обнаружения пересечения, в противном случае - false.</returns>
         public bool IsConflict(Rectangle rect)
         {
             return rect.IntersectsWith(Region);
@@ -63,7 +63,7 @@ namespace DynamicParser
     public sealed class Region
     {
         /// <summary>
-        /// Хранит области, индексируя их как Width * y + x.
+        /// Хранит области, индексируя их как (<see cref="Width"/> * y) + x.
         /// </summary>
         readonly SortedDictionary<ulong, Registered> _rects = new SortedDictionary<ulong, Registered>();
 
@@ -115,11 +115,11 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Вычисляет индекс по формуле Width * y + x.
+        /// Вычисляет индекс по формуле (<see cref="Width"/> * y) + x.
         /// </summary>
         /// <param name="x">Координата X.</param>
         /// <param name="y">Координата Y.</param>
-        /// <returns>Возвращает индекс по формуле Width * y + x.</returns>
+        /// <returns>Возвращает индекс по формуле (<see cref="Width"/> * y) + x.</returns>
         ulong GetIndex(int x, int y)
         {
             if (x < 0)
@@ -156,10 +156,10 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Определяет, перекрывается ли указанная область с какой-либо из содержащихся в объекте.
+        /// Определяет, перекрывается ли указанная область с какой-либо из содержащихся в текущем экземпляре.
         /// </summary>
         /// <param name="rect">Проверяемая область.</param>
-        /// <returns>В случае, если перекрываются, возвращает true, в противном случае false.</returns>
+        /// <returns>В случае, если области перекрываются, возвращает значение true, в противном случае - false.</returns>
         public bool IsConflict(Rectangle rect)
         {
             if (rect.Right > Width || rect.Bottom > Height || rect.Width <= 0 || rect.Height <= 0 || rect.X < 0 || rect.Y < 0)
@@ -186,11 +186,11 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Вставляет указанную область в коллекцию.
+        /// Вставляет указанную область и карту в коллекцию.
         /// </summary>
         /// <param name="rect">Вставляемая область.</param>
         /// <param name="processor">Добавляемая карта.</param>
-        /// <param name="percent">Добавляемый процент соответствия карты.</param>
+        /// <param name="percent">Процент соответствия добавляемой карты.</param>
         public Registered Add(Rectangle rect, Processor processor = null, double percent = 0.0)
         {
             if (rect.Right > Width)
@@ -215,14 +215,14 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Вставляет указанную область в коллекцию.
+        /// Вставляет указанную область и карту в коллекцию.
         /// </summary>
-        /// <param name="x">Координата X.</param>
-        /// <param name="y">Координата Y.</param>
-        /// <param name="width">Ширина.</param>
-        /// <param name="height">Высота.</param>
+        /// <param name="x">Координата X вставляемой области.</param>
+        /// <param name="y">Координата Y вставляемой области.</param>
+        /// <param name="width">Ширина вставляемой области.</param>
+        /// <param name="height">Высота вставляемой области.</param>
         /// <param name="processor">Добавляемая карта.</param>
-        /// <param name="percent">Добавляемый процент соответствия карты.</param>
+        /// <param name="percent">Процент соответствия добавляемой карты.</param>
         public void Add(int x, int y, int width, int height, Processor processor = null, double percent = 0.0)
         {
             Add(new Rectangle(x, y, width, height), processor, percent);

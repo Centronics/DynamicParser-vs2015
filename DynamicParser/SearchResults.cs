@@ -37,7 +37,7 @@ namespace DynamicParser
         /// <summary>
         /// Инициализирует структуру с заданной позицией.
         /// </summary>
-        /// <param name="position">Позиция.</param>
+        /// <param name="position">Позиция выбранной карты.</param>
         public Reg(Point position)
         {
             Position = position;
@@ -46,23 +46,23 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Процент соответствия.
+        /// Процент соответствия выбранной карты.
         /// </summary>
         public double Percent;
 
         /// <summary>
-        /// Карта.
+        /// Выбранная карта.
         /// </summary>
         public Processor SelectedProcessor;
 
         /// <summary>
-        /// Координаты карты.
+        /// Координаты выбранной карты.
         /// </summary>
         public Point Position { get; }
     }
 
     /// <summary>
-    /// Отражает статус конкретного региона при проверке на совместимость с другим.
+    /// Отражает статус конкретного <see cref="Region"/> при проверке на совместимость с другим.
     /// </summary>
     public enum RegionStatus
     {
@@ -75,11 +75,11 @@ namespace DynamicParser
         /// </summary>
         Null,
         /// <summary>
-        /// Указанный регион шире существующего.
+        /// Указанный регион шире текущего.
         /// </summary>
         WidthBig,
         /// <summary>
-        /// Указанный регион выше существующего.
+        /// Указанный регион выше текущего.
         /// </summary>
         HeightBig
     }
@@ -115,17 +115,17 @@ namespace DynamicParser
         public Size ResultSize => new Size(Width, Height);
 
         /// <summary>
-        /// Ширина карт, которые проходили обработку.
+        /// Ширина обрабатываемых карт.
         /// </summary>
         public int MapWidth { get; }
 
         /// <summary>
-        /// Высота карт, которые проходили обработку.
+        /// Высота обрабатываемых карт.
         /// </summary>
         public int MapHeight { get; }
 
         /// <summary>
-        /// Размер карт, которые проходили обработку.
+        /// Размер обрабатываемых карт.
         /// </summary>
         public Size MapSize => new Size(MapWidth, MapHeight);
 
@@ -159,7 +159,7 @@ namespace DynamicParser
 
         /// <summary>
         /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+        /// Равносилен вызову метода <see cref="FindRelation(string,int,int)"/> для каждого слова. Оптимизирован для многопоточного исполнения.
         /// Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного массива.
         /// </summary>
         /// <param name="words">Искомые слова.</param>
@@ -173,7 +173,7 @@ namespace DynamicParser
 
         /// <summary>
         /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+        /// Равносилен вызову метода <see cref="FindRelation(string,int,int)"/> для каждого слова. Оптимизирован для многопоточного исполнения.
         /// Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного массива.
         /// </summary>
         /// <param name="words">Искомые слова.</param>
@@ -198,7 +198,7 @@ namespace DynamicParser
 
         /// <summary>
         /// Ищет возможность связывания указанных слов с полями <see cref="Processor.Tag"/> найденных карт.
-        /// Равносилен вызову метода FindRelation для каждого слова. Оптимизирован для многопоточного исполнения.
+        /// Равносилен вызову метода <see cref="FindRelation(string,int,int)"/> для каждого слова. Оптимизирован для многопоточного исполнения.
         /// Возвращает список слов, с которыми удалось установить связь, или null в случае ошибки или пустого исходного массива.
         /// </summary>
         /// <param name="words">Искомые слова.</param>
@@ -359,10 +359,10 @@ namespace DynamicParser
         /// <summary>
         /// Генерирует <see cref="WordSearcher"/> из <see cref="Processor.GetProcessorName"/>.
         /// </summary>
-        /// <param name="region">Регион, из которого требуется получить <see cref="WordSearcher"/>.</param>
+        /// <param name="region"><see cref="Region"/>, из которого требуется получить <see cref="WordSearcher"/>.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <param name="count">Количество символов в строке названия карты.</param>
-        /// <returns>Возвращает <see cref="WordSearcher"/> из первых букв названия (<see cref="Processor.Tag"/>) объектов региона.</returns>
+        /// <param name="count">Количество символов в строке <see cref="Processor.Tag"/> карты.</param>
+        /// <returns>Возвращает <see cref="WordSearcher"/> из первых букв названия (<see cref="Processor.Tag"/>) объектов <see cref="Region"/>.</returns>
         static WordSearcher GetStringFromRegion(Region region, int startIndex, int count)
         {
             if (region == null)
@@ -378,11 +378,11 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Находит объекты в результатах поиска, поля <see cref="Processor.Tag"/> которых по указанной позиции соответствуют указанной строке.
+        /// Находит карты в результатах поиска, поля <see cref="Processor.Tag"/> которых по указанной позиции соответствуют указанной строке.
         /// </summary>
         /// <param name="procName">Искомая строка.</param>
         /// <param name="startIndex">Индекс, начиная с которого будет сформирована строка названия карты.</param>
-        /// <returns>Возвращает информацию о найденных объектах.</returns>
+        /// <returns>Возвращает информацию о найденных картах.</returns>
         List<Reg> FindSymbols(string procName, int startIndex)
         {
             if (procName == null)
@@ -453,7 +453,7 @@ namespace DynamicParser
         /// <summary>
         /// Выполняет поиск наиболее подходящих карт в указанной области.
         /// </summary>
-        /// <param name="rect">Указанная область.</param>
+        /// <param name="rect">Область поиска карт.</param>
         /// <returns>Возвращает список наиболее подходящих карт в указанной области.</returns>
         public List<ProcPerc> Find(Rectangle rect)
         {
@@ -486,10 +486,10 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Определяет, есть ли какие-либо конфликты между заданным регионом и текущим.
+        /// Определяет, есть ли какие-либо конфликты между заданным <see cref="Region"/> и текущим.
         /// </summary>
-        /// <param name="region">Регион, относительно которого происходит проверка.</param>
-        /// <returns>Возвращает OK в случае отсутствия конфликтов.</returns>
+        /// <param name="region">Проверяемый <see cref="Region"/>.</param>
+        /// <returns>Возвращает <see cref="RegionStatus.Ok"/> в случае отсутствия конфликтов.</returns>
         public RegionStatus RegionCorrect(Region region)
         {
             if (region == null)

@@ -11,6 +11,8 @@ namespace DynamicParserTest
         public void TagSearcherTest1()
         {
             TagSearcher ts = new TagSearcher("000");
+            Assert.AreEqual(false, ts.IsEqual(string.Empty));
+            Assert.AreEqual(false, ts.IsEqual(null));
             Assert.AreEqual(true, ts.IsEqual("000"));
             ts = new TagSearcher("100");
             Assert.AreEqual(true, ts.IsEqual("100"));

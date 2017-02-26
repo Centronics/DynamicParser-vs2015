@@ -27,56 +27,56 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentNullException))]
         public void FindRelationException2()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((string)null);
+            new SearchResults(3, 3, 1, 1).FindRelation((string) null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void FindRelationException3()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>)null);
+            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>) null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void FindRelationException4()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((ICollection)null);
+            new SearchResults(3, 3, 1, 1).FindRelation((ICollection) null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void FindRelationException5()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((ICollection)new List<string> { "test" }, -1);
+            new SearchResults(3, 3, 1, 1).FindRelation((ICollection) new List<string> {"test"}, -1);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void FindRelationException6()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((ICollection)new List<string> { "test" }, 1, -1);
+            new SearchResults(3, 3, 1, 1).FindRelation((ICollection) new List<string> {"test"}, 1, -1);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void FindRelationException7()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>)new List<string> { "test" }, 1, 0);
+            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>) new List<string> {"test"}, 1, 0);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void FindRelationException8()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>)new List<string> { "test" }, 1, -1);
+            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>) new List<string> {"test"}, 1, -1);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void FindRelationException9()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>)new List<string> { "test" }, -1);
+            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>) new List<string> {"test"}, -1);
         }
 
         [TestMethod]
@@ -153,28 +153,28 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void FindRelationException20()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>)new List<string> { "test" }, 0, 3);
+            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>) new List<string> {"test"}, 0, 3);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void FindRelationException21()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>)new List<string> { "test" }, 0, 5);
+            new SearchResults(3, 3, 1, 1).FindRelation((IList<string>) new List<string> {"test"}, 0, 5);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void FindRelationException22()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((ICollection)new List<string> { "test" }, 0, 3);
+            new SearchResults(3, 3, 1, 1).FindRelation((ICollection) new List<string> {"test"}, 0, 3);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void FindRelationException23()
         {
-            new SearchResults(3, 3, 1, 1).FindRelation((ICollection)new List<string> { "test" }, 0, 5);
+            new SearchResults(3, 3, 1, 1).FindRelation((ICollection) new List<string> {"test"}, 0, 5);
         }
 
         [TestMethod]
@@ -293,15 +293,15 @@ namespace DynamicParserTest
 
             SearchResults sr = new SearchResults(3, 3, 2, 1)
             {
-                [0, 0] = new ProcPerc { Percent = 0.15, Procs = new[] { new Processor(svs, "121") } },
-                [0, 1] = new ProcPerc { Percent = 0.25, Procs = new[] { new Processor(svs, "552hjfgh") } },
-                [0, 2] = new ProcPerc { Percent = 0.35, Procs = new[] { new Processor(svs, "e") } },
-                [1, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { new Processor(svs, "683A") } },
-                [1, 1] = new ProcPerc { Percent = 0.55, Procs = new[] { new Processor(svs, "rt67") } },
-                [2, 0] = new ProcPerc { Percent = 0.65, Procs = new[] { new Processor(svs, "m") } },
-                [2, 1] = new ProcPerc { Percent = 0.75, Procs = new[] { new Processor(svs, "p") } },
-                [1, 2] = new ProcPerc { Percent = 0.85, Procs = new[] { new Processor(svs, "k") } },
-                [2, 2] = new ProcPerc { Percent = 0.95, Procs = new[] { new Processor(svs, "z") } }
+                [0, 0] = new ProcPerc {Percent = 0.15, Procs = new[] {new Processor(svs, "121")}},
+                [0, 1] = new ProcPerc {Percent = 0.25, Procs = new[] {new Processor(svs, "552hjfgh")}},
+                [0, 2] = new ProcPerc {Percent = 0.35, Procs = new[] {new Processor(svs, "e")}},
+                [1, 0] = new ProcPerc {Percent = 0.45, Procs = new[] {new Processor(svs, "683A")}},
+                [1, 1] = new ProcPerc {Percent = 0.55, Procs = new[] {new Processor(svs, "rt67")}},
+                [2, 0] = new ProcPerc {Percent = 0.65, Procs = new[] {new Processor(svs, "m")}},
+                [2, 1] = new ProcPerc {Percent = 0.75, Procs = new[] {new Processor(svs, "p")}},
+                [1, 2] = new ProcPerc {Percent = 0.85, Procs = new[] {new Processor(svs, "k")}},
+                [2, 2] = new ProcPerc {Percent = 0.95, Procs = new[] {new Processor(svs, "z")}}
             };
 
             Assert.AreEqual(true, sr.FindRelation("1"));
@@ -355,7 +355,8 @@ namespace DynamicParserTest
             Assert.AreEqual(true, sr.FindRelation("re"));
 
             {
-                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "1", "5", "6", "r", "p", "k", "z", "m", "e", "Z", "M", "E");
+                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "1", "5", "6", "r", "p", "k", "z", "m", "e", "Z", "M",
+                    "E");
                 Assert.AreEqual(true, bag.Contains("1"));
                 Assert.AreEqual(true, bag.Contains("5"));
                 Assert.AreEqual(true, bag.Contains("6"));
@@ -372,7 +373,8 @@ namespace DynamicParserTest
             }
 
             {
-                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "15", "1r", "16", "11", "p", "k", "1R", "R1", "r1", "1z", "1m", "1e", "1Z", "1M", "1E", "1p", "1k");
+                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "15", "1r", "16", "11", "p", "k", "1R", "R1", "r1",
+                    "1z", "1m", "1e", "1Z", "1M", "1E", "1p", "1k");
                 Assert.AreEqual(true, bag.Contains("15"));
                 Assert.AreEqual(true, bag.Contains("1r"));
                 Assert.AreEqual(true, bag.Contains("1R"));
@@ -394,7 +396,8 @@ namespace DynamicParserTest
             }
 
             {
-                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "51", "55", "56", "5r", "5p", "5k", "5z", "5m", "5e", "5Z", "5M", "5E");
+                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "51", "55", "56", "5r", "5p", "5k", "5z", "5m", "5e",
+                    "5Z", "5M", "5E");
                 Assert.AreEqual(true, bag.Contains("51"));
                 Assert.AreEqual(true, bag.Contains("55"));
                 Assert.AreEqual(true, bag.Contains("56"));
@@ -411,7 +414,8 @@ namespace DynamicParserTest
             }
 
             {
-                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "61", "65", "66", "6r", "p", "k", "6R", "R6", "r6", "6z", "6m", "6e", "6Z", "6M", "6E", "6p", "6k");
+                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "61", "65", "66", "6r", "p", "k", "6R", "R6", "r6",
+                    "6z", "6m", "6e", "6Z", "6M", "6E", "6p", "6k");
                 Assert.AreEqual(false, bag.Contains("61"));
                 Assert.AreEqual(true, bag.Contains("6R"));
                 Assert.AreEqual(true, bag.Contains("R6"));
@@ -433,7 +437,8 @@ namespace DynamicParserTest
             }
 
             {
-                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "r1", "r5", "r6", "rr", "p", "k", "RR", "Rr", "rR", "rz", "rm", "re", "rZ", "rM", "rE", "rp", "rk");
+                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "r1", "r5", "r6", "rr", "p", "k", "RR", "Rr", "rR",
+                    "rz", "rm", "re", "rZ", "rM", "rE", "rp", "rk");
                 Assert.AreEqual(true, bag.Contains("r1"));
                 Assert.AreEqual(false, bag.Contains("r5"));
                 Assert.AreEqual(true, bag.Contains("r6"));
@@ -462,15 +467,15 @@ namespace DynamicParserTest
 
             SearchResults sr = new SearchResults(3, 3, 1, 2)
             {
-                [0, 0] = new ProcPerc { Percent = 0.15, Procs = new[] { new Processor(svs, "121") } },
-                [0, 1] = new ProcPerc { Percent = 0.25, Procs = new[] { new Processor(svs, "552hjfgh") } },
-                [0, 2] = new ProcPerc { Percent = 0.35, Procs = new[] { new Processor(svs, "e") } },
-                [1, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { new Processor(svs, "683A") } },
-                [1, 1] = new ProcPerc { Percent = 0.55, Procs = new[] { new Processor(svs, "rt67") } },
-                [2, 0] = new ProcPerc { Percent = 0.65, Procs = new[] { new Processor(svs, "m") } },
-                [2, 1] = new ProcPerc { Percent = 0.75, Procs = new[] { new Processor(svs, "p") } },
-                [1, 2] = new ProcPerc { Percent = 0.85, Procs = new[] { new Processor(svs, "k") } },
-                [2, 2] = new ProcPerc { Percent = 0.95, Procs = new[] { new Processor(svs, "z") } }
+                [0, 0] = new ProcPerc {Percent = 0.15, Procs = new[] {new Processor(svs, "121")}},
+                [0, 1] = new ProcPerc {Percent = 0.25, Procs = new[] {new Processor(svs, "552hjfgh")}},
+                [0, 2] = new ProcPerc {Percent = 0.35, Procs = new[] {new Processor(svs, "e")}},
+                [1, 0] = new ProcPerc {Percent = 0.45, Procs = new[] {new Processor(svs, "683A")}},
+                [1, 1] = new ProcPerc {Percent = 0.55, Procs = new[] {new Processor(svs, "rt67")}},
+                [2, 0] = new ProcPerc {Percent = 0.65, Procs = new[] {new Processor(svs, "m")}},
+                [2, 1] = new ProcPerc {Percent = 0.75, Procs = new[] {new Processor(svs, "p")}},
+                [1, 2] = new ProcPerc {Percent = 0.85, Procs = new[] {new Processor(svs, "k")}},
+                [2, 2] = new ProcPerc {Percent = 0.95, Procs = new[] {new Processor(svs, "z")}}
             };
 
             Assert.AreEqual(true, sr.FindRelation("1"));
@@ -524,7 +529,8 @@ namespace DynamicParserTest
             Assert.AreEqual(false, sr.FindRelation("re"));
 
             {
-                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "1", "5", "6", "r", "p", "k", "z", "m", "e", "Z", "M", "E");
+                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "1", "5", "6", "r", "p", "k", "z", "m", "e", "Z", "M",
+                    "E");
                 Assert.AreEqual(true, bag.Contains("1"));
                 Assert.AreEqual(true, bag.Contains("5"));
                 Assert.AreEqual(true, bag.Contains("6"));
@@ -541,7 +547,8 @@ namespace DynamicParserTest
             }
 
             {
-                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "15", "1r", "16", "11", "p", "k", "1p", "P1", "p1", "1z", "1m", "1e", "1Z", "1M", "1E", "1k");
+                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "15", "1r", "16", "11", "p", "k", "1p", "P1", "p1",
+                    "1z", "1m", "1e", "1Z", "1M", "1E", "1k");
                 Assert.AreEqual(false, bag.Contains("15"));
                 Assert.AreEqual(true, bag.Contains("1r"));
                 Assert.AreEqual(true, bag.Contains("16"));
@@ -562,7 +569,8 @@ namespace DynamicParserTest
             }
 
             {
-                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "51", "55", "56", "5r", "5p", "5k", "5z", "5m", "5e", "5Z", "5M", "5E");
+                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "51", "55", "56", "5r", "5p", "5k", "5z", "5m", "5e",
+                    "5Z", "5M", "5E");
                 Assert.AreEqual(false, bag.Contains("51"));
                 Assert.AreEqual(true, bag.Contains("55"));
                 Assert.AreEqual(true, bag.Contains("56"));
@@ -579,7 +587,8 @@ namespace DynamicParserTest
             }
 
             {
-                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "61", "65", "66", "6r", "p", "k", "6R", "R6", "r6", "6z", "6m", "6e", "6Z", "6M", "6E", "6k", "6p");
+                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "61", "65", "66", "6r", "p", "k", "6R", "R6", "r6",
+                    "6z", "6m", "6e", "6Z", "6M", "6E", "6k", "6p");
                 Assert.AreEqual(true, bag.Contains("61"));
                 Assert.AreEqual(false, bag.Contains("6R"));
                 Assert.AreEqual(false, bag.Contains("R6"));
@@ -601,7 +610,8 @@ namespace DynamicParserTest
             }
 
             {
-                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "r1", "r5", "r6", "rr", "p", "k", "RR", "Rr", "rR", "rz", "rm", "re", "rZ", "rM", "rE", "rp", "rk");
+                ConcurrentBag<string> bag = sr.FindRelation(0, 1, "r1", "r5", "r6", "rr", "p", "k", "RR", "Rr", "rR",
+                    "rz", "rm", "re", "rZ", "rM", "rE", "rp", "rk");
                 Assert.AreEqual(true, bag.Contains("r1"));
                 Assert.AreEqual(true, bag.Contains("r5"));
                 Assert.AreEqual(false, bag.Contains("r6"));
@@ -627,12 +637,12 @@ namespace DynamicParserTest
         public void FindRelationTest1()
         {
             {
-                Processor pr1 = new Processor(new[] { SignValue.MaxValue }, "121");
-                Processor pr2 = new Processor(new[] { SignValue.MinValue }, "552hjfgh");
-                Processor pr3 = new Processor(new[] { SignValue.MinValue }, "683A");
+                Processor pr1 = new Processor(new[] {SignValue.MaxValue}, "121");
+                Processor pr2 = new Processor(new[] {SignValue.MinValue}, "552hjfgh");
+                Processor pr3 = new Processor(new[] {SignValue.MinValue}, "683A");
                 SearchResults sr = new SearchResults(1, 1, 1, 1)
                 {
-                    [0, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { pr1, pr3, pr2 } }
+                    [0, 0] = new ProcPerc {Percent = 0.45, Procs = new[] {pr1, pr3, pr2}}
                 };
                 Assert.AreEqual(true, sr.FindRelation("1"));
                 Assert.AreEqual(true, sr.FindRelation("5"));
@@ -657,16 +667,16 @@ namespace DynamicParserTest
             }
 
             {
-                Processor pr1 = new Processor(new[] { SignValue.MaxValue }, "1224");
-                Processor pr2 = new Processor(new[] { SignValue.MinValue }, "552hjfgh");
-                Processor pr3 = new Processor(new[] { SignValue.MinValue }, "12243A");
-                Processor pr4 = new Processor(new[] { SignValue.MinValue }, "552h5Bgh");
+                Processor pr1 = new Processor(new[] {SignValue.MaxValue}, "1224");
+                Processor pr2 = new Processor(new[] {SignValue.MinValue}, "552hjfgh");
+                Processor pr3 = new Processor(new[] {SignValue.MinValue}, "12243A");
+                Processor pr4 = new Processor(new[] {SignValue.MinValue}, "552h5Bgh");
                 SearchResults sr = new SearchResults(2, 2, 1, 1)
                 {
-                    [0, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { pr1 } },
-                    [1, 0] = new ProcPerc { Percent = 0.55, Procs = new[] { pr2 } },
-                    [0, 1] = new ProcPerc { Percent = 0.65, Procs = new[] { pr3 } },
-                    [1, 1] = new ProcPerc { Percent = 0.75, Procs = new[] { pr4 } }
+                    [0, 0] = new ProcPerc {Percent = 0.45, Procs = new[] {pr1}},
+                    [1, 0] = new ProcPerc {Percent = 0.55, Procs = new[] {pr2}},
+                    [0, 1] = new ProcPerc {Percent = 0.65, Procs = new[] {pr3}},
+                    [1, 1] = new ProcPerc {Percent = 0.75, Procs = new[] {pr4}}
                 };
                 Assert.AreEqual(true, sr.FindRelation("12241224", 0, 4));
                 Assert.AreEqual(true, sr.FindRelation("122122", 0, 3));
@@ -709,7 +719,8 @@ namespace DynamicParserTest
                 Assert.AreEqual(true, sr.FindRelation("3A", 4, 2));
 
                 {
-                    ConcurrentBag<string> bag = sr.FindRelation(0, 4, "12241224", "552h552h552h", "552hJ552Hj552HJ552hj", "552hj552hj552hj552hj");
+                    ConcurrentBag<string> bag = sr.FindRelation(0, 4, "12241224", "552h552h552h", "552hJ552Hj552HJ552hj",
+                        "552hj552hj552hj552hj");
                     Assert.AreEqual(true, bag.Contains("12241224"));
                     Assert.AreEqual(true, bag.Contains("552h552h552h"));
                     Assert.AreEqual(false, bag.Contains("552hJ552Hj552HJ552hj"));
@@ -742,7 +753,8 @@ namespace DynamicParserTest
                 }
 
                 {
-                    ConcurrentBag<string> bag = sr.FindRelation(6, 2, "Gh", "GHGH", "GH", "HGHG", "fg", "gH", "hghg", "GhGh", "gHgH");
+                    ConcurrentBag<string> bag = sr.FindRelation(6, 2, "Gh", "GHGH", "GH", "HGHG", "fg", "gH", "hghg",
+                        "GhGh", "gHgH");
                     Assert.AreEqual(true, bag.Contains("Gh"));
                     Assert.AreEqual(true, bag.Contains("GHGH"));
                     Assert.AreEqual(true, bag.Contains("GH"));
@@ -765,7 +777,8 @@ namespace DynamicParserTest
                 }
 
                 {
-                    ConcurrentBag<string> bag = sr.FindRelation(7, 1, "h", "hh", "hhHHH", "HhhhH", "fg", "H", "HH", "hH", "Hh");
+                    ConcurrentBag<string> bag = sr.FindRelation(7, 1, "h", "hh", "hhHHH", "HhhhH", "fg", "H", "HH", "hH",
+                        "Hh");
                     Assert.AreEqual(true, bag.Contains("h"));
                     Assert.AreEqual(true, bag.Contains("hh"));
                     Assert.AreEqual(true, bag.Contains("hhHHH"));
@@ -798,21 +811,21 @@ namespace DynamicParserTest
         [TestMethod]
         public void FindRelationTest()
         {
-            Processor pr1 = new Processor(new[] { SignValue.MaxValue }, "121");
-            Processor pr2 = new Processor(new[] { SignValue.MinValue }, "552hjfgh");
-            Processor pr3 = new Processor(new[] { SignValue.MinValue }, "683A");
+            Processor pr1 = new Processor(new[] {SignValue.MaxValue}, "121");
+            Processor pr2 = new Processor(new[] {SignValue.MinValue}, "552hjfgh");
+            Processor pr3 = new Processor(new[] {SignValue.MinValue}, "683A");
             SearchResults sr = new SearchResults(3, 3, 1, 1)
             {
-                [0, 0] = new ProcPerc { Percent = 0.45, Procs = new[] { pr1, pr3 } },
-                [1, 0] = new ProcPerc { Percent = 0.55, Procs = new[] { pr2 } },
-                [1, 1] = new ProcPerc { Percent = 0.65, Procs = new[] { pr3 } }
+                [0, 0] = new ProcPerc {Percent = 0.45, Procs = new[] {pr1, pr3}},
+                [1, 0] = new ProcPerc {Percent = 0.55, Procs = new[] {pr2}},
+                [1, 1] = new ProcPerc {Percent = 0.65, Procs = new[] {pr3}}
             };
             for (int k = 0; k < 1000; k++)
             {
                 Assert.AreEqual(null, sr.FindRelation(0, 1));
                 Assert.AreEqual(false, sr.FindRelation(string.Empty));
-                Assert.AreEqual(null, sr.FindRelation((IList<string>)new List<string>()));
-                Assert.AreEqual(null, sr.FindRelation((ICollection)new List<string>()));
+                Assert.AreEqual(null, sr.FindRelation((IList<string>) new List<string>()));
+                Assert.AreEqual(null, sr.FindRelation((ICollection) new List<string>()));
                 Assert.AreEqual(false, sr.FindRelation("rwefd"));
                 Assert.AreEqual(false, sr.FindRelation("19"));
                 Assert.AreEqual(false, sr.FindRelation("5568", 0, 4));
@@ -931,7 +944,7 @@ namespace DynamicParserTest
                 Assert.AreEqual(true, bag.Contains("686855"));
                 Assert.AreEqual(true, bag.Contains("686868"));
 
-                bag = sr.FindRelation((ICollection)new[]
+                bag = sr.FindRelation((ICollection) new[]
                 {
                     "121212", "121255", "121268", "125512", "125555", "125568", "126812", "126855", "126868", "551212",
                     "551255", "551268", "555512", "555555", "555568", "556812", "556855", "556868", "681212", "681255",
@@ -967,7 +980,7 @@ namespace DynamicParserTest
                 Assert.AreEqual(true, bag.Contains("686855"));
                 Assert.AreEqual(true, bag.Contains("686868"));
 
-                bag = sr.FindRelation((IList<string>)new[]
+                bag = sr.FindRelation((IList<string>) new[]
                 {
                     "121212", "121255", "121268", "125512", "125555", "125568", "126812", "126855", "126868", "551212",
                     "551255", "551268", "555512", "555555", "555568", "556812", "556855", "556868", "681212", "681255",
@@ -1010,7 +1023,7 @@ namespace DynamicParserTest
         {
             SearchResults sr = new SearchResults(1, 1, 1, 1)
             {
-                [0, 0] = new ProcPerc { Procs = new[] { new Processor(new[] { SignValue.MaxValue }, "Tag") } }
+                [0, 0] = new ProcPerc {Procs = new[] {new Processor(new[] {SignValue.MaxValue}, "Tag")}}
             };
             {
                 ConcurrentBag<string> bag = sr.FindRelation(0, 3, "tag");
@@ -1019,31 +1032,31 @@ namespace DynamicParserTest
                 Assert.AreEqual("tag", bag.ElementAt(0));
             }
             {
-                ConcurrentBag<string> bag = sr.FindRelation((ICollection)new[] { "tag" }, 0, 3);
+                ConcurrentBag<string> bag = sr.FindRelation((ICollection) new[] {"tag"}, 0, 3);
                 Assert.AreNotEqual(null, bag);
                 Assert.AreEqual(1, bag.Count);
                 Assert.AreEqual("tag", bag.ElementAt(0));
             }
             {
-                ConcurrentBag<string> bag = sr.FindRelation((IList<string>)new[] { "tag" }, 0, 3);
+                ConcurrentBag<string> bag = sr.FindRelation((IList<string>) new[] {"tag"}, 0, 3);
                 Assert.AreNotEqual(null, bag);
                 Assert.AreEqual(1, bag.Count);
                 Assert.AreEqual("tag", bag.ElementAt(0));
             }
             {
-                ConcurrentBag<string> bag = sr.FindRelation((IList<string>)new[] { "Tag" });
+                ConcurrentBag<string> bag = sr.FindRelation((IList<string>) new[] {"Tag"});
                 Assert.AreEqual(null, bag);
             }
             {
-                ConcurrentBag<string> bag = sr.FindRelation((IList<string>)new[] { string.Empty });
+                ConcurrentBag<string> bag = sr.FindRelation((IList<string>) new[] {string.Empty});
                 Assert.AreEqual(null, bag);
             }
             {
-                ConcurrentBag<string> bag = sr.FindRelation((IList<string>)new[] { (string)null });
+                ConcurrentBag<string> bag = sr.FindRelation((IList<string>) new[] {(string) null});
                 Assert.AreEqual(null, bag);
             }
             {
-                ConcurrentBag<string> bag = sr.FindRelation((IList<string>)new[] { null, "Tag" }, 0, 3);
+                ConcurrentBag<string> bag = sr.FindRelation((IList<string>) new[] {null, "Tag"}, 0, 3);
                 Assert.AreNotEqual(null, bag);
                 Assert.AreEqual(1, bag.Count);
                 Assert.AreEqual("Tag", bag.ElementAt(0));
@@ -1068,31 +1081,31 @@ namespace DynamicParserTest
 
             SearchResults sr = new SearchResults(10, 15, 5, 6)
             {
-                [0, 0] = new ProcPerc { Percent = 1.4800 },
-                [1, 0] = new ProcPerc { Percent = 1.4709 },
-                [2, 0] = new ProcPerc { Percent = 2.4 },
-                [3, 0] = new ProcPerc { Percent = 3.4 },
-                [4, 0] = new ProcPerc { Percent = 4.4, Procs = new Processor[0] },
-                [0, 1] = new ProcPerc { Percent = 1.5 },
-                [1, 1] = new ProcPerc { Percent = 1.6 },
-                [2, 1] = new ProcPerc { Percent = 7.4 },
-                [3, 1] = new ProcPerc { Percent = 8.4 },
-                [4, 1] = new ProcPerc { Percent = 9.4 },
-                [0, 2] = new ProcPerc { Percent = 10.4 },
-                [1, 2] = new ProcPerc { Percent = 11.4 },
-                [2, 2] = new ProcPerc { Percent = 12.4 },
-                [3, 2] = new ProcPerc { Percent = 13.4 },
-                [4, 2] = new ProcPerc { Percent = 14.4 },
-                [0, 3] = new ProcPerc { Percent = 15.4 },
-                [1, 3] = new ProcPerc { Percent = 16.4 },
-                [2, 3] = new ProcPerc { Percent = 17.4 },
-                [3, 3] = new ProcPerc { Percent = 18.4, Procs = new Processor[0] },
-                [4, 3] = new ProcPerc { Percent = 18.4 },
-                [0, 4] = new ProcPerc { Percent = 19.4 },
-                [1, 4] = new ProcPerc { Percent = 20.4 },
-                [2, 4] = new ProcPerc { Percent = 21.4 },
-                [3, 4] = new ProcPerc { Percent = 22.4 },
-                [4, 4] = new ProcPerc { Percent = 23.4 }
+                [0, 0] = new ProcPerc {Percent = 1.4800},
+                [1, 0] = new ProcPerc {Percent = 1.4709},
+                [2, 0] = new ProcPerc {Percent = 2.4},
+                [3, 0] = new ProcPerc {Percent = 3.4},
+                [4, 0] = new ProcPerc {Percent = 4.4, Procs = new Processor[0]},
+                [0, 1] = new ProcPerc {Percent = 1.5},
+                [1, 1] = new ProcPerc {Percent = 1.6},
+                [2, 1] = new ProcPerc {Percent = 7.4},
+                [3, 1] = new ProcPerc {Percent = 8.4},
+                [4, 1] = new ProcPerc {Percent = 9.4},
+                [0, 2] = new ProcPerc {Percent = 10.4},
+                [1, 2] = new ProcPerc {Percent = 11.4},
+                [2, 2] = new ProcPerc {Percent = 12.4},
+                [3, 2] = new ProcPerc {Percent = 13.4},
+                [4, 2] = new ProcPerc {Percent = 14.4},
+                [0, 3] = new ProcPerc {Percent = 15.4},
+                [1, 3] = new ProcPerc {Percent = 16.4},
+                [2, 3] = new ProcPerc {Percent = 17.4},
+                [3, 3] = new ProcPerc {Percent = 18.4, Procs = new Processor[0]},
+                [4, 3] = new ProcPerc {Percent = 18.4},
+                [0, 4] = new ProcPerc {Percent = 19.4},
+                [1, 4] = new ProcPerc {Percent = 20.4},
+                [2, 4] = new ProcPerc {Percent = 21.4},
+                [3, 4] = new ProcPerc {Percent = 22.4},
+                [4, 4] = new ProcPerc {Percent = 23.4}
             };
 
             Assert.AreEqual(10, sr.Width);

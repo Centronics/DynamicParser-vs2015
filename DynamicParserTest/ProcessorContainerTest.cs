@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DynamicParser;
 using DynamicProcessor;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Processor = DynamicParser.Processor;
 
 namespace DynamicParserTest
@@ -14,10 +14,10 @@ namespace DynamicParserTest
         public void ProcessorContainerConsTest()
         {
             ProcessorContainer pc = new ProcessorContainer(
-                new Processor(new[] { new SignValue(1), SignValue.MaxValue }, "Одномерный1"),
-                new Processor(new[] { new SignValue(2), SignValue.MinValue }, "Одномерный2"),
-                null, //                                                       Одномерный3
-                new Processor(new[] { new SignValue(3), SignValue.MaxValue }, "Одномерный4"));
+                new Processor(new[] {new SignValue(1), SignValue.MaxValue}, "Одномерный1"),
+                new Processor(new[] {new SignValue(2), SignValue.MinValue}, "Одномерный2"),
+                null, //                                                     Одномерный3
+                new Processor(new[] {new SignValue(3), SignValue.MaxValue}, "Одномерный4"));
             Assert.AreEqual(3, pc.Count);
             Assert.AreEqual(2, pc.Width);
             Assert.AreEqual(1, pc.Height);
@@ -29,11 +29,13 @@ namespace DynamicParserTest
         [TestMethod]
         public void ProcessorContainerConsTest1()
         {
-            ProcessorContainer pc = new ProcessorContainer(new List<Processor> {
-                new Processor(new[] { new SignValue(1), SignValue.MaxValue }, "Одномерный1"),
-                new Processor(new[] { new SignValue(2), SignValue.MinValue }, "Одномерный2"),
-                null, //                                                       Одномерный3
-                new Processor(new[] { new SignValue(3), SignValue.MaxValue }, "Одномерный4")});
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor>
+            {
+                new Processor(new[] {new SignValue(1), SignValue.MaxValue}, "Одномерный1"),
+                new Processor(new[] {new SignValue(2), SignValue.MinValue}, "Одномерный2"),
+                null, //                                                     Одномерный3
+                new Processor(new[] {new SignValue(3), SignValue.MaxValue}, "Одномерный4")
+            });
             Assert.AreEqual(3, pc.Count);
             Assert.AreEqual(2, pc.Width);
             Assert.AreEqual(1, pc.Height);
@@ -45,10 +47,22 @@ namespace DynamicParserTest
         [TestMethod]
         public void ProcessorContainerAddRange1Test()
         {
-            Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
+            Processor proc1 =
+                new Processor(
+                    new[]
+                    {
+                        new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20)
+                    }, "Одномерный1");
             ProcessorContainer pc = new ProcessorContainer(proc1);
-            Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25), new SignValue(98) }, "Одномерный2");
-            Processor proc3 = new Processor(new[] { SignValue.MaxValue, new SignValue(18), new SignValue(200), new SignValue(30) }, "Одномерный3");
+            Processor proc2 =
+                new Processor(
+                    new[]
+                    {
+                        SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25), new SignValue(98)
+                    }, "Одномерный2");
+            Processor proc3 =
+                new Processor(new[] {SignValue.MaxValue, new SignValue(18), new SignValue(200), new SignValue(30)},
+                    "Одномерный3");
             bool res = false;
             try
             {
@@ -68,10 +82,25 @@ namespace DynamicParserTest
         [TestMethod]
         public void ProcessorContainerAddRange2Test()
         {
-            Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
+            Processor proc1 =
+                new Processor(
+                    new[]
+                    {
+                        new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20)
+                    }, "Одномерный1");
             ProcessorContainer pc = new ProcessorContainer(proc1);
-            Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25), new SignValue(98) }, "Одномерный2");
-            Processor proc3 = new Processor(new[] { SignValue.MaxValue, new SignValue(18), new SignValue(200), new SignValue(30), new SignValue(99) }, "Одномерный3");
+            Processor proc2 =
+                new Processor(
+                    new[]
+                    {
+                        SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25), new SignValue(98)
+                    }, "Одномерный2");
+            Processor proc3 =
+                new Processor(
+                    new[]
+                    {
+                        SignValue.MaxValue, new SignValue(18), new SignValue(200), new SignValue(30), new SignValue(99)
+                    }, "Одномерный3");
             pc.AddRange(proc2, null, proc3);
             Assert.AreEqual(3, pc.Count);
             Assert.AreEqual("Одномерный1", pc[0].Tag);
@@ -84,9 +113,16 @@ namespace DynamicParserTest
         [TestMethod]
         public void ProcessorContainerAddRange3Test()
         {
-            Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
+            Processor proc1 =
+                new Processor(
+                    new[]
+                    {
+                        new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20)
+                    }, "Одномерный1");
             ProcessorContainer pc = new ProcessorContainer(proc1);
-            Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25) }, "Одномерный2");
+            Processor proc2 =
+                new Processor(new[] {SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25)},
+                    "Одномерный2");
             int res = 0;
             try
             {
@@ -114,11 +150,26 @@ namespace DynamicParserTest
         [TestMethod]
         public void ProcessorContainerAddRange4Test()
         {
-            Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
+            Processor proc1 =
+                new Processor(
+                    new[]
+                    {
+                        new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20)
+                    }, "Одномерный1");
             ProcessorContainer pc = new ProcessorContainer(proc1);
-            Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25), new SignValue(98) }, "Одномерный2");
-            Processor proc3 = new Processor(new[] { SignValue.MaxValue, new SignValue(18), new SignValue(200), new SignValue(30), new SignValue(99) }, "Одномерный3");
-            IList<Processor> prcs = new[] { proc2, null, proc3 };
+            Processor proc2 =
+                new Processor(
+                    new[]
+                    {
+                        SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25), new SignValue(98)
+                    }, "Одномерный2");
+            Processor proc3 =
+                new Processor(
+                    new[]
+                    {
+                        SignValue.MaxValue, new SignValue(18), new SignValue(200), new SignValue(30), new SignValue(99)
+                    }, "Одномерный3");
+            IList<Processor> prcs = new[] {proc2, null, proc3};
             pc.AddRange(prcs);
             Assert.AreEqual(3, pc.Count);
             Assert.AreEqual("Одномерный1", pc[0].Tag);
@@ -132,8 +183,15 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx1Test()
         {
-            Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
-            Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25) }, "Одномерный2");
+            Processor proc1 =
+                new Processor(
+                    new[]
+                    {
+                        new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20)
+                    }, "Одномерный1");
+            Processor proc2 =
+                new Processor(new[] {SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25)},
+                    "Одномерный2");
             // ReSharper disable once UnusedVariable
             ProcessorContainer pc = new ProcessorContainer(proc1, proc2);
         }
@@ -149,7 +207,7 @@ namespace DynamicParserTest
         [TestMethod]
         public void ProcessorContainerEx3Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable");
             // ReSharper disable once UnusedVariable
             ProcessorContainer pc = new ProcessorContainer(null, p);
         }
@@ -197,7 +255,7 @@ namespace DynamicParserTest
             int count = 0;
             try
             {
-                IList<Processor> prcs = new[] { proc1, proc2, null, proc3 };
+                IList<Processor> prcs = new[] {proc1, proc2, null, proc3};
                 pc.AddRange(prcs);
             }
             catch (ArgumentException)
@@ -236,8 +294,8 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx5Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " Unusedvariable ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " Unusedvariable ");
             // ReSharper disable once UnusedVariable
             ProcessorContainer pc = new ProcessorContainer(null, p, p1);
         }
@@ -246,7 +304,7 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx6Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable");
             // ReSharper disable once UnusedVariable
             ProcessorContainer pc = new ProcessorContainer(p, p);
         }
@@ -255,8 +313,8 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx7Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(p, p1);
             pc.Add(p1);
         }
@@ -265,39 +323,39 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx8Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(p, p1);
-            pc.Add(new Processor(new[] { SignValue.MaxValue }, " unusedvAriable1 "));
+            pc.Add(new Processor(new[] {SignValue.MaxValue}, " unusedvAriable1 "));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx9Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(p, p1);
-            pc.AddRange(new Processor(new[] { SignValue.MaxValue }, " unusedvAriable1 "));
+            pc.AddRange(new Processor(new[] {SignValue.MaxValue}, " unusedvAriable1 "));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx10Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(null, p, p1);
-            pc.AddRange(new Processor(new[] { SignValue.MaxValue }, " unusedvAriable "),
-                new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 "));
+            pc.AddRange(new Processor(new[] {SignValue.MaxValue}, " unusedvAriable "),
+                new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 "));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx11Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(null, p, p1);
             Processor[] procs =
             {
@@ -311,8 +369,8 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx12Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(p, p1);
             IList<Processor> procs = new[]
             {
@@ -326,8 +384,8 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx13Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(p, p1);
             Processor[] procs =
             {
@@ -341,8 +399,8 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx14Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(p, p1);
             Processor[] procs =
             {
@@ -356,8 +414,8 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx15Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(p, p1);
             IList<Processor> procs = new[]
             {
@@ -371,8 +429,8 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx16Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " UnusedVariable1 ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " UnusedVariable1 ");
             ProcessorContainer pc = new ProcessorContainer(p, p1);
             IList<Processor> procs = new[]
             {
@@ -386,39 +444,53 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx17Test()
         {
-            Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
-            Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25) }, "Одномерный2");
+            Processor proc1 =
+                new Processor(
+                    new[]
+                    {
+                        new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20)
+                    }, "Одномерный1");
+            Processor proc2 =
+                new Processor(new[] {SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25)},
+                    "Одномерный2");
             // ReSharper disable once UnusedVariable
-            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { proc1, proc2 });
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> {proc1, proc2});
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx18Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable"),
-                p1 = new Processor(new[] { SignValue.MaxValue }, " Unusedvariable ");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable"),
+                p1 = new Processor(new[] {SignValue.MaxValue}, " Unusedvariable ");
             // ReSharper disable once UnusedVariable
-            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { null, p, p1 });
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> {null, p, p1});
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx19Test()
         {
-            Processor p = new Processor(new[] { SignValue.MaxValue }, "UnusedVariable");
+            Processor p = new Processor(new[] {SignValue.MaxValue}, "UnusedVariable");
             // ReSharper disable once UnusedVariable
-            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { p, p });
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> {p, p});
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorContainerEx20Test()
         {
-            Processor proc1 = new Processor(new[] { new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20) }, "Одномерный1");
-            Processor proc2 = new Processor(new[] { SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25) }, "Одномерный2");
+            Processor proc1 =
+                new Processor(
+                    new[]
+                    {
+                        new SignValue(70), SignValue.MaxValue, new SignValue(10), new SignValue(200), new SignValue(20)
+                    }, "Одномерный1");
+            Processor proc2 =
+                new Processor(new[] {SignValue.MaxValue, new SignValue(17), new SignValue(202), new SignValue(25)},
+                    "Одномерный2");
             // ReSharper disable once UnusedVariable
-            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { proc1, proc2 });
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> {proc1, proc2});
         }
 
         [TestMethod]
@@ -426,7 +498,7 @@ namespace DynamicParserTest
         public void ProcessorContainerEx21Test()
         {
             // ReSharper disable once UnusedVariable
-            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { null });
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> {null});
         }
 
         [TestMethod]
@@ -450,14 +522,14 @@ namespace DynamicParserTest
         public void ProcessorContainerEx24Test()
         {
             // ReSharper disable once UnusedVariable
-            ProcessorContainer pc = new ProcessorContainer(new Processor(new[] { SignValue.MaxValue }, "Tag"));
+            ProcessorContainer pc = new ProcessorContainer(new Processor(new[] {SignValue.MaxValue}, "Tag"));
             pc.Add(new Processor(new SignValue[1, 2], "Tag1"));
         }
 
         [TestMethod]
         public void ProcessorContainerInOneSizeTestNull()
         {
-            Assert.AreEqual(true, ProcessorContainer.InOneSize(new List<Processor> { null }));
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(new List<Processor> {null}));
         }
 
         [TestMethod]
@@ -528,19 +600,19 @@ namespace DynamicParserTest
             Processor proc2 = new Processor(pr2, "pr2");
             Processor proc3 = new Processor(pr3, "pr3");
 
-            Assert.AreEqual(false, ProcessorContainer.InOneSize(new[] { proc1, proc2, proc3 }));
-            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] { proc1, proc2 }));
-            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] { proc1, proc2 }));
+            Assert.AreEqual(false, ProcessorContainer.InOneSize(new[] {proc1, proc2, proc3}));
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] {proc1, proc2}));
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] {proc1, proc2}));
             Assert.AreEqual(true, ProcessorContainer.InOneSize(null));
-            Assert.AreEqual(false, ProcessorContainer.InOneSize(new[] { proc1, proc1, proc2, proc3 }));
-            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] { proc1 }));
-            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] { proc1 }));
-            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] { proc1 }));
+            Assert.AreEqual(false, ProcessorContainer.InOneSize(new[] {proc1, proc1, proc2, proc3}));
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] {proc1}));
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] {proc1}));
+            Assert.AreEqual(true, ProcessorContainer.InOneSize(new[] {proc1}));
 
-            Assert.AreEqual(false, ProcessorContainer.IsEquals(new[] { proc1, proc2 }));
-            Assert.AreEqual(true, ProcessorContainer.IsEquals(new[] { proc1, proc1 }));
+            Assert.AreEqual(false, ProcessorContainer.IsEquals(new[] {proc1, proc2}));
+            Assert.AreEqual(true, ProcessorContainer.IsEquals(new[] {proc1, proc1}));
             Assert.AreEqual(false, ProcessorContainer.IsEquals(null));
-            Assert.AreEqual(true, ProcessorContainer.IsEquals(new[] { proc3, proc2, proc3, proc2 }));
+            Assert.AreEqual(true, ProcessorContainer.IsEquals(new[] {proc3, proc2, proc3, proc2}));
         }
 
         [TestMethod]
@@ -594,15 +666,15 @@ namespace DynamicParserTest
             Assert.AreEqual(false, pc.ContainsTag(string.Empty));
 
             Assert.AreEqual(true, ProcessorContainer.InOneTag(null));
-            Assert.AreEqual(false, ProcessorContainer.InOneTag(new[] { proc1, proc1, proc2 }));
+            Assert.AreEqual(false, ProcessorContainer.InOneTag(new[] {proc1, proc1, proc2}));
             proc2 = new Processor(pr2, " pr1");
             Processor proc3 = new Processor(pr3, "pr3");
-            Assert.AreEqual(false, ProcessorContainer.InOneTag(new[] { proc1, proc2, proc3 }));
+            Assert.AreEqual(false, ProcessorContainer.InOneTag(new[] {proc1, proc2, proc3}));
             proc1 = new Processor(pr2, " pR1 ");
-            Assert.AreEqual(false, ProcessorContainer.InOneTag(new[] { proc1, proc2, proc3 }));
-            Assert.AreEqual(true, ProcessorContainer.InOneTag(new[] { proc1 }));
+            Assert.AreEqual(false, ProcessorContainer.InOneTag(new[] {proc1, proc2, proc3}));
+            Assert.AreEqual(true, ProcessorContainer.InOneTag(new[] {proc1}));
             proc2 = new Processor(pr2, " pt1");
-            Assert.AreEqual(true, ProcessorContainer.InOneTag(new[] { proc1, proc2, proc3 }));
+            Assert.AreEqual(true, ProcessorContainer.InOneTag(new[] {proc1, proc2, proc3}));
         }
     }
 }

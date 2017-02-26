@@ -314,7 +314,7 @@
         <member name="T:DynamicParser.Registered">
             <summary>
                 Представляет область, которая не пересекается ни с какой другой.
-                Хранит список наиболее соответствующих найденных карт.
+                Хранит наиболее соответствующую найденную карту.
             </summary>
         </member>
         <member name="P:DynamicParser.Registered.Region">

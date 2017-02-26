@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DynamicParser;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DynamicParserTest
 {
@@ -11,7 +11,7 @@ namespace DynamicParserTest
         public void WordSearchTest()
         {
             {
-                WordSearcher ws = new WordSearcher(new[] { "0", "0", "1", "0", "1", "2" });
+                WordSearcher ws = new WordSearcher(new[] {"0", "0", "1", "0", "1", "2"});
                 Assert.AreEqual(3, ws.Count);
                 Assert.AreEqual(true, ws.IsEqual("000"));
                 Assert.AreEqual(true, ws.IsEqual("001"));
@@ -48,7 +48,7 @@ namespace DynamicParserTest
             }
 
             {
-                WordSearcher ws = new WordSearcher(new[] { "00", "09", "rr", "rrR", "RR", "09", "f" });
+                WordSearcher ws = new WordSearcher(new[] {"00", "09", "rr", "rrR", "RR", "09", "f"});
                 Assert.AreEqual(5, ws.Count);
                 Assert.AreEqual(true, ws.IsEqual("00"));
                 Assert.AreEqual(false, ws.IsEqual("r9"));
@@ -68,14 +68,14 @@ namespace DynamicParserTest
             }
 
             {
-                WordSearcher ws = new WordSearcher(new[] { "0", "0", "1", "0", "1", "2" });
+                WordSearcher ws = new WordSearcher(new[] {"0", "0", "1", "0", "1", "2"});
                 Assert.AreEqual(3, ws.Count);
                 Assert.AreEqual(false, ws.IsEqual(string.Empty));
                 Assert.AreEqual(false, ws.IsEqual(null));
             }
 
             {
-                WordSearcher ws = new WordSearcher(new[] { string.Empty, null, string.Empty, null });
+                WordSearcher ws = new WordSearcher(new[] {string.Empty, null, string.Empty, null});
                 Assert.AreEqual(0, ws.Count);
                 Assert.AreEqual(false, ws.IsEqual(string.Empty));
                 Assert.AreEqual(false, ws.IsEqual(null));

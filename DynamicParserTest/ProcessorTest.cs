@@ -17,7 +17,7 @@ namespace DynamicParserTest
         [TestMethod]
         public void ProcessorTestGetName()
         {
-            Processor proc = new Processor(new[] { SignValue.MaxValue }, "123456789");
+            Processor proc = new Processor(new[] {SignValue.MaxValue}, "123456789");
             Assert.AreEqual("567", proc.GetProcessorName(4, 3));
             Assert.AreEqual(null, proc.GetProcessorName(4, 19));
             Assert.AreEqual(null, proc.GetProcessorName(-1, 1));
@@ -45,7 +45,7 @@ namespace DynamicParserTest
             using (MemoryStream ms = new MemoryStream())
             {
                 {
-                    Processor pr = new Processor(new[] { SignValue.MaxValue }, "Tag");
+                    Processor pr = new Processor(new[] {SignValue.MaxValue}, "Tag");
                     pr.Serialize(ms);
                     Assert.AreEqual("Tag", pr.Tag);
                     Assert.AreEqual("Tag", pr.ToString());
@@ -283,7 +283,7 @@ namespace DynamicParserTest
         public void ProcessorGetEqualTestEx11()
         {
             SignValue[,] svs1 = new SignValue[2, 1];
-            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { new Processor(svs1, "k") });
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> {new Processor(svs1, "k")});
             SignValue[,] svs = new SignValue[1, 1];
             Processor pr = new Processor(svs, "Tag");
             pr.GetEqual(pc);
@@ -294,7 +294,7 @@ namespace DynamicParserTest
         public void ProcessorGetEqualTestEx12()
         {
             SignValue[,] svs1 = new SignValue[1, 2];
-            ProcessorContainer pc = new ProcessorContainer(new List<Processor> { new Processor(svs1, "k") });
+            ProcessorContainer pc = new ProcessorContainer(new List<Processor> {new Processor(svs1, "k")});
             SignValue[,] svs = new SignValue[1, 1];
             Processor pr = new Processor(svs, "Tag");
             pr.GetEqual(pc);
@@ -305,7 +305,7 @@ namespace DynamicParserTest
         public void ProcessorGetEqualTestEx13()
         {
             Processor pr = new Processor(new SignValue[1, 1], "Tag");
-            pr.GetEqual((ProcessorContainer)null);
+            pr.GetEqual((ProcessorContainer) null);
         }
 
         [TestMethod]
@@ -385,7 +385,7 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentException))]
         public void ProcessorCtorTestEx21()
         {
-            Processor pr = new Processor(new[] { SignValue.MaxValue }, "Tag");
+            Processor pr = new Processor(new[] {SignValue.MaxValue}, "Tag");
             pr.GetEqual(new List<ProcessorContainer>());
         }
 
@@ -393,8 +393,8 @@ namespace DynamicParserTest
         [ExpectedException(typeof(ArgumentNullException))]
         public void ProcessorCtorTestEx22()
         {
-            Processor pr = new Processor(new[] { SignValue.MaxValue }, "Tag");
-            pr.GetEqual((IList<ProcessorContainer>)null);
+            Processor pr = new Processor(new[] {SignValue.MaxValue}, "Tag");
+            pr.GetEqual((IList<ProcessorContainer>) null);
         }
 
         [TestMethod]
@@ -452,7 +452,9 @@ namespace DynamicParserTest
             btm2.SetPixel(0, 1, Color.Aquamarine);
             btm2.SetPixel(1, 1, Color.DarkSeaGreen);
 
-            Processor proc = new Processor(btm, "Main"), prt1 = new Processor(btm1, "1"), prt2 = new Processor(btm2, "2");
+            Processor proc = new Processor(btm, "Main"),
+                prt1 = new Processor(btm1, "1"),
+                prt2 = new Processor(btm2, "2");
             for (int i = 0; i < 50000; i++)
             {
                 SearchResults sr1 = proc.GetEqual(prt1, prt2);
@@ -694,24 +696,24 @@ namespace DynamicParserTest
                 Assert.AreEqual(srp3.Length, srp4.Length);
 
                 for (int y = 0; y < proc.Height; y++)
-                    for (int x = 0; x < proc.Width; x++)
+                for (int x = 0; x < proc.Width; x++)
+                {
+                    Assert.AreEqual(sr1[x, y].Percent, sr2[x, y].Percent);
+                    for (int k = 0; k < srp3.Length; k++)
+                        Assert.AreEqual(srp3[k][x, y].Percent, srp4[k][x, y].Percent);
+                    for (int k = 0; k < (sr1[x, y].Procs?.Length ?? 0); k++)
+                        Assert.AreEqual(sr1[x, y].Procs?[k].Tag, sr2[x, y].Procs?[k].Tag);
+                    if (x > 3 || y > 3)
+                        break;
+                    for (int j = 0; j < srp3.Length; j++)
                     {
-                        Assert.AreEqual(sr1[x, y].Percent, sr2[x, y].Percent);
-                        for (int k = 0; k < srp3.Length; k++)
-                            Assert.AreEqual(srp3[k][x, y].Percent, srp4[k][x, y].Percent);
-                        for (int k = 0; k < (sr1[x, y].Procs?.Length ?? 0); k++)
-                            Assert.AreEqual(sr1[x, y].Procs?[k].Tag, sr2[x, y].Procs?[k].Tag);
-                        if (x > 3 || y > 3)
-                            break;
-                        for (int j = 0; j < srp3.Length; j++)
-                        {
-                            Assert.AreNotEqual(null, srp3[j][x, y].Procs);
-                            Assert.AreNotEqual(null, srp4[j][x, y].Procs);
-                            Assert.AreEqual(srp3[j][x, y].Procs.Length, srp4[j][x, y].Procs.Length);
-                            for (int k = 0; k < srp3[j][x, y].Procs.Length; k++)
-                                Assert.AreEqual(srp3[j][x, y].Procs?[k].Tag, srp4[j][x, y].Procs?[k].Tag);
-                        }
+                        Assert.AreNotEqual(null, srp3[j][x, y].Procs);
+                        Assert.AreNotEqual(null, srp4[j][x, y].Procs);
+                        Assert.AreEqual(srp3[j][x, y].Procs.Length, srp4[j][x, y].Procs.Length);
+                        for (int k = 0; k < srp3[j][x, y].Procs.Length; k++)
+                            Assert.AreEqual(srp3[j][x, y].Procs?[k].Tag, srp4[j][x, y].Procs?[k].Tag);
                     }
+                }
 
                 {
                     Rectangle rect1 = new Rectangle(0, 0, 2, 2);
@@ -792,12 +794,12 @@ namespace DynamicParserTest
                     Assert.AreEqual(1, sr3[4, 4].Percent);
 
                     for (int y = 0; y < sr3.Height; y++)
-                        for (int x = 0; x < sr3.Width; x++)
-                        {
-                            Assert.AreNotEqual(null, sr3[x, y].Procs);
-                            Assert.AreEqual(1, sr3[x, y].Procs.Length);
-                            Assert.AreSame(pr3, sr3[x, y].Procs[0]);
-                        }
+                    for (int x = 0; x < sr3.Width; x++)
+                    {
+                        Assert.AreNotEqual(null, sr3[x, y].Procs);
+                        Assert.AreEqual(1, sr3[x, y].Procs.Length);
+                        Assert.AreSame(pr3, sr3[x, y].Procs[0]);
+                    }
                 }
             }
         }
@@ -819,7 +821,7 @@ namespace DynamicParserTest
             mas1[1, 0] = new SignValue(Color.Chocolate);
             mas1[0, 1] = new SignValue(Color.Aquamarine);
             mas1[1, 1] = new SignValue(Color.DarkSeaGreen);
-            SignValue[] mas2 = { new SignValue(Color.Red), SignValue.MaxValue };
+            SignValue[] mas2 = {new SignValue(Color.Red), SignValue.MaxValue};
 
             Processor procb1 = new Processor(btm1, "b1");
             Processor procb2 = new Processor(btm2, "b2");
@@ -831,15 +833,19 @@ namespace DynamicParserTest
             Assert.AreEqual(procb1[0, 1], procm1[0, 1]);
             Assert.AreEqual(procb1[1, 1], procm1[1, 1]);
 
-            Assert.AreEqual(procb1[0, 0].ValueColor, Color.FromArgb(Color.IndianRed.ToArgb() | unchecked((int)0xFF000000)));
-            Assert.AreEqual(procb1[0, 1].ValueColor, Color.FromArgb(Color.Aquamarine.ToArgb() | unchecked((int)0xFF000000)));
-            Assert.AreEqual(procb1[1, 0].ValueColor, Color.FromArgb(Color.Chocolate.ToArgb() | unchecked((int)0xFF000000)));
-            Assert.AreEqual(procb1[1, 1].ValueColor, Color.FromArgb(Color.DarkSeaGreen.ToArgb() | unchecked((int)0xFF000000)));
+            Assert.AreEqual(procb1[0, 0].ValueColor,
+                Color.FromArgb(Color.IndianRed.ToArgb() | unchecked((int) 0xFF000000)));
+            Assert.AreEqual(procb1[0, 1].ValueColor,
+                Color.FromArgb(Color.Aquamarine.ToArgb() | unchecked((int) 0xFF000000)));
+            Assert.AreEqual(procb1[1, 0].ValueColor,
+                Color.FromArgb(Color.Chocolate.ToArgb() | unchecked((int) 0xFF000000)));
+            Assert.AreEqual(procb1[1, 1].ValueColor,
+                Color.FromArgb(Color.DarkSeaGreen.ToArgb() | unchecked((int) 0xFF000000)));
 
             Assert.AreEqual(procb2[0, 0], procm2[0, 0]);
             Assert.AreEqual(procb2[1, 0], procm2[1, 0]);
 
-            Assert.AreEqual(procb2[0, 0].ValueColor, Color.FromArgb(Color.Red.ToArgb() | unchecked((int)0xFF000000)));
+            Assert.AreEqual(procb2[0, 0].ValueColor, Color.FromArgb(Color.Red.ToArgb() | unchecked((int) 0xFF000000)));
             Assert.AreEqual(procb2[1, 0].ValueColor, SignValue.MaxValue.ValueColor);
         }
 
@@ -848,7 +854,7 @@ namespace DynamicParserTest
         public void ProcessorContainerEx1Test()
         {
             // ReSharper disable once ObjectCreationAsStatement
-            new Processor((Bitmap)null, "f");
+            new Processor((Bitmap) null, "f");
         }
 
         [TestMethod]
@@ -856,7 +862,7 @@ namespace DynamicParserTest
         public void ProcessorContainerEx2Test()
         {
             // ReSharper disable once ObjectCreationAsStatement
-            new Processor((SignValue[,])null, "f");
+            new Processor((SignValue[,]) null, "f");
         }
 
         [TestMethod]
@@ -864,7 +870,7 @@ namespace DynamicParserTest
         public void ProcessorContainerEx3Test()
         {
             // ReSharper disable once ObjectCreationAsStatement
-            new Processor((SignValue[])null, "f");
+            new Processor((SignValue[]) null, "f");
         }
 
         [TestMethod]

@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DynamicParser;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DynamicParserTest
 {

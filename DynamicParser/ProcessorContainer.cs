@@ -5,7 +5,7 @@ using System.Linq;
 namespace DynamicParser
 {
     /// <summary>
-    /// Содержит массив карт для поиска. Проверяет их на то, чтобы все они были одинакового размера.
+    /// Содержит массив карт для поиска. Проверяет их, чтобы все они были одинакового размера.
     /// </summary>
     public sealed class ProcessorContainer
     {
@@ -73,6 +73,7 @@ namespace DynamicParser
         /// Выдаёт исключения в случае обнаружения каких-либо ошибок.
         /// </summary>
         /// <param name="processors">Добавляемые карты.</param>
+        /// <returns>Возвращает первый процессор в коллекции, который не равен null или null, если таких процессоров в коллекции нет.</returns>
         Processor ArgumentAssertions(IList<Processor> processors)
         {
             if (processors == null)
@@ -132,7 +133,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Проверяет, присутствуют ли одинаковые ссылки на объекты.
+        /// Проверяет, присутствуют ли одинаковые ссылки на объекты карт.
         /// </summary>
         /// <param name="processors">Проверяемый массив.</param>
         /// <returns>В случае, когда обнаружены совпадающе ссылки, возвращает true, иначе false.</returns>
@@ -162,10 +163,9 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Проверяет, все ли указанные карты одного размера, также она проверяет присутствие ссылок на один и тот же объект.
-        /// Если они будут обнаружены, функция породит исключение ArgumentException.
+        /// Проверяет, являются ли все указанные карты, картами одного размера.
         /// </summary>
-        /// <param name="processors">Список карт, с которыми идёт сопоставление.</param>
+        /// <param name="processors">Список проверяемых карт.</param>
         /// <returns>Возвращает true в случае, если все ли указанные карты одного размера, в противном случае false.</returns>
         public static bool InOneSize(IList<Processor> processors)
         {
@@ -195,19 +195,19 @@ namespace DynamicParser
         /// Проверяет, все ли элементы коллекции равны null или отсутствуют.
         /// </summary>
         /// <param name="collection">Проверяемая коллекция.</param>
-        /// <returns>Возвращает true в случае, если все элементы коллекции равны null или отсутствуют.</returns>
+        /// <returns>Возвращает значение true в случае, если все элементы коллекции равны null или отсутствуют, в противном случае - false.</returns>
         static bool IsNull(ICollection<Processor> collection)
         {
             if (collection == null)
-                throw new ArgumentNullException(nameof(collection), $"{nameof(IsNull)}: Проверяемая коллекция не может быть равна null.");
+                throw new ArgumentNullException(nameof(collection), $"{nameof(IsNull)}: Проверяемая коллекция равна null.");
             return collection.Count <= 0 || collection.All(pr => pr == null);
         }
 
         /// <summary>
-        /// Проверяет присутствие карт с одинаковыми свойствами <see cref="Processor.Tag"/> в указанном списке.
+        /// Проверяет присутствие карт с одинаковыми значениями свойства <see cref="Processor.Tag"/> в указанном списке.
         /// </summary>
         /// <param name="tags">Проверяемый список.</param>
-        /// <returns>Возвращает true в случае, когда повторяющиеся значения не встречались, в противном случае false.</returns>
+        /// <returns>Возвращает true в случае, когда повторяющиеся значения отсутствуют, в противном случае false.</returns>
         public static bool InOneTag(ICollection<Processor> tags)
         {
             if (tags == null || tags.Count <= 1)
@@ -231,7 +231,7 @@ namespace DynamicParser
         }
 
         /// <summary>
-        /// Определяет, существует ли в текущем списке карта с таким же тегом или нет.
+        /// Определяет, существует ли в текущем списке карта с таким же значением свойства <see cref="Processor.Tag"/> или нет.
         /// </summary>
         /// <param name="tag">Искомый тег.</param>
         /// <returns>Возвращает true в случае, если карта найдена, в противном случае false.</returns>
@@ -250,14 +250,14 @@ namespace DynamicParser
         public static bool TagStringCompare(string tag, string cmp)
         {
             if (tag == null)
-                throw new ArgumentNullException(nameof(tag), $"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} не может быть равно null.");
+                throw new ArgumentNullException(nameof(tag), $"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно null.");
             if (tag == string.Empty)
-                throw new ArgumentException($"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} не может быть равно {nameof(string.Empty)}.",
+                throw new ArgumentException($"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно {nameof(string.Empty)}.",
                     nameof(tag));
             if (cmp == null)
-                throw new ArgumentNullException(nameof(cmp), $"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} не может быть равно null.");
+                throw new ArgumentNullException(nameof(cmp), $"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно null.");
             if (cmp == string.Empty)
-                throw new ArgumentException($"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} не может быть равно {nameof(string.Empty)}.",
+                throw new ArgumentException($"{nameof(TagStringCompare)}: Свойство {nameof(Processor.Tag)} равно {nameof(string.Empty)}.",
                     nameof(cmp));
             return string.Compare(tag.Trim(), cmp.Trim(), StringComparison.OrdinalIgnoreCase) == 0;
         }

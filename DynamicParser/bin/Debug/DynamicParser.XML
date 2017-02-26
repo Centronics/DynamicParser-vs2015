@@ -6,9 +6,8 @@
     <members>
         <member name="T:DynamicParser.Processor">
             <summary>
-            Процессор (одновременно являющийся картой), выполняющий поиск соответствующих указанных карт на рабочем поле.
-            Работает по принципу поисковика наиболее подходящей карты для каждого места на рабочем поле.
-            Поиск производится по всему полю.
+            Процессор (одновременно являющийся картой), выполняющий поиск указанных карт на рабочем поле.
+            Работает по принципу поисковика наиболее подходящей карты в каждой точке рабочего поля.
             </summary>
         </member>
         <member name="F:DynamicParser.Processor.DiffEqual">
@@ -18,7 +17,7 @@
         </member>
         <member name="F:DynamicParser.Processor._bitmap">
             <summary>
-            Рабочее поле, на котором производится поиск требумых данных.
+            Рабочее поле, на котором производится поиск указанных карт.
             </summary>
         </member>
         <member name="P:DynamicParser.Processor.Tag">
@@ -28,12 +27,12 @@
         </member>
         <member name="P:DynamicParser.Processor.Width">
             <summary>
-            Ширина.
+            Ширина текущего рабочего поля.
             </summary>
         </member>
         <member name="P:DynamicParser.Processor.Height">
             <summary>
-            Высота.
+            Высота текущего рабочего поля.
             </summary>
         </member>
         <member name="P:DynamicParser.Processor.Length">
@@ -48,11 +47,11 @@
         </member>
         <member name="P:DynamicParser.Processor.Item(System.Int32,System.Int32)">
             <summary>
-            Извлекает объект рабочего поля.
+            Получает объект рабочего поля.
             </summary>
-            <param name="x">Координата X.</param>
-            <param name="y">Координата Y.</param>
-            <returns>Возвращает запрашиваемый объект рабочего поля.</returns>
+            <param name="x">Координата X рабочего поля.</param>
+            <param name="y">Координата Y рабочего поля.</param>
+            <returns>Возвращает объект рабочего поля по указанным координатам.</returns>
         </member>
         <member name="P:DynamicParser.Processor.CurrentRegion">
             <summary>
@@ -137,26 +136,26 @@
             <summary>
             Находит соответствие между заданными картами и рабочей областью, производя поиск по ней.
             </summary>
-            <param name="processors">Все остальные карты. Может быть null.</param>
-            <returns>Возвращает SearchResults, содержащий поле с результатами поиска.</returns>
+            <param name="processors">Исследуемые карты.</param>
+            <returns>Возвращает <see cref="T:DynamicParser.SearchResults"/>, содержащий поле с результатами поиска.</returns>
         </member>
         <member name="M:DynamicParser.Processor.GetEqual(System.Collections.Generic.IList{DynamicParser.ProcessorContainer})">
             <summary>
             Находит соответствие между заданным массивом карт и рабочей областью в многопоточном режиме.
             </summary>
             <param name="processors">Массив искомых карт.</param>
-            <returns>Возвращает массив SearchResults, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
+            <returns>Возвращает массив <see cref="T:DynamicParser.SearchResults"/>, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
         </member>
         <member name="M:DynamicParser.Processor.GetEqual(DynamicParser.ProcessorContainer[])">
             <summary>
             Находит соответствие между заданным массивом карт и рабочей областью в многопоточном режиме.
             </summary>
             <param name="pc">Массив искомых карт.</param>
-            <returns>Возвращает массив SearchResults, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
+            <returns>Возвращает массив <see cref="T:DynamicParser.SearchResults"/>, в котором номер карты в исходном массиве соответствует её номеру в массиве результата.</returns>
         </member>
         <member name="M:DynamicParser.Processor.GetEqual(DynamicParser.ProcessorContainer)">
             <summary>
-            Производит поиск указанных карт на рабочей области и возвращает результат в виде класса SearchResults,
+            Производит поиск указанных карт на рабочей области и возвращает результат в виде класса <see cref="T:DynamicParser.SearchResults"/>,
             содержащего поле с результатами поиска.
             </summary>
             <param name="prc">Массив карт для поиска.</param>
@@ -164,7 +163,7 @@
         </member>
         <member name="T:DynamicParser.ProcessorContainer">
             <summary>
-            Содержит массив карт для поиска. Проверяет их на то, чтобы все они были одинакового размера.
+            Содержит массив карт для поиска. Проверяет их, чтобы все они были одинакового размера.
             </summary>
         </member>
         <member name="F:DynamicParser.ProcessorContainer._lstProcs">
@@ -217,6 +216,7 @@
             Выдаёт исключения в случае обнаружения каких-либо ошибок.
             </summary>
             <param name="processors">Добавляемые карты.</param>
+            <returns>Возвращает первый процессор в коллекции, который не равен null или null, если таких процессоров в коллекции нет.</returns>
         </member>
         <member name="M:DynamicParser.ProcessorContainer.Add(DynamicParser.Processor)">
             <summary>
@@ -238,17 +238,16 @@
         </member>
         <member name="M:DynamicParser.ProcessorContainer.IsEquals(System.Collections.Generic.IList{DynamicParser.Processor})">
             <summary>
-            Проверяет, присутствуют ли одинаковые ссылки на объекты.
+            Проверяет, присутствуют ли одинаковые ссылки на объекты карт.
             </summary>
             <param name="processors">Проверяемый массив.</param>
             <returns>В случае, когда обнаружены совпадающе ссылки, возвращает true, иначе false.</returns>
         </member>
         <member name="M:DynamicParser.ProcessorContainer.InOneSize(System.Collections.Generic.IList{DynamicParser.Processor})">
             <summary>
-            Проверяет, все ли указанные карты одного размера, также она проверяет присутствие ссылок на один и тот же объект.
-            Если они будут обнаружены, функция породит исключение ArgumentException.
+            Проверяет, являются ли все указанные карты, картами одного размера.
             </summary>
-            <param name="processors">Список карт, с которыми идёт сопоставление.</param>
+            <param name="processors">Список проверяемых карт.</param>
             <returns>Возвращает true в случае, если все ли указанные карты одного размера, в противном случае false.</returns>
         </member>
         <member name="M:DynamicParser.ProcessorContainer.FirstInArray(System.Collections.Generic.ICollection{DynamicParser.Processor})">
@@ -263,18 +262,18 @@
             Проверяет, все ли элементы коллекции равны null или отсутствуют.
             </summary>
             <param name="collection">Проверяемая коллекция.</param>
-            <returns>Возвращает true в случае, если все элементы коллекции равны null или отсутствуют.</returns>
+            <returns>Возвращает значение true в случае, если все элементы коллекции равны null или отсутствуют, в противном случае - false.</returns>
         </member>
         <member name="M:DynamicParser.ProcessorContainer.InOneTag(System.Collections.Generic.ICollection{DynamicParser.Processor})">
             <summary>
-            Проверяет присутствие карт с одинаковыми свойствами <see cref="P:DynamicParser.Processor.Tag"/> в указанном списке.
+            Проверяет присутствие карт с одинаковыми значениями свойства <see cref="P:DynamicParser.Processor.Tag"/> в указанном списке.
             </summary>
             <param name="tags">Проверяемый список.</param>
-            <returns>Возвращает true в случае, когда повторяющиеся значения не встречались, в противном случае false.</returns>
+            <returns>Возвращает true в случае, когда повторяющиеся значения отсутствуют, в противном случае false.</returns>
         </member>
         <member name="M:DynamicParser.ProcessorContainer.ContainsTag(System.String)">
             <summary>
-            Определяет, существует ли в текущем списке карта с таким же тегом или нет.
+            Определяет, существует ли в текущем списке карта с таким же значением свойства <see cref="P:DynamicParser.Processor.Tag"/> или нет.
             </summary>
             <param name="tag">Искомый тег.</param>
             <returns>Возвращает true в случае, если карта найдена, в противном случае false.</returns>

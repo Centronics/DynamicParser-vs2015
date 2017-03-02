@@ -1,0 +1,10 @@
+D:\разработки\DynamicParser\DynamicParserTest\bin\Release\DynamicParserTest.dll
+D:\разработки\DynamicParser\DynamicParserTest\bin\Release\DynamicParserTest.pdb
+D:\разработки\DynamicParser\DynamicParserTest\bin\Release\DynamicParser.dll
+D:\разработки\DynamicParser\DynamicParserTest\bin\Release\DynamicProcessor.dll
+D:\разработки\DynamicParser\DynamicParserTest\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+D:\разработки\DynamicParser\DynamicParserTest\bin\Release\DynamicParser.pdb
+D:\разработки\DynamicParser\DynamicParserTest\bin\Release\DynamicParser.xml
+D:\разработки\DynamicParser\DynamicParserTest\bin\Release\DynamicProcessor.xml
+D:\разработки\DynamicParser\DynamicParserTest\obj\Release\DynamicParserTest.dll
+D:\разработки\DynamicParser\DynamicParserTest\obj\Release\DynamicParserTest.pdb

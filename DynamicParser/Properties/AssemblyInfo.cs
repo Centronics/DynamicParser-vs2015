@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // связанные со сборкой.
 
 [assembly: AssemblyTitle("DynamicParser")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Библиотека преобразования данных.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("Home")]
 [assembly: AssemblyProduct("DynamicParser")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2016")]
+[assembly: AssemblyCopyright("Copyright © Microsoft 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

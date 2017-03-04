@@ -1,8 +1,0 @@
-D:\разработки\DynamicParser\DynamicParser\bin\Release\DynamicParser.XML
-D:\разработки\DynamicParser\DynamicParser\bin\Release\DynamicParser.dll
-D:\разработки\DynamicParser\DynamicParser\bin\Release\DynamicParser.pdb
-D:\разработки\DynamicParser\DynamicParser\bin\Release\DynamicProcessor.dll
-D:\разработки\DynamicParser\DynamicParser\bin\Release\DynamicProcessor.xml
-D:\разработки\DynamicParser\DynamicParser\obj\Release\DynamicParser.csprojResolveAssemblyReference.cache
-D:\разработки\DynamicParser\DynamicParser\obj\Release\DynamicParser.dll
-D:\разработки\DynamicParser\DynamicParser\obj\Release\DynamicParser.pdb

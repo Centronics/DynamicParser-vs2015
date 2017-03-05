@@ -319,8 +319,9 @@ namespace DynamicParser
             foreach (string str in GetWord(word, count))
             {
                 List<Reg> lstReg = FindSymbols(str, startIndex);
-                if (lstReg != null && lstReg.Count > 0)
-                    lst.AddRange(lstReg);
+                if (lstReg == null || lstReg.Count <= 0)
+                    return false;
+                lst.AddRange(lstReg);
             }
             return FindWord(lst, startIndex, word, count);
         }
